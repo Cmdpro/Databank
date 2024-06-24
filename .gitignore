@@ -14,7 +14,10 @@ out
 .idea
 
 # gradle
-build
+.gradle/
+build/
+out/
+classes/
 
 # other
 eclipse
