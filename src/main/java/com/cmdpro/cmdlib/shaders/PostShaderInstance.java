@@ -45,23 +45,26 @@ public abstract class PostShaderInstance {
             }
         }
         if (postChain != null) {
-            if (active) {
-                time += Minecraft.getInstance().getDeltaFrameTime() / 20.0;
-            }
             for (PostPass i : passes) {
                 i.getEffect().safeGetUniform("time").set(time);
                 i.getEffect().safeGetUniform("CameraPosition").set(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().toVector3f());
                 i.getEffect().safeGetUniform("ModelViewMat").set(RenderSystem.getModelViewMatrix());
-                i.getEffect().safeGetUniform("FOV").set(Minecraft.getInstance().gameRenderer.getFov(Minecraft.getInstance().gameRenderer.getMainCamera(), Minecraft.getInstance().getFrameTime(), true));
                 setUniforms(i);
             }
             beforeProcess();
             if (active) {
-                postChain.process(Minecraft.getInstance().getFrameTime());
-                GlStateManager._glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Minecraft.getInstance().getMainRenderTarget().frameBufferId);
+                time += Minecraft.getInstance().getDeltaFrameTime() / 20.0;
+                processPostChain();
                 afterProcess();
             }
         }
+    }
+    public void processPostChain() {
+        postChain.process(Minecraft.getInstance().getFrameTime());
+        GlStateManager._glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Minecraft.getInstance().getMainRenderTarget().frameBufferId);
+    }
+    public void tick() {
+
     }
     public void setUniforms(PostPass instance) {}
     public void beforeProcess() {}
