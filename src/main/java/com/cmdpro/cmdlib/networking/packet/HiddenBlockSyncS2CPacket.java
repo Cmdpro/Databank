@@ -1,45 +1,41 @@
 package com.cmdpro.cmdlib.networking.packet;
 
 import com.cmdpro.cmdlib.ClientCmdLibUtils;
+import com.cmdpro.cmdlib.CmdLib;
 import com.cmdpro.cmdlib.hiddenblocks.HiddenBlock;
 import com.cmdpro.cmdlib.hiddenblocks.HiddenBlocksManager;
 import com.cmdpro.cmdlib.hiddenblocks.HiddenBlocksSerializer;
+import com.cmdpro.cmdlib.networking.Message;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class HiddenBlockSyncS2CPacket {
-    private final Map<ResourceLocation, HiddenBlock> blocks;
+public record HiddenBlockSyncS2CPacket(Map<ResourceLocation, HiddenBlock> blocks) implements Message {
 
-    public HiddenBlockSyncS2CPacket(Map<ResourceLocation, HiddenBlock> blocks) {
-        this.blocks = blocks;
+    public static HiddenBlockSyncS2CPacket read(FriendlyByteBuf buf) {
+        Map<ResourceLocation, HiddenBlock> blocks = buf.readMap(FriendlyByteBuf::readResourceLocation, HiddenBlocksSerializer::fromNetwork);
+        return new HiddenBlockSyncS2CPacket(blocks);
     }
-
-    public HiddenBlockSyncS2CPacket(FriendlyByteBuf buf) {
-        this.blocks = buf.readMap(FriendlyByteBuf::readResourceLocation, HiddenBlocksSerializer::fromNetwork);
-    }
-
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeMap(blocks, FriendlyByteBuf::writeResourceLocation, HiddenBlocksSerializer::toNetwork);
     }
-
-    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            ClientPacketHandler.handlePacket(this, supplier);
-        });
-        return true;
+    public static final ResourceLocation ID = new ResourceLocation(CmdLib.MOD_ID, "hidden_block_sync");
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
-    public static class ClientPacketHandler {
-        public static void handlePacket(HiddenBlockSyncS2CPacket msg, Supplier<NetworkEvent.Context> supplier) {
-            HiddenBlocksManager.blocks.clear();
-            for (Map.Entry<ResourceLocation, HiddenBlock> i : msg.blocks.entrySet()) {
-                HiddenBlocksManager.blocks.put(i.getKey(), i.getValue());
-            }
-            ClientCmdLibUtils.updateWorld();
+
+    @Override
+    public void handleClient(Minecraft minecraft, Player player) {
+        HiddenBlocksManager.blocks.clear();
+        for (Map.Entry<ResourceLocation, HiddenBlock> i : blocks.entrySet()) {
+            HiddenBlocksManager.blocks.put(i.getKey(), i.getValue());
         }
+        ClientCmdLibUtils.updateWorld();
     }
 }

@@ -2,53 +2,61 @@ package com.cmdpro.cmdlib.networking;
 
 import com.cmdpro.cmdlib.CmdLib;
 import com.cmdpro.cmdlib.networking.packet.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
+@Mod.EventBusSubscriber(modid = CmdLib.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModMessages {
-
-    private static SimpleChannel INSTANCE;
-
-    private static int packetId = 0;
-    private static int id() {
-        return packetId++;
+    public class Handler {
+        public static <T extends CustomPacketPayload> void handle(T message, IPayloadContext ctx) {
+            if (message instanceof Message msg) {
+                if (ctx.flow().getReceptionSide() == LogicalSide.SERVER) {
+                    ctx.workHandler().submitAsync(() -> {
+                        Server.handle(msg, ctx);
+                    });
+                } else {
+                    ctx.workHandler().submitAsync(() -> {
+                        Client.handle(msg, ctx);
+                    });
+                }
+            }
+        }
+        public class Client {
+            public static <T extends Message> void handle(T message, IPayloadContext ctx) {
+                message.handleClient(Minecraft.getInstance(), Minecraft.getInstance().player);
+            }
+        }
+        public class Server {
+            public static <T extends Message> void handle(T message, IPayloadContext ctx) {
+                message.handleServer(ctx.level().get().getServer(), (ServerPlayer)ctx.player().get());
+            }
+        }
     }
-    public static void register() {
-        SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(CmdLib.MOD_ID, "messages"))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .simpleChannel();
+    @SubscribeEvent
+    public static void register(RegisterPayloadHandlerEvent event) {
+        IPayloadRegistrar registrar = event.registrar(CmdLib.MOD_ID)
+                .versioned("1.0");
 
-        INSTANCE = net;
-
-        net.messageBuilder(HiddenBlockSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(HiddenBlockSyncS2CPacket::new)
-                .encoder(HiddenBlockSyncS2CPacket::toBytes)
-                .consumerMainThread(HiddenBlockSyncS2CPacket::handle)
-                .add();
-        net.messageBuilder(UnlockedHiddenBlocksSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(UnlockedHiddenBlocksSyncS2CPacket::new)
-                .encoder(UnlockedHiddenBlocksSyncS2CPacket::toBytes)
-                .consumerMainThread(UnlockedHiddenBlocksSyncS2CPacket::handle)
-                .add();
-        net.messageBuilder(UnlockHiddenBlockSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(UnlockHiddenBlockSyncS2CPacket::new)
-                .encoder(UnlockHiddenBlockSyncS2CPacket::toBytes)
-                .consumerMainThread(UnlockHiddenBlockSyncS2CPacket::handle)
-                .add();
-
+        //S2C
+        registrar.play(UnlockedHiddenBlocksSyncS2CPacket.ID, UnlockedHiddenBlocksSyncS2CPacket::read, Handler::handle);
+        registrar.play(UnlockHiddenBlockSyncS2CPacket.ID, UnlockHiddenBlockSyncS2CPacket::read, Handler::handle);
+        //S2C Config
+        registrar.configuration(HiddenBlockSyncS2CPacket.ID, HiddenBlockSyncS2CPacket::read, Handler::handle);
     }
-    public static <MSG> void sendToServer(MSG message) {
-        INSTANCE.sendToServer(message);
+    public static <T extends Message> void sendToServer(T message) {
+        PacketDistributor.SERVER.noArg().send(message);
     }
 
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+    public static <T extends Message> void sendToPlayer(T message, ServerPlayer player) {
+        PacketDistributor.PLAYER.with(player).send(message);
     }
 }

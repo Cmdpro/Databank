@@ -3,10 +3,11 @@ package com.cmdpro.cmdlib.hiddenblocks.conditions;
 import com.cmdpro.cmdlib.hiddenblocks.HiddenBlockConditions;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 public class AdvancementCondition extends HiddenBlockConditions.HiddenBlockCondition {
     public ResourceLocation advancement;
@@ -15,7 +16,7 @@ public class AdvancementCondition extends HiddenBlockConditions.HiddenBlockCondi
     }
     @Override
     public boolean isUnlocked(Player player) {
-        Advancement advancement2 = ServerLifecycleHooks.getCurrentServer().getAdvancements().getAdvancement(advancement);
+        AdvancementHolder advancement2 = ServerLifecycleHooks.getCurrentServer().getAdvancements().get(advancement);
         if (advancement2 != null) {
             return ((ServerPlayer) player).getAdvancements().getOrStartProgress(advancement2).isDone();
         } else {

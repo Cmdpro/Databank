@@ -16,7 +16,7 @@ import java.util.Map;
 public class BlockModelShaperMixin {
     @Shadow
     private Map<BlockState, BakedModel> modelByStateCache;
-    @Inject(method = "getBlockModel", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "getBlockModel", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getBlockModel(BlockState pState, CallbackInfoReturnable<BakedModel> cir) {
         BlockState state = ClientCmdLibUtils.getHiddenBlock(pState.getBlock());
         if (state != null) {

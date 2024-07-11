@@ -1,45 +1,40 @@
 package com.cmdpro.cmdlib.networking.packet;
 
 import com.cmdpro.cmdlib.ClientCmdLibUtils;
+import com.cmdpro.cmdlib.CmdLib;
 import com.cmdpro.cmdlib.hiddenblocks.ClientHiddenBlocks;
 import com.cmdpro.cmdlib.hiddenblocks.HiddenBlocksManager;
+import com.cmdpro.cmdlib.networking.Message;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 import java.util.function.Supplier;
 
-public class UnlockHiddenBlockSyncS2CPacket {
-    private final ResourceLocation block;
-
-    public UnlockHiddenBlockSyncS2CPacket(ResourceLocation block) {
-        this.block = block;
+public record UnlockHiddenBlockSyncS2CPacket(ResourceLocation block) implements Message {
+    public static UnlockHiddenBlockSyncS2CPacket read(FriendlyByteBuf buf) {
+        ResourceLocation block = buf.readResourceLocation();
+        return new UnlockHiddenBlockSyncS2CPacket(block);
     }
-
-    public UnlockHiddenBlockSyncS2CPacket(FriendlyByteBuf buf) {
-        this.block = buf.readResourceLocation();
-    }
-
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeResourceLocation(block);
     }
-
-    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            ClientPacketHandler.handlePacket(this, supplier);
-        });
-        return true;
+    public static final ResourceLocation ID = new ResourceLocation(CmdLib.MOD_ID, "unlock_hidden_block_sync");
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
-    public static class ClientPacketHandler {
-        public static void handlePacket(UnlockHiddenBlockSyncS2CPacket msg, Supplier<NetworkEvent.Context> supplier) {
-            if (!ClientHiddenBlocks.unlocked.contains(msg.block)) {
-                if (HiddenBlocksManager.blocks.containsKey(msg.block)) {
-                    ClientHiddenBlocks.unlocked.add(msg.block);
-                }
+
+    @Override
+    public void handleClient(Minecraft minecraft, Player player) {
+        if (!ClientHiddenBlocks.unlocked.contains(block)) {
+            if (HiddenBlocksManager.blocks.containsKey(block)) {
+                ClientHiddenBlocks.unlocked.add(block);
             }
-            ClientCmdLibUtils.updateWorld();
         }
+        ClientCmdLibUtils.updateWorld();
     }
 }
