@@ -2,9 +2,9 @@ package com.cmdpro.databank.networking.packet;
 
 import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
-import com.cmdpro.databank.hiddenblocks.HiddenBlock;
-import com.cmdpro.databank.hiddenblocks.HiddenBlocksManager;
-import com.cmdpro.databank.hiddenblocks.HiddenBlocksSerializer;
+import com.cmdpro.databank.hiddenblock.HiddenBlock;
+import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
+import com.cmdpro.databank.hiddenblock.HiddenBlocksSerializer;
 import com.cmdpro.databank.networking.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,6 +17,13 @@ public record HiddenBlockSyncS2CPacket(Map<ResourceLocation, HiddenBlock> blocks
 
     public static HiddenBlockSyncS2CPacket read(FriendlyByteBuf buf) {
         Map<ResourceLocation, HiddenBlock> blocks = buf.readMap(FriendlyByteBuf::readResourceLocation, HiddenBlocksSerializer::fromNetwork);
+        for (Map.Entry<ResourceLocation, HiddenBlock> i : blocks.entrySet()) {
+            if (i.getValue().condition == null) {
+                if (HiddenBlocksManager.blocks.containsKey(i.getKey())) {
+                    i.getValue().condition = HiddenBlocksManager.blocks.get(i.getKey()).condition;
+                }
+            }
+        }
         return new HiddenBlockSyncS2CPacket(blocks);
     }
     public static void write(FriendlyByteBuf buf, HiddenBlockSyncS2CPacket obj) {
@@ -31,9 +38,7 @@ public record HiddenBlockSyncS2CPacket(Map<ResourceLocation, HiddenBlock> blocks
     @Override
     public void handleClient(Minecraft minecraft, Player player) {
         HiddenBlocksManager.blocks.clear();
-        for (Map.Entry<ResourceLocation, HiddenBlock> i : blocks.entrySet()) {
-            HiddenBlocksManager.blocks.put(i.getKey(), i.getValue());
-        }
+        HiddenBlocksManager.blocks.putAll(blocks);
         ClientDatabankUtils.updateWorld();
     }
 }

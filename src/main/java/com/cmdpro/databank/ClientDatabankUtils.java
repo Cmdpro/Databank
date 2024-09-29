@@ -1,8 +1,8 @@
 package com.cmdpro.databank;
 
-import com.cmdpro.databank.hiddenblocks.ClientHiddenBlocks;
-import com.cmdpro.databank.hiddenblocks.HiddenBlock;
-import com.cmdpro.databank.hiddenblocks.HiddenBlocksManager;
+import com.cmdpro.databank.hiddenblock.ClientHiddenBlocks;
+import com.cmdpro.databank.hiddenblock.HiddenBlock;
+import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -16,8 +16,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.Map;

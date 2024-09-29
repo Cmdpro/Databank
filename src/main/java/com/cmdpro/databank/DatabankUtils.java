@@ -1,7 +1,7 @@
 package com.cmdpro.databank;
 
-import com.cmdpro.databank.hiddenblocks.HiddenBlock;
-import com.cmdpro.databank.hiddenblocks.HiddenBlocksManager;
+import com.cmdpro.databank.hiddenblock.HiddenBlock;
+import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.UnlockHiddenBlockSyncS2CPacket;
 import com.cmdpro.databank.networking.packet.UnlockedHiddenBlocksSyncS2CPacket;

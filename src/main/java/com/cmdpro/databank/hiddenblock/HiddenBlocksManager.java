@@ -1,4 +1,4 @@
-package com.cmdpro.databank.hiddenblocks;
+package com.cmdpro.databank.hiddenblock;
 
 import com.cmdpro.databank.Databank;
 import com.google.gson.*;

@@ -2,8 +2,8 @@ package com.cmdpro.databank.networking.packet;
 
 import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
-import com.cmdpro.databank.hiddenblocks.ClientHiddenBlocks;
-import com.cmdpro.databank.hiddenblocks.HiddenBlocksManager;
+import com.cmdpro.databank.hiddenblock.ClientHiddenBlocks;
+import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
 import com.cmdpro.databank.networking.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;

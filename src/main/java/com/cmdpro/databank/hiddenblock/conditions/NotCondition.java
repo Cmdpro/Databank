@@ -1,6 +1,6 @@
-package com.cmdpro.databank.hiddenblocks.conditions;
+package com.cmdpro.databank.hiddenblock.conditions;
 
-import com.cmdpro.databank.hiddenblocks.HiddenBlockConditions;
+import com.cmdpro.databank.hiddenblock.HiddenBlockConditions;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
