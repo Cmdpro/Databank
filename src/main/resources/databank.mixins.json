@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.cmdpro.databank.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "BlockBehaviourMixin"
+  ],
+  "client": [
+    "client.BlockModelShaperMixin",
+    "client.BlockMixin",
+    "client.GameRendererMixin",
+    "client.LevelRendererMixin"
+  ]
+}
