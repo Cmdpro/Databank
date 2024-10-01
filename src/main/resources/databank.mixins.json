@@ -10,6 +10,7 @@
     "client.BlockModelShaperMixin",
     "client.BlockMixin",
     "client.GameRendererMixin",
-    "client.LevelRendererMixin"
+    "client.LevelRendererMixin",
+    "client.BufferSourceMixin"
   ]
 }

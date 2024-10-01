@@ -58,6 +58,7 @@ public class ModMessages {
         registrar.playToClient(UnlockedHiddenBlocksSyncS2CPacket.TYPE, getNetworkCodec(UnlockedHiddenBlocksSyncS2CPacket::read, UnlockedHiddenBlocksSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(UnlockHiddenBlockSyncS2CPacket.TYPE, getNetworkCodec(UnlockHiddenBlockSyncS2CPacket::read, UnlockHiddenBlockSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(HiddenBlockSyncS2CPacket.TYPE, getNetworkCodec(HiddenBlockSyncS2CPacket::read, HiddenBlockSyncS2CPacket::write), Handler::handle);
+        registrar.playToClient(MultiblockSyncS2CPacket.TYPE, getNetworkCodec(MultiblockSyncS2CPacket::read, MultiblockSyncS2CPacket::write), Handler::handle);
     }
 
     public static <T extends Message> StreamCodec<RegistryFriendlyByteBuf, T> getNetworkCodec(Handler.Reader<T> reader, Handler.Writer<T> writer) {
