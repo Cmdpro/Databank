@@ -34,7 +34,9 @@ import java.util.concurrent.Executor;
 public class DatabankModels {
     public static void init() {
         Minecraft mc = Minecraft.getInstance();
-
+        if (mc == null) {
+            return;
+        }
         if (mc.getResourceManager() instanceof ReloadableResourceManager resourceManager)
             resourceManager.registerReloadListener(DatabankModels::reload);
     }
