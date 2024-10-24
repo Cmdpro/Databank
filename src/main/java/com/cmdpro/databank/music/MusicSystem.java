@@ -31,6 +31,7 @@ public class MusicSystem {
                 SoundEvent getMusic = i.getMusic();
                 if (getMusic != null) {
                     mus = getMusic;
+                    playMusic = true;
                     break;
                 }
             }
