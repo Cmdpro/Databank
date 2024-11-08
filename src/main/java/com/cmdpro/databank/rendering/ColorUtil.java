@@ -60,4 +60,16 @@ public class ColorUtil {
                 Math.lerp(color1.getAlpha()/255f, color2.getAlpha()/255f, blend)
         );
     }
+    public static Color mixColorsSubtractive(Color color1, Color color2) {
+        return mixColorsSubtractive(color1, color2, 1f);
+    }
+    public static Color mixColorsSubtractive(Color color1, Color color2, float alpha) {
+        return mixColorsSubtractive(color1, color2, (int)(alpha*255));
+    }
+    public static Color mixColorsSubtractive(Color color1, Color color2, int alpha) {
+        Color color1Inv = new Color(255-color1.getRed(), 255-color1.getGreen(), 255-color1.getBlue());
+        Color color2Inv = new Color(255-color2.getRed(), 255-color2.getGreen(), 255-color2.getBlue());
+        Color combined = new Color(color1Inv.getRed()+color2Inv.getRed(), color1Inv.getGreen()+color2Inv.getGreen(), color1Inv.getBlue()+color2Inv.getBlue());
+        return new Color(255-combined.getRed(), 255-combined.getGreen(), 255-combined.getBlue(), alpha);
+    }
 }
