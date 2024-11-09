@@ -64,12 +64,37 @@ public class ColorUtil {
         return mixColorsSubtractive(color1, color2, 1f);
     }
     public static Color mixColorsSubtractive(Color color1, Color color2, float alpha) {
-        return mixColorsSubtractive(color1, color2, (int)(alpha*255));
+        return cmyToRgb(blendCmy(rgbToCmy(color1), rgbToCmy(color2), alpha));
     }
-    public static Color mixColorsSubtractive(Color color1, Color color2, int alpha) {
-        Color color1Inv = new Color(255-color1.getRed(), 255-color1.getGreen(), 255-color1.getBlue());
-        Color color2Inv = new Color(255-color2.getRed(), 255-color2.getGreen(), 255-color2.getBlue());
-        Color combined = new Color(color1Inv.getRed()+color2Inv.getRed(), color1Inv.getGreen()+color2Inv.getGreen(), color1Inv.getBlue()+color2Inv.getBlue());
-        return new Color(255-combined.getRed(), 255-combined.getGreen(), 255-combined.getBlue(), alpha);
+    public static float[] rgbToCmy(Color color) {
+        float r = color.getRed() / 255f;
+        float g = color.getGreen() / 255f;
+        float b = color.getBlue() / 255f;
+        float c = 1f - r;
+        float m = 1f - g;
+        float y = 1f - b;
+        return new float[] {c, m, y};
+    }
+    public static float[] blendCmy(float[] cmy1, float[] cmy2, float alpha) {
+        float c, m, y;
+        if (alpha == 1f) {
+            c = Math.max(0, Math.min(1, cmy1[0] + cmy2[0]));
+            m = Math.max(0, Math.min(1, cmy1[1] + cmy2[1]));
+            y = Math.max(0, Math.min(1, cmy1[2] + cmy2[2]));
+        } else {
+            c = (1 - alpha) * cmy1[0] + alpha * cmy2[0];
+            m = (1 - alpha) * cmy1[1] + alpha * cmy2[1];
+            y = (1 - alpha) * cmy1[2] + alpha * cmy2[2];
+        }
+        return new float[] {c, m, y};
+    }
+    private static Color cmyToRgb(float[] cmy) {
+        int r = (int)((1f - cmy[0]) * 255);
+        int g = (int)((1f - cmy[1]) * 255);
+        int b = (int)((1f - cmy[2]) * 255);
+        r = Math.min(255, Math.max(0, r));
+        g = Math.min(255, Math.max(0, g));
+        b = Math.min(255, Math.max(0, b));
+        return new Color(r, g, b);
     }
 }
