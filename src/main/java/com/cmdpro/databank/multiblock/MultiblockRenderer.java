@@ -243,7 +243,7 @@ public class MultiblockRenderer {
                     }
                 } catch (Exception e) {
                     erroredBlockEntities.add(be);
-                    Databank.LOGGER.error("Error rendering block entity", e);
+                    Databank.LOGGER.error("[DATABANK ERROR] Error rendering block entity", e);
                 }
             }
         }

@@ -23,7 +23,7 @@ public class BlockstateMultiblockPredicateSerializer extends MultiblockPredicate
         try {
             return BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), buf.readUtf(), false).blockState();
         } catch (Exception e) {
-            Databank.LOGGER.error(e.getMessage());
+            Databank.LOGGER.error("[DATABANK ERROR] "+e.getMessage());
             return Blocks.AIR.defaultBlockState();
         }
     }

@@ -33,7 +33,7 @@ public class HiddenBlocksSerializer {
         try {
             hiddenAs = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), json.get("hiddenAs").getAsString(), false).blockState();
         } catch (Exception e) {
-            Databank.LOGGER.error(e.getMessage());
+            Databank.LOGGER.error("[DATABANK ERROR] "+e.getMessage());
         }
         return new HiddenBlock(HiddenBlockConditions.conditions.get(condition).deserialize(conditionData), originalBlock, hiddenAs);
     }
@@ -46,7 +46,7 @@ public class HiddenBlocksSerializer {
         try {
             hiddenAs = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), hiddenAsString, false).blockState();
         } catch (Exception e) {
-            Databank.LOGGER.error(e.getMessage());
+            Databank.LOGGER.error("[DATABANK ERROR] "+e.getMessage());
         }
         return new HiddenBlock(null, originalBlock, hiddenAs);
     }

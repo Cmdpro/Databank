@@ -27,7 +27,7 @@ public class HiddenBlocksManager extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         blocks = new HashMap<>();
-        Databank.LOGGER.info("Adding Databank Hidden Blocks");
+        Databank.LOGGER.info("[DATABANK] Adding Databank Hidden Blocks");
         for (Map.Entry<ResourceLocation, JsonElement> i : pObject.entrySet()) {
             ResourceLocation location = i.getKey();
             if (location.getPath().startsWith("_")) {
@@ -39,10 +39,10 @@ public class HiddenBlocksManager extends SimpleJsonResourceReloadListener {
                 HiddenBlock block = serializer.read(i.getKey(), obj);
                 blocks.put(i.getKey(), block);
             } catch (IllegalArgumentException | JsonParseException e) {
-                Databank.LOGGER.error("Parsing error loading hidden block type {}", location, e);
+                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading hidden block type {}", location, e);
             }
         }
-        Databank.LOGGER.info("Loaded {} hidden blocks", blocks.size());
+        Databank.LOGGER.info("[DATABANK] Loaded {} hidden blocks", blocks.size());
     }
     public static HiddenBlocksSerializer serializer = new HiddenBlocksSerializer();
 }

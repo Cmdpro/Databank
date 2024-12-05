@@ -71,7 +71,7 @@ public class DatabankModels {
                         models.put(i.getKey().withPath(path), i.getValue().join());
                     }
                     DatabankModels.models = models;
-                    Databank.LOGGER.info("Loaded Databank Models");
+                    Databank.LOGGER.info("[DATABANK] Loaded Databank Models");
                 });
     }
 }

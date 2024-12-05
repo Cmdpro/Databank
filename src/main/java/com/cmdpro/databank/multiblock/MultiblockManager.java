@@ -27,7 +27,7 @@ public class MultiblockManager extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
         multiblocks = new HashMap<>();
-        Databank.LOGGER.info("Adding Databank Multiblocks");
+        Databank.LOGGER.info("[DATABANK] Adding Databank Multiblocks");
         for (Map.Entry<ResourceLocation, JsonElement> i : pObject.entrySet()) {
             ResourceLocation location = i.getKey();
             if (location.getPath().startsWith("_")) {
@@ -39,10 +39,10 @@ public class MultiblockManager extends SimpleJsonResourceReloadListener {
                 Multiblock multiblock = serializer.read(i.getKey(), obj);
                 multiblocks.put(i.getKey(), multiblock);
             } catch (IllegalArgumentException | JsonParseException e) {
-                Databank.LOGGER.error("Parsing error loading multiblock {}", location, e);
+                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading multiblock {}", location, e);
             }
         }
-        Databank.LOGGER.info("Loaded {} multiblocks", multiblocks.size());
+        Databank.LOGGER.info("[DATABANK] Loaded {} multiblocks", multiblocks.size());
     }
     public static MultiblockSerializer serializer = new MultiblockSerializer();
 }
