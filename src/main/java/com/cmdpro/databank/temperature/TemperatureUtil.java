@@ -9,15 +9,15 @@ import net.minecraft.world.level.biome.Biome;
 public class TemperatureUtil {
 
     // Commonly-used (assuming they'll be, anyway) values
-    public int ABSOLUTE_ZERO = -273; // should never be gone below
-    public int WATER_BOILING_POINT = 100;
+    public static int ABSOLUTE_ZERO = -273; // should never be gone below
+    public static int WATER_BOILING_POINT = 100;
 
     /**
      * Gets the ambient temperature of the given position.
      * @param pos the position to query
      * @return ambient temperature in degrees C
      */
-    public int getAmbientTemperatureAt(BlockPos pos) {
+    public static int getAmbientTemperatureAt(BlockPos pos) {
         Level world = Minecraft.getInstance().level;
         float T = getBiomeTemperature(world.getBiome(pos).value()); // start with biome temp
         T += (world.dimension() == Level.NETHER) ? WATER_BOILING_POINT : 0; // obviously much hotter in the Nether
@@ -48,7 +48,7 @@ public class TemperatureUtil {
      * @param biome the biome to use
      * @return workable temperature in degrees C
      */
-    public int getBiomeTemperature(Biome biome) {
+    public static int getBiomeTemperature(Biome biome) {
         float factor = biome.getBaseTemperature();
         return (int) (30 * factor) - 10;
     }
