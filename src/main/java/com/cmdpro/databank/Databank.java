@@ -6,6 +6,13 @@ import com.cmdpro.databank.hiddenblock.conditions.AndCondition;
 import com.cmdpro.databank.hiddenblock.conditions.NotCondition;
 import com.cmdpro.databank.hiddenblock.conditions.OrCondition;
 import com.cmdpro.databank.model.DatabankModels;
+import com.cmdpro.databank.music.MusicConditions;
+import com.cmdpro.databank.music.MusicController;
+import com.cmdpro.databank.music.MusicSystem;
+import com.cmdpro.databank.music.conditions.AndMusicCondition;
+import com.cmdpro.databank.music.conditions.EntityNearbyMusicCondition;
+import com.cmdpro.databank.music.conditions.NotMusicCondition;
+import com.cmdpro.databank.music.conditions.OrMusicCondition;
 import com.cmdpro.databank.registry.MultiblockPredicateRegistry;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.mojang.logging.LogUtils;
@@ -39,11 +46,17 @@ public class Databank
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "or"), OrCondition.OrConditionSerializer.INSTANCE);
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "not"), NotCondition.NotConditionSerializer.INSTANCE);
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "advancement"), AdvancementCondition.AdvancementConditionSerializer.INSTANCE);
-        if (FMLEnvironment.dist == Dist.CLIENT)
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             DatabankModels.init();
+            MusicSystem.init();
+        }
     }
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
         RenderTypeHandler.load();
+        MusicConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "and"), AndMusicCondition.AndConditionSerializer.INSTANCE);
+        MusicConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "or"), OrMusicCondition.OrConditionSerializer.INSTANCE);
+        MusicConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "not"), NotMusicCondition.NotConditionSerializer.INSTANCE);
+        MusicConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "entity_nearby"), EntityNearbyMusicCondition.EntityNearbyConditionSerializer.INSTANCE);
     }
 }
