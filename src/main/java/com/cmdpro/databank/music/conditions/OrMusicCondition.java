@@ -17,10 +17,10 @@ public class OrMusicCondition extends MusicConditions.MusicCondition {
     }
     @Override
     public Serializer getSerializer() {
-        return AndMusicCondition.AndConditionSerializer.INSTANCE;
+        return OrConditionSerializer.INSTANCE;
     }
     public static class OrConditionSerializer extends Serializer {
-        public static final AndMusicCondition.AndConditionSerializer INSTANCE = new AndMusicCondition.AndConditionSerializer();
+        public static final OrConditionSerializer INSTANCE = new OrConditionSerializer();
         @Override
         public MusicConditions.MusicCondition deserialize(JsonObject json) {
             ResourceLocation conditionA = ResourceLocation.tryParse(json.get("conditionA").getAsString());

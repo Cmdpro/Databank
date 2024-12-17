@@ -23,7 +23,7 @@ public class EntityNearbyMusicCondition extends MusicConditions.MusicCondition {
     }
     @Override
     public Serializer getSerializer() {
-        return NotMusicCondition.NotConditionSerializer.INSTANCE;
+        return EntityNearbyConditionSerializer.INSTANCE;
     }
     public static class EntityNearbyConditionSerializer extends Serializer {
         public static final EntityNearbyConditionSerializer INSTANCE = new EntityNearbyConditionSerializer();

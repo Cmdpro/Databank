@@ -58,7 +58,8 @@ public class MusicSystem {
             for (MusicController i : sortedControllers) {
                 SoundEvent getMusic = i.music;
                 if (i.condition.isPlaying()) {
-                    mus = getMusic;
+                    SoundEvent override = i.condition.getMusicOverride(i);
+                    mus = override == null ? getMusic : override;
                     playMusic = true;
                     break;
                 }
