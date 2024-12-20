@@ -1,5 +1,6 @@
 package com.cmdpro.databank.events;
 
+import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
 import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
@@ -8,6 +9,7 @@ import com.cmdpro.databank.multiblock.MultiblockManager;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.HiddenBlockSyncS2CPacket;
 import com.cmdpro.databank.networking.packet.MultiblockSyncS2CPacket;
+import com.cmdpro.databank.networking.packet.UnlockedHiddenBlocksSyncS2CPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -36,6 +38,7 @@ public class ModEvents {
     protected static void syncToPlayer(ServerPlayer player) {
         ModMessages.sendToPlayer(new HiddenBlockSyncS2CPacket(HiddenBlocksManager.blocks), player);
         ModMessages.sendToPlayer(new MultiblockSyncS2CPacket(MultiblockManager.multiblocks), player);
+        DatabankUtils.updateHiddenBlocks(player);
     }
     @SubscribeEvent
     public static void onAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
