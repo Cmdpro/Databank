@@ -29,7 +29,7 @@ public class RenderHandler {
             for (RenderType i : RenderTypeHandler.normalRenderTypes) {
                 createBufferSource().endBatch(i);
             }
-            RenderSystem.getModelViewStack().set(oldMat);
+            RenderSystem.getModelViewMatrix().set(oldMat);
             for (RenderType i : RenderTypeHandler.particleRenderTypes) {
                 createBufferSource().endBatch(i);
             }
