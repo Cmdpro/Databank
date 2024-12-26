@@ -66,9 +66,9 @@ public class RenderTypeHandler {
     public static RenderType registerRenderType(RenderType type, boolean isParticle) {
         renderTypes.add(type);
         if (isParticle) {
-            normalRenderTypes.add(type);
-        } else {
             particleRenderTypes.add(type);
+        } else {
+            normalRenderTypes.add(type);
         }
         return type;
     }
