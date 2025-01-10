@@ -5,6 +5,7 @@ import com.cmdpro.databank.hiddenblock.HiddenBlock;
 import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
 import com.cmdpro.databank.mixin.ItemRendererAccessor;
 import com.cmdpro.databank.rendering.ColorUtil;
+import com.cmdpro.databank.rendering.ShaderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -27,6 +28,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HalfTransparentBlock;
@@ -55,8 +57,24 @@ public class ClientDatabankUtils {
         return null;
     }
     public static void updateWorld() {
-        for (SectionRenderDispatcher.RenderSection i : Minecraft.getInstance().levelRenderer.viewArea.sections) {
-            i.setDirty(false);
+        if (ShaderHelper.isSodiumActive()) {
+            int viewDistance = Minecraft.getInstance().options.renderDistance().get();
+            int max = Minecraft.getInstance().level.getMaxSection();
+            int min = Minecraft.getInstance().level.getMinSection();
+            ChunkPos playerChunkPos = Minecraft.getInstance().player.chunkPosition();
+            for (int x = -viewDistance; x < viewDistance; x++) {
+                for (int z = -viewDistance; z < viewDistance; z++) {
+                    if (Minecraft.getInstance().level.hasChunk(playerChunkPos.x+x, playerChunkPos.z+z)) {
+                        for (int y = min; y < max; y++) {
+                            Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (SectionRenderDispatcher.RenderSection i : Minecraft.getInstance().levelRenderer.viewArea.sections) {
+                i.setDirty(false);
+            }
         }
     }
     public static void renderAdvancedBeaconBeam(PoseStack pPoseStack, MultiBufferSource pBufferSource, ResourceLocation pBeamLocation, float pPartialTick, float pTextureScale, long pGameTime, Vec3 pointA, Vec3 pointB, Color color, float pBeamRadius, float pGlowRadius) {
