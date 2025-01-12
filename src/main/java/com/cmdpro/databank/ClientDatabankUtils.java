@@ -66,7 +66,7 @@ public class ClientDatabankUtils {
                 for (int z = -viewDistance; z < viewDistance; z++) {
                     if (Minecraft.getInstance().level.hasChunk(playerChunkPos.x+x, playerChunkPos.z+z)) {
                         for (int y = min; y < max; y++) {
-                            Minecraft.getInstance().levelRenderer.setSectionDirty(x, y, z);
+                            Minecraft.getInstance().levelRenderer.setSectionDirty(playerChunkPos.x+x, y, playerChunkPos.z+z);
                         }
                     }
                 }
