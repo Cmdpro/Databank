@@ -99,6 +99,7 @@ function goThroughChildren(array, parentOffset) {
     });
     return parts
 }
+let modelFormat, codec
 Plugin.register('databank_blockbench', {
     title: 'Databank Utils',
     author: 'Cmdpro',
@@ -108,17 +109,33 @@ Plugin.register('databank_blockbench', {
     variant: 'both',
     onload() {
         console.log("Loaded Databank Utils Plugin")
+        modelFormat = new ModelFormat({
+            id: 'databank',
+            name: "Databank Model",
+            icon: 'icon-format_java',
+            category: 'minecraft',
+            target: 'Databank',
+            box_uv: true,
+            box_uv_float_size: true,
+            single_texture: true,
+            bone_rig: true,
+            centered_grid: true,
+            rotate_cubes: true,
+            integer_size: true,
+            animation_mode: true,
+            display_mode: true,
+        })
         button = new Action('export_to_databank_model', {
             name: 'Export to Databank Model',
             description: 'Exports to a Databank Model json',
             icon: "archive",
             category: "file",
-            condition: () => Format.id === 'modded_entity',
+            condition: () => Format.id === 'databank',
             click: function() {
                 var model = {}
 
                 duplicateNames = {}
-                
+
                 var animations = {}
                 Project.animations.forEach(anim => {
                     animParts = []
@@ -179,7 +196,7 @@ Plugin.register('databank_blockbench', {
                 model.parts = parts
 
                 model.textureSize = [
-                    Project.texture_width, 
+                    Project.texture_width,
                     Project.texture_height
                 ];
 
@@ -195,5 +212,6 @@ Plugin.register('databank_blockbench', {
     },
     onunload() {
         button.delete()
+        modelFormat.delete()
     }
 });
