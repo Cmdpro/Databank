@@ -1,3 +1,96 @@
+function makeCodec() {
+    return new Codec('databank_block_model', {
+        name: 'Java Block/Item Model',
+        remember: true,
+        extension: 'json',
+        support_partial_export: true,
+        load_filter: {
+            type: 'json',
+            extensions: ['json'],
+            condition(model) {
+                return false
+            }
+        },
+        compile(options) {
+            if (options === undefined) options = {}
+            var textures_used = []
+            var element_index_lut = []
+
+            function checkExport(key, condition) {
+                key = options[key]
+                if (key === undefined) {
+                    return condition;
+                } else {
+                    return key
+                }
+            }
+            var isTexturesOnlyModel = checkExport('parent', Project.parent != '')
+            var texturesObj = {}
+            Texture.all.forEach(function(t, i){
+                var link = t.javaTextureLink()
+                if (t.particle) {
+                    texturesObj.particle = link
+                }
+                if (!textures_used.includes(t) && !isTexturesOnlyModel) return;
+                if (t.id !== link.replace(/^#/, '')) {
+                    texturesObj[t.id] = link
+                }
+            })
+
+            var blockmodel = {}
+            if (checkExport('comment', Project.credit || settings.credit.value)) {
+                blockmodel.credit = Project.credit || settings.credit.value
+            }
+            if (checkExport('parent', Project.parent != '')) {
+                blockmodel.parent = Project.parent
+            }
+            if (checkExport('ambientocclusion', Project.ambientocclusion === false)) {
+                blockmodel.ambientocclusion = false
+            }
+            if (Project.unhandled_root_fields.render_type) {
+                blockmodel.render_type = Project.unhandled_root_fields.render_type;
+            }
+            if (Project.texture_width !== 16 || Project.texture_height !== 16) {
+                blockmodel.texture_size = [Project.texture_width, Project.texture_height]
+            }
+            if (checkExport('textures', Object.keys(texturesObj).length >= 1)) {
+                blockmodel.textures = texturesObj
+            }
+            if (checkExport('front_gui_light', Project.front_gui_light)) {
+                blockmodel.gui_light = 'front';
+            }
+            if (checkExport('overrides', Project.overrides instanceof Array && Project.overrides.length)) {
+                Project.overrides.forEach(override => delete override._uuid)
+                blockmodel.overrides = Project.overrides.map(override => new oneLiner(override));
+            }
+            if (checkExport('display', Object.keys(Project.display_settings).length >= 1)) {
+                var new_display = {}
+                var entries = 0;
+                for (var i in DisplayMode.slots) {
+                    var key = DisplayMode.slots[i]
+                    if (DisplayMode.slots.hasOwnProperty(i) && Project.display_settings[key] && Project.display_settings[key].export) {
+                        new_display[key] = Project.display_settings[key].export()
+                        entries++;
+                    }
+                }
+                if (entries) {
+                    blockmodel.display = new_display
+                }
+            }
+            for (let key in Project.unhandled_root_fields) {
+                if (blockmodel[key] === undefined) blockmodel[key] = Project.unhandled_root_fields[key];
+            }
+            this.dispatchEvent('compile', {model: blockmodel, options});
+            if (options.raw) {
+                return blockmodel
+            } else {
+                return autoStringify(blockmodel)
+            }
+        },
+        parse(model, path, add) {},
+    })
+}
+
 var duplicateNames = {}
 
 function getNewName(name) {
@@ -99,7 +192,7 @@ function goThroughChildren(array, parentOffset) {
     });
     return parts
 }
-let modelFormat, codec
+let modelFormat, codec, export_to_databank_model, export_display
 Plugin.register('databank_blockbench', {
     title: 'Databank Utils',
     author: 'Cmdpro',
@@ -109,6 +202,7 @@ Plugin.register('databank_blockbench', {
     variant: 'both',
     onload() {
         console.log("Loaded Databank Utils Plugin")
+        codec = makeCodec()
         modelFormat = new ModelFormat({
             id: 'databank',
             name: "Databank Model",
@@ -124,8 +218,19 @@ Plugin.register('databank_blockbench', {
             integer_size: true,
             animation_mode: true,
             display_mode: true,
+            select_texture_for_particles: true,
         })
-        button = new Action('export_to_databank_model', {
+        codec.format = modelFormat
+        export_display = new Action({
+            id: 'export_blockmodel',
+            icon: 'icon-format_block',
+            category: 'file',
+            condition: () => Format.id === 'databank',
+            click: function () {
+                codec.export();
+            }
+        })
+        export_to_databank_model = new Action('export_to_databank_model', {
             name: 'Export to Databank Model',
             description: 'Exports to a Databank Model json',
             icon: "archive",
@@ -208,10 +313,12 @@ Plugin.register('databank_blockbench', {
                 });
             }
         })
-        MenuBar.addAction(button, 'file.export');
+        MenuBar.addAction(export_to_databank_model, 'file.export');
+        MenuBar.addAction(export_display, 'file.export');
     },
     onunload() {
-        button.delete()
+        export_to_databank_model.delete()
+        export_display.delete()
         modelFormat.delete()
     }
 });
