@@ -21,6 +21,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.conditions.ConditionalOps;
+import net.neoforged.neoforge.common.conditions.ICondition;
+import net.neoforged.neoforge.common.conditions.WithConditions;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -28,8 +31,7 @@ import java.util.stream.Collectors;
 
 public class MultiblockSerializer {
     public Multiblock read(ResourceLocation entryId, JsonObject json) {
-        Multiblock multiblock = CODEC.codec().parse(JsonOps.INSTANCE, json).getOrThrow();
-        return multiblock;
+        return ICondition.getWithWithConditionsCodec(CODEC, JsonOps.INSTANCE, json).orElse(null);
     }
     public static final Codec<MultiblockPredicate> PREDICATE_CODEC = DatabankRegistries.MULTIBLOCK_PREDICATE_REGISTRY.byNameCodec().dispatch(MultiblockPredicate::getSerializer, pageSerializer -> pageSerializer.getCodec());
     public static final StreamCodec<RegistryFriendlyByteBuf, MultiblockPredicate> PREDICATE_STREAM_CODEC = StreamCodec.of((pBuffer, pValue) -> {
@@ -41,7 +43,7 @@ public class MultiblockSerializer {
         MultiblockPredicate predicate = (MultiblockPredicate)pageSerializer.getStreamCodec().decode(pBuffer);
         return predicate;
     });
-    public static final MapCodec<Multiblock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
+    public static final MapCodec<Multiblock> ORIGINAL_CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             Codec.unboundedMap(Codec.STRING, PREDICATE_CODEC).fieldOf("key").forGetter((multiblock) -> {
                 Map<String, MultiblockPredicate> map = multiblock.key.entrySet().stream().map((a) -> Map.entry(a.getKey().toString(), a.getValue())).collect(Collectors.toMap((a) -> a.getKey(), (a) -> a.getValue()));
                 return map;
@@ -52,6 +54,7 @@ public class MultiblockSerializer {
         Map<Character, MultiblockPredicate> key2 = key.entrySet().stream().map((a) -> Map.entry(a.getKey().charAt(0), a.getValue())).collect(Collectors.toMap((a) -> a.getKey(), (a) -> a.getValue()));
         return new Multiblock(layers.stream().map((a) -> a.toArray(new String[0])).toList().toArray(new String[0][]), key2, offset);
     }));
+    public static final Codec<Optional<WithConditions<Multiblock>>> CODEC = ConditionalOps.createConditionalCodecWithConditions(ORIGINAL_CODEC.codec());
     public static final StreamCodec<RegistryFriendlyByteBuf, Multiblock> STREAM_CODEC = StreamCodec.of((pBuffer, pValue) -> {
         pBuffer.writeMap(pValue.key, (a, b) -> a.writeChar(b), (a, b) -> PREDICATE_STREAM_CODEC.encode((RegistryFriendlyByteBuf) a, b));
         pBuffer.writeBlockPos(pValue.offset);

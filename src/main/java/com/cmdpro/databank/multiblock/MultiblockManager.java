@@ -35,8 +35,10 @@ public class MultiblockManager extends SimpleJsonResourceReloadListener {
             }
 
             try {
-                JsonObject obj = i.getValue().getAsJsonObject();
-                Multiblock multiblock = serializer.read(i.getKey(), obj);
+                Multiblock multiblock = serializer.read(i.getKey(), i.getValue().getAsJsonObject());
+                if (multiblock == null) {
+                    continue;
+                }
                 multiblocks.put(i.getKey(), multiblock);
             } catch (IllegalArgumentException | JsonParseException e) {
                 Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading multiblock {}", location, e);
