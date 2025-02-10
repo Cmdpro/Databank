@@ -53,4 +53,10 @@ public class DatabankUtils {
     public static void unlockHiddenBlock(Player player, ResourceLocation hiddenBlock) {
         ModMessages.sendToPlayer(new UnlockHiddenBlockSyncS2CPacket(hiddenBlock), (ServerPlayer)player);
     }
+    public static float kelvinToCelcius(float kelvin) {
+        return kelvin+273.15f;
+    }
+    public static float celciusToKelvin(float celcius) {
+        return celcius-273.15f;
+    }
 }

@@ -18,8 +18,6 @@ import java.util.Map;
 
 @Mixin(ItemBlockRenderTypes.class)
 public class ItemBlockRenderTypesMixin {
-    @Shadow
-    private static Map<Block, RenderType> TYPE_BY_BLOCK;
     @Inject(method = "getRenderLayers", at = @At(value = "HEAD"), cancellable = true, remap = false)
     private static void getRenderLayers(BlockState pState, CallbackInfoReturnable<ChunkRenderTypeSet> cir) {
         BlockState state = ClientDatabankUtils.getHiddenBlock(pState.getBlock());
