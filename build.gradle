@@ -112,7 +112,7 @@ dependencies {
     // We add the full version to localRuntime, not runtimeOnly, so that we do not publish a dependency on it
     // localRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
     implementation "maven.modrinth:iris:1.8.1+1.21.1-neoforge"
-    implementation "maven.modrinth:sodium:mc1.21.1-0.6.5-neoforge"
+    implementation "maven.modrinth:sodium:mc1.21.1-0.6.7-neoforge"
     implementation "maven.modrinth:jade:15.9.2+neoforge"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
