@@ -48,10 +48,13 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 
 import java.util.*;
 @EventBusSubscriber(value = Dist.CLIENT, modid = Databank.MOD_ID)
 public class MultiblockRenderer {
+    protected static Map<BlockPos, BlockEntity> blockEntityCache = new Object2ObjectOpenHashMap<>();
+    protected static Set<BlockEntity> erroredBlockEntities = Collections.newSetFromMap(new WeakHashMap<>());
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage().equals(RenderLevelStageEvent.Stage.AFTER_PARTICLES)) {
@@ -91,13 +94,11 @@ public class MultiblockRenderer {
     public static Multiblock multiblock;
 
     public static MultiBufferSource.BufferSource buffers;
-    private static Map<BlockPos, BlockEntity> blockEntityCache = new Object2ObjectOpenHashMap<>();
-    private static Set<BlockEntity> erroredBlockEntities = Collections.newSetFromMap(new WeakHashMap<>());
-    public static void renderBlock(BlockState block, BlockPos pos, PoseStack stack, DeltaTracker partialTick) {
+    public static void renderBlock(Multiblock multiblock, BlockState block, BlockPos pos, BlockPos worldPos, PoseStack stack, DeltaTracker partialTick) {
         if (buffers == null) {
             buffers = initBuffers(Minecraft.getInstance().renderBuffers().bufferSource());
         }
-        renderBlock(block, pos, stack, partialTick, buffers);
+        renderBlock(multiblock, block, pos, worldPos, stack, partialTick, buffers);
     }
     public static void renderCurrentMultiblock(PoseStack stack, DeltaTracker partialTick) {
         if (multiblock != null) {
@@ -135,96 +136,38 @@ public class MultiblockRenderer {
         renderMultiblock(multiblock, pos, stack, partialTick, rotation, buffers);
     }
     public static void renderMultiblock(Multiblock multiblock, BlockPos pos, PoseStack stack, DeltaTracker partialTick, Rotation rotation, MultiBufferSource.BufferSource bufferSource) {
-        for (List<Multiblock.PredicateAndPos> i : multiblock.getStates()) {
-            for (Multiblock.PredicateAndPos o : i) {
-                if (pos != null) {
-                    BlockState state = Minecraft.getInstance().level.getBlockState(o.offset.rotate(rotation).offset(pos));
-                    boolean stateMatches = o.predicate.isSame(state, rotation);
-                    if (!stateMatches) {
-                        renderBlock(o.predicate.getVisual().rotate(rotation), o.offset.rotate(rotation).offset(pos), stack, partialTick, bufferSource);
+        for (List<List<Multiblock.PredicateAndPos>> i : multiblock.getStates()) {
+            for (List<Multiblock.PredicateAndPos> j : i) {
+                for (Multiblock.PredicateAndPos k : j) {
+                    if (pos != null) {
+                        BlockState state = Minecraft.getInstance().level.getBlockState(k.offset.rotate(rotation).offset(pos));
+                        boolean stateMatches = k.predicate.isSame(state, rotation);
+                        if (!stateMatches) {
+                            renderBlock(multiblock, k.predicate.getVisual().rotate(Minecraft.getInstance().level, k.offset, rotation), k.offset, k.offset.rotate(rotation).offset(pos), stack, partialTick, bufferSource);
+                        }
+                    } else {
+                        renderBlock(multiblock, k.predicate.getVisual().rotate(Minecraft.getInstance().level, k.offset, rotation), k.offset, k.offset.rotate(rotation), stack, partialTick, bufferSource);
                     }
-                } else {
-                    renderBlock(o.predicate.getVisual().rotate(rotation), o.offset.rotate(rotation), stack, partialTick, bufferSource);
                 }
             }
         }
         bufferSource.endBatch();
     }
-    private static BlockAndTintGetter blockAndTintGetter = new BlockAndTintGetter() {
-
-        @Nullable
-        @Override
-        public BlockEntity getBlockEntity(BlockPos pos) {
-            BlockState state = this.getBlockState(pos);
-            if (state.getBlock() instanceof EntityBlock eb) {
-                return MultiblockRenderer.blockEntityCache.computeIfAbsent(pos.immutable(), p -> eb.newBlockEntity(p, state));
-            }
-            return null;
-        }
-
-        @Override
-        public BlockState getBlockState(BlockPos p_45571_) {
-            return Minecraft.getInstance().level.getBlockState(p_45571_);
-        }
-
-        @Override
-        public FluidState getFluidState(BlockPos pos) {
-            return Fluids.EMPTY.defaultFluidState();
-        }
-
-        @Override
-        public float getShade(Direction direction, boolean shaded) {
-            return 1.0F;
-        }
-
-        @Override
-        public LevelLightEngine getLightEngine() {
-            return null;
-        }
-
-        @Override
-        public int getBlockTint(BlockPos pos, ColorResolver color) {
-            var plains = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.BIOME)
-                    .getOrThrow(Biomes.PLAINS);
-            return color.getColor(plains, pos.getX(), pos.getZ());
-        }
-
-        @Override
-        public int getBrightness(LightLayer type, BlockPos pos) {
-            return 15;
-        }
-
-        @Override
-        public int getRawBrightness(BlockPos pos, int ambientDarkening) {
-            return 15 - ambientDarkening;
-        }
-
-        // These heights were assumed based being derivative of old behavior, but it may be ideal to change
-        @Override
-        public int getHeight() {
-            return Minecraft.getInstance().level.getHeight();
-        }
-
-        @Override
-        public int getMinBuildHeight() {
-            return Minecraft.getInstance().level.getMinBuildHeight();
-        }
-    };
-    public static void renderBlock(BlockState block, BlockPos pos, PoseStack stack, DeltaTracker partialTick, MultiBufferSource.BufferSource bufferSource) {
+    public static void renderBlock(Multiblock multiblock, BlockState block, BlockPos pos, BlockPos worldPos, PoseStack stack, DeltaTracker partialTick, MultiBufferSource.BufferSource bufferSource) {
         stack.pushPose();
-        stack.translate(pos.getX(), pos.getY(), pos.getZ());
+        stack.translate(worldPos.getX(), worldPos.getY(), worldPos.getZ());
         BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
         FluidState fluidState = block.getFluidState();
         if (!fluidState.isEmpty()) {
             RenderType layer = ItemBlockRenderTypes.getRenderLayer(fluidState);
             VertexConsumer buffer = bufferSource.getBuffer(layer);
-            blockRenderer.renderLiquid(pos, blockAndTintGetter, buffer, block, fluidState);
+            blockRenderer.renderLiquid(pos, multiblock, buffer, block, fluidState);
         }
         if (block.getRenderShape() != RenderShape.INVISIBLE) {
             BakedModel model = blockRenderer.getBlockModel(block);
             for (RenderType i : model.getRenderTypes(block, Minecraft.getInstance().level.random, ModelData.EMPTY)) {
                 VertexConsumer hologramConsumer = bufferSource.getBuffer(i);
-                blockRenderer.renderBatched(block, pos, blockAndTintGetter, stack, hologramConsumer, false, Minecraft.getInstance().level.random, ModelData.EMPTY, i);
+                blockRenderer.renderBatched(block, pos, multiblock, stack, hologramConsumer, false, Minecraft.getInstance().level.random, ModelData.EMPTY, i);
             }
         }
         if (block.getBlock() instanceof EntityBlock entityBlock) {
