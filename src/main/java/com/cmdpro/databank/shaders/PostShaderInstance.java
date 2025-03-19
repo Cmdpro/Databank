@@ -1,5 +1,7 @@
 package com.cmdpro.databank.shaders;
 
+import com.mojang.blaze3d.pipeline.MainTarget;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -63,8 +65,17 @@ public abstract class PostShaderInstance {
         }
     }
     public void processPostChain() {
+        getDepthBackupTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
         postChain.process(Minecraft.getInstance().getTimer().getGameTimeDeltaTicks());
+        Minecraft.getInstance().getMainRenderTarget().copyDepthFrom(getDepthBackupTarget());
         GlStateManager._glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Minecraft.getInstance().getMainRenderTarget().frameBufferId);
+    }
+    private static RenderTarget depthBackupTarget;
+    protected static RenderTarget getDepthBackupTarget() {
+        if (depthBackupTarget == null) {
+            depthBackupTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
+        }
+        return depthBackupTarget;
     }
     public void tick() {
 
