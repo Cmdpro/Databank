@@ -2,6 +2,7 @@ package com.cmdpro.databank.registry;
 
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.multiblock.MultiblockPredicateSerializer;
+import com.cmdpro.databank.multiblock.predicates.serializers.AnyMultiblockPredicateSerializer;
 import com.cmdpro.databank.multiblock.predicates.serializers.BlockstateMultiblockPredicateSerializer;
 import com.cmdpro.databank.multiblock.predicates.serializers.TagMultiblockPredicateSerializer;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +15,7 @@ public class MultiblockPredicateRegistry {
 
     public static final Supplier<MultiblockPredicateSerializer> BLOCKSTATE = register("blockstate", () -> new BlockstateMultiblockPredicateSerializer());
     public static final Supplier<MultiblockPredicateSerializer> TAG = register("tag", () -> new TagMultiblockPredicateSerializer());
+    public static final Supplier<MultiblockPredicateSerializer> ANY = register("any", () -> new AnyMultiblockPredicateSerializer());
     private static <T extends MultiblockPredicateSerializer> Supplier<T> register(final String name, final Supplier<T> item) {
         return MULTIBLOCK_PREDICATE_TYPES.register(name, item);
     }

@@ -1,7 +1,7 @@
 package com.cmdpro.databank.multiblock;
 
+import com.cmdpro.databank.multiblock.predicates.AnyMultiblockPredicate;
 import com.cmdpro.databank.multiblock.predicates.BlockstateMultiblockPredicate;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,13 +26,14 @@ import java.util.*;
 public class Multiblock implements BlockAndTintGetter {
     public String[][] multiblockLayers;
     public Map<Character, MultiblockPredicate> key;
-    public BlockPos offset;
+    public BlockPos center;
     private List<List<List<PredicateAndPos>>> states;
-    public Multiblock(String[][] multiblockLayers, Map<Character, MultiblockPredicate> key, BlockPos offset) {
+    public Multiblock(String[][] multiblockLayers, Map<Character, MultiblockPredicate> key, BlockPos center) {
         this.multiblockLayers = multiblockLayers;
         key.put(' ', new BlockstateMultiblockPredicate(Blocks.AIR.defaultBlockState()));
+        key.put('*', new AnyMultiblockPredicate());
         this.key = key;
-        this.offset = offset;
+        this.center = center;
     }
     public List<List<List<PredicateAndPos>>> getStates() {
         return getStates(false);
@@ -50,7 +51,7 @@ public class Multiblock implements BlockAndTintGetter {
                     List<PredicateAndPos> layer = new ArrayList<>();
                     x = 0;
                     for (char p : o.toCharArray()) {
-                        layer.add(new PredicateAndPos(key.get(p), new BlockPos(x, y, z).offset(offset.getX(), offset.getY(), offset.getZ())));
+                        layer.add(new PredicateAndPos(key.get(p), new BlockPos(x, y, z).offset(center.getX(), center.getY(), center.getZ())));
                         x++;
                     }
                     states2.add(layer);

@@ -1,31 +1,20 @@
 package com.cmdpro.databank.multiblock;
 
 import com.cmdpro.databank.DatabankRegistries;
-import com.cmdpro.databank.multiblock.MultiblockPredicate;
-import com.cmdpro.databank.multiblock.MultiblockPredicateSerializer;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.conditions.ConditionalOps;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.WithConditions;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,7 +38,7 @@ public class MultiblockSerializer {
                 return map;
             }),
             Codec.STRING.listOf().listOf().fieldOf("layers").forGetter((multiblock) -> multiblock.getMultiblockLayersList()),
-            BlockPos.CODEC.fieldOf("offset").forGetter((multiblock) -> multiblock.offset)
+            BlockPos.CODEC.fieldOf("center").forGetter((multiblock) -> multiblock.center)
     ).apply(instance, (key, layers, offset) -> {
         Map<Character, MultiblockPredicate> key2 = key.entrySet().stream().map((a) -> Map.entry(a.getKey().charAt(0), a.getValue())).collect(Collectors.toMap((a) -> a.getKey(), (a) -> a.getValue()));
         return new Multiblock(layers.stream().map((a) -> a.toArray(new String[0])).toList().toArray(new String[0][]), key2, offset);
@@ -57,7 +46,7 @@ public class MultiblockSerializer {
     public static final Codec<Optional<WithConditions<Multiblock>>> CODEC = ConditionalOps.createConditionalCodecWithConditions(ORIGINAL_CODEC.codec());
     public static final StreamCodec<RegistryFriendlyByteBuf, Multiblock> STREAM_CODEC = StreamCodec.of((pBuffer, pValue) -> {
         pBuffer.writeMap(pValue.key, (a, b) -> a.writeChar(b), (a, b) -> PREDICATE_STREAM_CODEC.encode((RegistryFriendlyByteBuf) a, b));
-        pBuffer.writeBlockPos(pValue.offset);
+        pBuffer.writeBlockPos(pValue.center);
         List<List<String>> layers = new ArrayList<>();
         for (String[] i : pValue.multiblockLayers) {
             layers.add(List.of(i));
