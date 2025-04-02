@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientDatabankUtils {
-    public static BlockState getHiddenBlock(Block block) {
+    public static Block getHiddenBlock(Block block) {
         for (Map.Entry<ResourceLocation, HiddenBlock> i : HiddenBlocksManager.blocks.entrySet()) {
             if (i.getValue().originalBlock == null || i.getValue().hiddenAs == null) {
                 continue;

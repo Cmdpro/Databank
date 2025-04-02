@@ -1,8 +1,10 @@
 package com.cmdpro.databank.mixin.client;
 
 import com.cmdpro.databank.ClientDatabankUtils;
+import com.cmdpro.databank.DatabankUtils;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,9 +20,9 @@ public class BlockModelShaperMixin {
     private Map<BlockState, BakedModel> modelByStateCache;
     @Inject(method = "getBlockModel", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getBlockModel(BlockState pState, CallbackInfoReturnable<BakedModel> cir) {
-        BlockState state = ClientDatabankUtils.getHiddenBlock(pState.getBlock());
-        if (state != null) {
-            cir.setReturnValue(modelByStateCache.get(state));
+        Block block = ClientDatabankUtils.getHiddenBlock(pState.getBlock());
+        if (block != null) {
+            cir.setReturnValue(modelByStateCache.get(DatabankUtils.changeBlockType(pState, block)));
         }
     }
 }

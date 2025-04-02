@@ -13,9 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BlockMixin {
     @Inject(method = "getName", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getName(CallbackInfoReturnable<MutableComponent> cir) {
-        BlockState state = ClientDatabankUtils.getHiddenBlock((Block)(Object)this);
-        if (state != null) {
-            cir.setReturnValue(state.getBlock().getName());
+        Block block = ClientDatabankUtils.getHiddenBlock((Block)(Object)this);
+        if (block != null) {
+            cir.setReturnValue(block.getName());
         }
     }
 }

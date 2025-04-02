@@ -28,30 +28,20 @@ public class HiddenBlocksSerializer {
         }
         ResourceLocation condition = ResourceLocation.tryParse(json.get("condition").getAsString());
         JsonObject conditionData = json.get("conditionData").getAsJsonObject();
-        BlockState hiddenAs = null;
         Block originalBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(json.get("originalBlock").getAsString()));
-        try {
-            hiddenAs = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), json.get("hiddenAs").getAsString(), false).blockState();
-        } catch (Exception e) {
-            Databank.LOGGER.error("[DATABANK ERROR] "+e.getMessage());
-        }
+        Block hiddenAs = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(json.get("hiddenAs").getAsString()));
         return new HiddenBlock(HiddenBlockConditions.conditions.get(condition).deserialize(conditionData), originalBlock, hiddenAs);
     }
     @Nonnull
     public static HiddenBlock fromNetwork(FriendlyByteBuf buf) {
-        BlockState hiddenAs = null;
         String originalBlockString = buf.readUtf();
         String hiddenAsString = buf.readUtf();
         Block originalBlock = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(originalBlockString));
-        try {
-            hiddenAs = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), hiddenAsString, false).blockState();
-        } catch (Exception e) {
-            Databank.LOGGER.error("[DATABANK ERROR] "+e.getMessage());
-        }
+        Block hiddenAs = BuiltInRegistries.BLOCK.get(ResourceLocation.tryParse(hiddenAsString));
         return new HiddenBlock(null, originalBlock, hiddenAs);
     }
     public static void toNetwork(FriendlyByteBuf buf, HiddenBlock block) {
         buf.writeResourceLocation(BuiltInRegistries.BLOCK.getKey(block.originalBlock));
-        buf.writeUtf(BlockStateParser.serialize(block.hiddenAs));
+        buf.writeResourceLocation(BuiltInRegistries.BLOCK.getKey(block.hiddenAs));
     }
 }

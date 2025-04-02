@@ -24,14 +24,14 @@ public abstract class BlockBehaviourMixin {
     @Inject(method = "getDrops", at = @At(value = "HEAD"), cancellable = true)
     public void getDrops(BlockState pState, LootParams.Builder pParams, CallbackInfoReturnable<List<ItemStack>> cir) {
         if (pParams.getOptionalParameter(LootContextParams.THIS_ENTITY) instanceof Player player) {
-            BlockState state = DatabankUtils.getHiddenBlock(this.asBlock(), player);
-            if (state != null) {
-                cir.setReturnValue(state.getDrops(pParams));
+            Block block = DatabankUtils.getHiddenBlock(this.asBlock(), player);
+            if (block != null) {
+                cir.setReturnValue(DatabankUtils.changeBlockType(pState, block).getDrops(pParams));
             }
         } else {
-            BlockState state = DatabankUtils.getHiddenBlock(this.asBlock());
-            if (state != null) {
-                cir.setReturnValue(state.getDrops(pParams));
+            Block block = DatabankUtils.getHiddenBlock(this.asBlock());
+            if (block != null) {
+                cir.setReturnValue(DatabankUtils.changeBlockType(pState, block).getDrops(pParams));
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.cmdpro.databank.mixin.client;
 
 import com.cmdpro.databank.ClientDatabankUtils;
+import com.cmdpro.databank.DatabankUtils;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -20,9 +21,9 @@ import java.util.Map;
 public class ItemBlockRenderTypesMixin {
     @Inject(method = "getRenderLayers", at = @At(value = "HEAD"), cancellable = true, remap = false)
     private static void getRenderLayers(BlockState pState, CallbackInfoReturnable<ChunkRenderTypeSet> cir) {
-        BlockState state = ClientDatabankUtils.getHiddenBlock(pState.getBlock());
-        if (state != null) {
-            cir.setReturnValue(ItemBlockRenderTypes.getRenderLayers(state));
+        Block block = ClientDatabankUtils.getHiddenBlock(pState.getBlock());
+        if (block != null) {
+            cir.setReturnValue(ItemBlockRenderTypes.getRenderLayers(DatabankUtils.changeBlockType(pState, block)));
         }
     }
 }
