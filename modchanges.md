@@ -3,3 +3,7 @@
 
 ### Changes
 - Changed the "offset" field in multiblocks to "center" to be more clear
+
+### Fixes
+- Hopefully fixed CMY color mixing
+- Made blockstate properties properly copy over when a block is hidden
