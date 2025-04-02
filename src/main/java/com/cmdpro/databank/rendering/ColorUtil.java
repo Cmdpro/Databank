@@ -75,17 +75,11 @@ public class ColorUtil {
         float y = 1f - b;
         return new float[] {c, m, y};
     }
-    public static float[] blendCmy(float[] cmy1, float[] cmy2, float alpha) {
+    public static float[] blendCmy(float[] cmy1, float[] cmy2, float intensity) {
         float c, m, y;
-        if (alpha == 1f) {
-            c = Math.max(0, Math.min(1, cmy1[0] + cmy2[0]));
-            m = Math.max(0, Math.min(1, cmy1[1] + cmy2[1]));
-            y = Math.max(0, Math.min(1, cmy1[2] + cmy2[2]));
-        } else {
-            c = (1 - alpha) * cmy1[0] + alpha * cmy2[0];
-            m = (1 - alpha) * cmy1[1] + alpha * cmy2[1];
-            y = (1 - alpha) * cmy1[2] + alpha * cmy2[2];
-        }
+        c = cmy1[0] * (1.0f - intensity) + cmy2[0] * intensity;
+        m = cmy1[1] * (1.0f - intensity) + cmy2[1] * intensity;
+        y = cmy1[2] * (1.0f - intensity) + cmy2[2] * intensity;
         return new float[] {c, m, y};
     }
     private static Color cmyToRgb(float[] cmy) {
