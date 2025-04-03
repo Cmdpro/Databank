@@ -77,9 +77,9 @@ public class ColorUtil {
     }
     public static float[] blendCmy(float[] cmy1, float[] cmy2, float intensity) {
         float c, m, y;
-        c = cmy1[0] * (1.0f - intensity) + cmy2[0] * intensity;
-        m = cmy1[1] * (1.0f - intensity) + cmy2[1] * intensity;
-        y = cmy1[2] * (1.0f - intensity) + cmy2[2] * intensity;
+        c = cmy1[0] * (1.0f - (intensity/2)) + cmy2[0] * (intensity/2);
+        m = cmy1[1] * (1.0f - (intensity/2)) + cmy2[1] * (intensity/2);
+        y = cmy1[2] * (1.0f - (intensity/2)) + cmy2[2] * (intensity/2);
         return new float[] {c, m, y};
     }
     private static Color cmyToRgb(float[] cmy) {
