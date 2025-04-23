@@ -25,14 +25,19 @@ import java.util.List;
 public class PostShaderManager {
     public static Matrix4f viewStackMatrix;
     public static List<PostShaderInstance> instances = new ArrayList<>();
+    public static List<PostShaderInstance> removalQueue = new ArrayList<>();
     public static void addShader(PostShaderInstance instance) {
         instances.add(instance);
     }
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
-        for (PostShaderInstance i : PostShaderManager.instances) {
+        for (PostShaderInstance i : instances) {
             i.tick();
         }
+        for (PostShaderInstance i : removalQueue) {
+            instances.remove(i);
+        }
+        removalQueue.clear();
     }
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {

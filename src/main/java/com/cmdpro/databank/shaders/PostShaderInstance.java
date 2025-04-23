@@ -37,6 +37,11 @@ public abstract class PostShaderInstance {
             postChain.resize(pWidth, pHeight);
         }
     }
+    public void queueRemoval() {
+        if (!PostShaderManager.removalQueue.contains(this)) {
+            PostShaderManager.removalQueue.add(this);
+        }
+    }
     public void process() {
         if (postChain == null) {
             try {
