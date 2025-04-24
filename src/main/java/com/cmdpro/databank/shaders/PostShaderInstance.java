@@ -54,7 +54,7 @@ public abstract class PostShaderInstance {
         }
         if (postChain != null) {
             for (PostPass i : passes) {
-                i.getEffect().safeGetUniform("time").set(time);
+                i.getEffect().safeGetUniform("time").set(time + (Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true) / 20f));
                 i.getEffect().safeGetUniform("CameraPosition").set(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().toVector3f());
                 i.getEffect().safeGetUniform("ModelViewMat").set(RenderSystem.getModelViewMatrix());
                 i.getEffect().safeGetUniform("invViewMat").set(new Matrix4f(PostShaderManager.viewStackMatrix).invert());
@@ -63,7 +63,6 @@ public abstract class PostShaderInstance {
             }
             beforeProcess();
             if (active) {
-                time += Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true) / 20f;
                 processPostChain();
                 afterProcess();
             }
@@ -83,7 +82,7 @@ public abstract class PostShaderInstance {
         return depthBackupTarget;
     }
     public void tick() {
-
+        time += 1/20f;
     }
     public void setUniforms(PostPass instance) {}
     public void beforeProcess() {}
