@@ -41,7 +41,6 @@ public class Multiblock implements BlockAndTintGetter {
     }
     public List<List<List<PredicateAndPos>>> getStates(boolean forceCacheReset) {
         if (forceCacheReset || this.states == null) {
-            statesForMultiblockChecks.clear();
             int x = 0;
             int y = 0;
             int z = 0;
