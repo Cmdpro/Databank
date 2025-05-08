@@ -28,6 +28,7 @@ public class Multiblock implements BlockAndTintGetter {
     public Map<Character, MultiblockPredicate> key;
     public BlockPos center;
     private List<List<List<PredicateAndPos>>> states;
+    private List<PredicateAndPos> statesForMultiblockChecks;
     public Multiblock(String[][] multiblockLayers, Map<Character, MultiblockPredicate> key, BlockPos center) {
         this.multiblockLayers = multiblockLayers;
         key.put(' ', new BlockstateMultiblockPredicate(Blocks.AIR.defaultBlockState()));
@@ -40,6 +41,7 @@ public class Multiblock implements BlockAndTintGetter {
     }
     public List<List<List<PredicateAndPos>>> getStates(boolean forceCacheReset) {
         if (forceCacheReset || this.states == null) {
+            statesForMultiblockChecks.clear();
             int x = 0;
             int y = 0;
             int z = 0;
@@ -66,6 +68,28 @@ public class Multiblock implements BlockAndTintGetter {
             return this.states;
         }
     }
+    private List<PredicateAndPos> getStatesForMultiblockCheck() {
+        return getStatesForMultiblockCheck(false);
+    }
+    private List<PredicateAndPos> getStatesForMultiblockCheck(boolean forceCacheReset) {
+        if (forceCacheReset || this.statesForMultiblockChecks == null) {
+            List<List<List<PredicateAndPos>>> states = getStates();
+            List<PredicateAndPos> statesForMultiChecks = new ArrayList<>();
+            for (List<List<PredicateAndPos>> i : states) {
+                for (List<PredicateAndPos> j : i) {
+                    for (PredicateAndPos k : j) {
+                        if (!(k.predicate instanceof AnyMultiblockPredicate)) {
+                            statesForMultiChecks.add(k);
+                        }
+                    }
+                }
+            }
+            statesForMultiblockChecks = statesForMultiChecks;
+            return statesForMultiChecks;
+        } else {
+            return this.statesForMultiblockChecks;
+        }
+    }
     public Rotation getMultiblockRotation(Level level, BlockPos pos) {
         if (checkMultiblock(level, pos, Rotation.NONE)) {
             return Rotation.NONE;
@@ -88,18 +112,14 @@ public class Multiblock implements BlockAndTintGetter {
         return checkMultiblock(level, pos, Rotation.NONE) || checkMultiblock(level, pos, Rotation.CLOCKWISE_90) || checkMultiblock(level, pos, Rotation.CLOCKWISE_180) || checkMultiblock(level, pos, Rotation.COUNTERCLOCKWISE_90);
     }
     public boolean checkMultiblock(Level level, BlockPos pos, Rotation rotation) {
-        for (List<List<PredicateAndPos>> i : getStates()) {
-            for (List<PredicateAndPos> j : i) {
-                for (PredicateAndPos k : j) {
-                    if (k.predicate == null) {
-                        continue;
-                    }
-                    BlockPos blockPos = k.offset.rotate(rotation).offset(pos.getX(), pos.getY(), pos.getZ());
-                    BlockState state = level.getBlockState(blockPos);
-                    if (!k.predicate.isSame(state, rotation)) {
-                        return false;
-                    }
-                }
+        for (PredicateAndPos i : getStatesForMultiblockCheck()) {
+            if (i.predicate == null) {
+                continue;
+            }
+            BlockPos blockPos = i.offset.rotate(rotation).offset(pos.getX(), pos.getY(), pos.getZ());
+            BlockState state = level.getBlockState(blockPos);
+            if (!i.predicate.isSame(state, rotation)) {
+                return false;
             }
         }
         return true;
