@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MegablockCoreUtil {
     public static boolean ableToPlace(MegablockCore core, BlockPlaceContext context) {
-        MegablockShape shape = core.getShape();
+        MegablockShape shape = core.getMegablockShape();
         for (Vec3i i : shape.shape) {
             if (!context.getLevel().getBlockState(context.getClickedPos().offset(i)).canBeReplaced()) {
                 return false;
@@ -22,7 +22,7 @@ public class MegablockCoreUtil {
         return true;
     }
     public static void placeRouters(MegablockCore core, Rotation rotation, Level level, BlockPos pos) {
-        MegablockShape shape = core.getShape().getRotated(rotation);
+        MegablockShape shape = core.getMegablockShape().getRotated(rotation);
         for (Vec3i i : shape.shape) {
             if (level.getBlockState(pos.offset(i)).canBeReplaced()) {
                 BlockState router = core.getRouterBlock().defaultBlockState();
@@ -32,7 +32,7 @@ public class MegablockCoreUtil {
         setRouterDirections(shape, core, pos, level, pos);
     }
     public static void setRouterDirections(MegablockCore core, BlockPos corePos, Level level, BlockPos pos) {
-        setRouterDirections(new ArrayList<>(), core.getShape(), core, corePos, level, pos);
+        setRouterDirections(new ArrayList<>(), core.getMegablockShape(), core, corePos, level, pos);
     }
     public static void setRouterDirections(MegablockShape shape, MegablockCore core, BlockPos corePos, Level level, BlockPos pos) {
         setRouterDirections(new ArrayList<>(), shape, core, corePos, level, pos);
@@ -56,7 +56,7 @@ public class MegablockCoreUtil {
         }
     }
     public static void removeRouters(MegablockCore core, Rotation rotation, Level level, BlockPos pos) {
-        MegablockShape shape = core.getShape().getRotated(rotation);
+        MegablockShape shape = core.getMegablockShape().getRotated(rotation);
         for (Vec3i i : shape.shape) {
             if (level.getBlockState(pos.offset(i)).is(core.getRouterBlock())) {
                 level.destroyBlock(pos.offset(i), true);
