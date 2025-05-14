@@ -50,7 +50,7 @@ public class MegablockCoreUtil {
                 if (state.is(core.getRouterBlock())) {
                     state = state.setValue(MegablockRouter.FACING, i.getOpposite());
                     level.setBlockAndUpdate(shifted, state);
-                    setRouterDirections(shape, core, corePos, level, shifted);
+                    setRouterDirections(alreadyVisited, shape, core, corePos, level, shifted);
                 }
             }
         }
