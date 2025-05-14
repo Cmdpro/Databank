@@ -22,13 +22,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MegablockRouter extends Block {
+public abstract class MegablockRouter extends Block {
     public static final Property<Direction> FACING = BlockStateProperties.FACING;
-    public Block core;
     public MegablockRouter(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.DOWN));
     }
+    public abstract Block getCore();
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
@@ -48,11 +48,12 @@ public class MegablockRouter extends Block {
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
         super.destroy(level, pos, state);
         if (level instanceof ServerLevel serverLevel) {
-            BlockPos blockPos = findCore(serverLevel, pos);
-            if (blockPos != null) {
-                BlockState blockState = level.getBlockState(blockPos);
-                if (blockState.is(core)) {
-                    level.destroyBlock(pos.below(), true);
+            BlockPos core = findCore(serverLevel, pos.relative(state.getValue(FACING)));
+            if (core != null) {
+                BlockState blockState = level.getBlockState(core);
+                if (blockState.is(getCore())) {
+                    level.destroyBlock(core, true);
+                    blockState.getBlock().destroy(level, core, blockState);
                 }
             }
         }
@@ -67,7 +68,7 @@ public class MegablockRouter extends Block {
             if (state2.is(this)) {
                 blockPos = blockPos.relative(state2.getValue(FACING));
             } else {
-                if (state2.is(core)) {
+                if (state2.is(getCore())) {
                     valid = true;
                 }
                 break;
@@ -88,6 +89,10 @@ public class MegablockRouter extends Block {
         return super.canSurvive(state, level, pos);
     }
     public Vec3i findOffset(Level level, BlockPos pos) {
-        return pos.subtract(findCore(level, pos));
+        BlockPos core = findCore(level, pos);
+        if (core == null) {
+            return null;
+        }
+        return pos.subtract(core);
     }
 }

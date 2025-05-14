@@ -24,7 +24,7 @@ public class MegablockCoreUtil {
     public static void placeRouters(MegablockCore core, Rotation rotation, Level level, BlockPos pos) {
         MegablockShape shape = core.getMegablockShape().getRotated(rotation);
         for (Vec3i i : shape.shape) {
-            if (level.getBlockState(pos.offset(i)).canBeReplaced()) {
+            if (!i.equals(Vec3i.ZERO) && level.getBlockState(pos.offset(i)).canBeReplaced()) {
                 BlockState router = core.getRouterBlock().defaultBlockState();
                 level.setBlockAndUpdate(pos.offset(i), router);
             }

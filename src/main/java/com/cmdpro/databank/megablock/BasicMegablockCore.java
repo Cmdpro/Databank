@@ -15,6 +15,9 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
     public BasicMegablockCore(Properties properties) {
         super(properties);
     }
+    public Rotation getRotation() {
+        return Rotation.NONE;
+    }
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         if (!MegablockCoreUtil.ableToPlace(this, context)) {
@@ -25,7 +28,7 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        MegablockCoreUtil.placeRouters(this, Rotation.NONE, level, pos);
+        MegablockCoreUtil.placeRouters(this, getRotation(), level, pos);
         super.onPlace(state, level, pos, oldState, movedByPiston);
     }
 
@@ -33,7 +36,7 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
         super.destroy(level, pos, state);
         if (level instanceof ServerLevel serverLevel) {
-            MegablockCoreUtil.removeRouters(this, Rotation.NONE, serverLevel, pos);
+            MegablockCoreUtil.removeRouters(this, getRotation(), serverLevel, pos);
         }
     }
 }
