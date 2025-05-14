@@ -3,6 +3,6 @@ package com.cmdpro.databank.megablock;
 import net.minecraft.world.level.block.Block;
 
 public interface MegablockCore {
-    MegablockShape getShape();
+    MegablockShape getMegablockShape();
     Block getRouterBlock();
 }
