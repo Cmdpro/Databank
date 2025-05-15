@@ -44,11 +44,12 @@ public abstract class MegablockRouter extends Block {
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     @Override
-    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        super.destroy(level, pos, state);
-        if (level instanceof ServerLevel serverLevel) {
-            BlockPos core = findCore(serverLevel, pos.relative(state.getValue(FACING)));
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
+        if (state.getBlock() != newState.getBlock()) {
+            BlockPos core = findCore(level, pos.relative(state.getValue(FACING)));
             if (core != null) {
                 BlockState blockState = level.getBlockState(core);
                 if (blockState.is(getCore())) {
@@ -58,6 +59,7 @@ public abstract class MegablockRouter extends Block {
             }
         }
     }
+
     public BlockPos findCore(Level level, BlockPos pos) {
         List<BlockPos> visited = new ArrayList<>();
         BlockPos blockPos = pos;

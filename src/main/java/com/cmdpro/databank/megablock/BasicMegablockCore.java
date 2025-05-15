@@ -33,10 +33,10 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
     }
 
     @Override
-    public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
-        super.destroy(level, pos, state);
-        if (level instanceof ServerLevel serverLevel) {
-            MegablockCoreUtil.removeRouters(this, getRotation(), serverLevel, pos);
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
+        if (state.getBlock() != newState.getBlock()) {
+            MegablockCoreUtil.removeRouters(this, getRotation(), level, pos);
         }
     }
 }
