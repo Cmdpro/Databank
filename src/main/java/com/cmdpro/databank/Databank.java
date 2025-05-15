@@ -13,7 +13,7 @@ import com.cmdpro.databank.music.conditions.AndMusicCondition;
 import com.cmdpro.databank.music.conditions.EntityNearbyMusicCondition;
 import com.cmdpro.databank.music.conditions.NotMusicCondition;
 import com.cmdpro.databank.music.conditions.OrMusicCondition;
-import com.cmdpro.databank.registry.MultiblockPredicateRegistry;
+import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +41,13 @@ public class Databank
     public Databank(IEventBus bus)
     {
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
+
+        ItemRegistry.ITEMS.register(bus);
+        BlockRegistry.BLOCKS.register(bus);
+        BlockEntityRegistry.BLOCK_ENTITIES.register(bus);
         MultiblockPredicateRegistry.MULTIBLOCK_PREDICATE_TYPES.register(bus);
+        AttachmentTypeRegistry.ATTACHMENT_TYPES.register(bus);
+
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "and"), AndCondition.AndConditionSerializer.INSTANCE);
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "or"), OrCondition.OrConditionSerializer.INSTANCE);
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "not"), NotCondition.NotConditionSerializer.INSTANCE);

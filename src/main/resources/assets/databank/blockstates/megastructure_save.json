@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "databank:block/megastructure_save"
+    }
+  }
+}
