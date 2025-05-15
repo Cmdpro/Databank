@@ -54,7 +54,6 @@ public abstract class MegablockRouter extends Block {
                 BlockState blockState = level.getBlockState(core);
                 if (blockState.is(getCore())) {
                     level.destroyBlock(core, true);
-                    blockState.getBlock().destroy(level, core, blockState);
                 }
             }
         }
