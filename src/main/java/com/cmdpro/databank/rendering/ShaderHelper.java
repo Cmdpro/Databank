@@ -12,6 +12,9 @@ public class ShaderHelper {
         }
         return Minecraft.useShaderTransparency();
     }
+    public static boolean needsBufferWorkaround() {
+        return ModList.get().isLoaded("iris");
+    }
     public static boolean isSodiumActive() {
         return ModList.get().isLoaded("sodium");
     }

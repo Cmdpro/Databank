@@ -34,6 +34,7 @@ public class RenderTypeHandler {
     public static List<RenderType> particleRenderTypes = new ArrayList<>();
     public static final RenderStateShard.ShaderStateShard TRANSLUCENT_SHADER = new RenderStateShard.ShaderStateShard(ShaderTypeHandler::getTranslucent);
     public static final RenderStateShard.ShaderStateShard ADDITIVE_SHADER = new RenderStateShard.ShaderStateShard(ShaderTypeHandler::getAdditive);
+    public static final RenderStateShard.ShaderStateShard SCREEN_PROJECTION_SHADER = new RenderStateShard.ShaderStateShard(ShaderTypeHandler::getScreenProjection);
     public static final RenderStateShard.TextureStateShard PARTICLE_SHEET = new RenderStateShard.TextureStateShard(TextureAtlas.LOCATION_PARTICLES, false, false);
     public static final RenderType TRANSPARENT = registerRenderType(RenderType.create(Databank.MOD_ID + ":transparent",
             DefaultVertexFormat.PARTICLE,
@@ -63,6 +64,13 @@ public class RenderTypeHandler {
             true,
             true,
             RenderType.CompositeState.builder().setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).setLightmapState(RenderStateShard.LIGHTMAP).setTransparencyState(ADDITIVE_TRANSPARENCY).setTextureState(PARTICLE_SHEET).setShaderState(ADDITIVE_SHADER).createCompositeState(false)), false);
+    public static final RenderType SCREEN_PROJECTION = registerRenderType(RenderType.create(Databank.MOD_ID + ":screen_projection",
+            DefaultVertexFormat.POSITION_TEX,
+            VertexFormat.Mode.QUADS,
+            256,
+            false,
+            false,
+            RenderType.CompositeState.builder().setShaderState(SCREEN_PROJECTION_SHADER).createCompositeState(false)), false);
     public static RenderType registerRenderType(RenderType type, boolean isParticle) {
         renderTypes.add(type);
         if (isParticle) {

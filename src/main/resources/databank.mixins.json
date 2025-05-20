@@ -14,6 +14,7 @@
     "client.GameRendererMixin",
     "client.LevelRendererMixin",
     "client.ItemBlockRenderTypesMixin",
-    "client.BlockColorsMixin"
+    "client.BlockColorsMixin",
+    "client.RenderBuffersMixin"
   ]
 }
