@@ -68,6 +68,9 @@ public class RenderProjectionUtil {
         event.getPoseStack().popPose();
     }
     private static final List<ProjectionRender> queued = new ArrayList<>();
+    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
+        project(graphics, source, null, from, to, width, height, true);
+    }
     public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height) {
         project(graphics, source, poseStack, from, to, width, height, true);
     }
@@ -75,9 +78,37 @@ public class RenderProjectionUtil {
         ProjectionRender render = new ProjectionRender(graphics, source, from, to, width, height);
         if (queue) {
             queued.add(render);
-        } else {
+        } else if (poseStack != null) {
             render.apply(poseStack);
         }
+    }
+    public static void renderTarget(RenderTarget target, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to) {
+        ShaderTypeHandler.SCREEN_PROJECTION.setSampler("ProjectedTarget", target.getColorTextureId());
+
+        Vec3 minPos = new Vec3(Math.min(from.x, to.x), Math.min(from.y, to.y), Math.min(from.z, to.z));
+        Vec3 maxPos = new Vec3(Math.max(from.x, to.x), Math.max(from.y, to.y), Math.max(from.z, to.z));
+        float minX = (float)minPos.x;
+        float minY = (float)minPos.y;
+        float minZ = (float)minPos.z;
+        float maxX = (float)maxPos.x;
+        float maxY = (float)maxPos.y;
+        float maxZ = (float)maxPos.z;
+        VertexConsumer consumer = source.getBuffer(RenderTypeHandler.SCREEN_PROJECTION);
+
+        poseStack.pushPose();
+        PoseStack.Pose pose = poseStack.last();
+        consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
+        consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
+        consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
+        consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
+
+        consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
+        consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
+        consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
+        consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
+        poseStack.popPose();
+
+        source.endBatch(RenderTypeHandler.SCREEN_PROJECTION);
     }
     static MultiBufferSource.BufferSource projectionBufferSource = null;
     private static MultiBufferSource.BufferSource createProjectionBufferSource() {
@@ -163,32 +194,8 @@ public class RenderProjectionUtil {
             matrix4fstack.set(mat);
             RenderSystem.applyModelViewMatrix();
 
-            ShaderTypeHandler.SCREEN_PROJECTION.setSampler("ProjectedTarget", target.getColorTextureId());
+            RenderProjectionUtil.renderTarget(target, source, poseStack, from, to);
 
-            Vec3 minPos = new Vec3(Math.min(from.x, to.x), Math.min(from.y, to.y), Math.min(from.z, to.z));
-            Vec3 maxPos = new Vec3(Math.max(from.x, to.x), Math.max(from.y, to.y), Math.max(from.z, to.z));
-            float minX = (float)minPos.x;
-            float minY = (float)minPos.y;
-            float minZ = (float)minPos.z;
-            float maxX = (float)maxPos.x;
-            float maxY = (float)maxPos.y;
-            float maxZ = (float)maxPos.z;
-            VertexConsumer consumer = source.getBuffer(RenderTypeHandler.SCREEN_PROJECTION);
-
-            poseStack.pushPose();
-            PoseStack.Pose pose = poseStack.last();
-            consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
-            consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
-            consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
-            consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
-
-            consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
-            consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
-            consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
-            consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
-            poseStack.popPose();
-
-            source.endBatch(RenderTypeHandler.SCREEN_PROJECTION);
             pool.unmarkUse(target, use);
         }
     }
