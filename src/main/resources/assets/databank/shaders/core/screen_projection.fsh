@@ -9,7 +9,7 @@ in vec2 texCoord0;
 out vec4 fragColor;
 
 void main() {
-    vec4 color = texture(ProjectedTarget, vec2(texCoord0.x, 1.0-texCoord0.y));
+    vec4 color = texture(ProjectedTarget, vec2(texCoord0.x, texCoord0.y));
     if (color.a == 0.0) {
         discard;
     }

@@ -193,8 +193,8 @@ public class RenderProjectionUtil {
 
             poseStack.pushPose();
             Vec3 middle = from.lerp(to, 0.5);
-            Vec3 from = this.from.subtract(middle);
-            Vec3 to = this.to.subtract(middle);
+            Vec3 from = middle.subtract(this.from);
+            Vec3 to = middle.subtract(this.to);
             poseStack.translate(middle.x, middle.y, middle.z);
             poseStack.pushPose();
             applyPoseStackTransformations.accept(poseStack);

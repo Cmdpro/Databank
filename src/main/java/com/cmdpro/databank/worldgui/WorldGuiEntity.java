@@ -2,6 +2,7 @@ package com.cmdpro.databank.worldgui;
 
 import com.cmdpro.databank.DatabankRegistries;
 import com.cmdpro.databank.registry.EntityRegistry;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.List;
 
@@ -119,11 +121,9 @@ public class WorldGuiEntity extends Entity {
         List<Vec3> rotations = gui.applyRotations();
         Matrix3f matrix = new Matrix3f();
         for (Vec3 i : rotations) {
-            matrix.rotate(Axis.YP.rotation((float)i.y));
-            matrix.rotate(Axis.XP.rotation((float)i.x));
-            matrix.rotate(Axis.ZP.rotation((float)i.z));
+            matrix.rotateZYX((float)i.z, (float)i.y, (float)i.x);
         }
-        vec3.mul(matrix);
+        matrix.transform(vec3);
         Vec3 corner = position().add(vec3.x, vec3.y, vec3.z);
         return corner;
     }
@@ -166,7 +166,7 @@ public class WorldGuiEntity extends Entity {
         double v = dMS1.dot(dS31);
 
         if ((u >= 0.0f && u <= dS21.dot(dS21) && v >= 0.0f && v <= dS31.dot(dS31))) {
-            return new WorldGuiIntersectionResult(new Vec2((float)u, (float)v), M);
+            return new WorldGuiIntersectionResult(new Vec2(1f-(float)u, (float)v), M);
         }
         return null;
     }
