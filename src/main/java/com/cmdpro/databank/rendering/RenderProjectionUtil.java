@@ -3,12 +3,9 @@ package com.cmdpro.databank.rendering;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.mixin.client.BufferSourceMixin;
 import com.cmdpro.databank.mixin.client.RenderBuffersMixin;
-import com.cmdpro.databank.rendering.RenderHandler;
-import com.cmdpro.databank.rendering.ShaderHelper;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -21,17 +18,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import org.joml.Quaternionf;
-import org.joml.Vector2i;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.SequencedMap;
 import java.util.function.Consumer;
@@ -69,13 +61,16 @@ public class RenderProjectionUtil {
     }
     private static final List<ProjectionRender> queued = new ArrayList<>();
     public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
-        project(graphics, source, null, from, to, width, height, true);
+        project(graphics, (stack) -> {}, (stack) -> {}, source, null, from, to, width, height, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height) {
-        project(graphics, source, poseStack, from, to, width, height, true);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, from, to, width, height, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height, boolean queue) {
-        ProjectionRender render = new ProjectionRender(graphics, source, from, to, width, height);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, from, to, width, height, true);
+    }
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height, boolean queue) {
+        ProjectionRender render = new ProjectionRender(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, from, to, width, height);
         if (queue) {
             queued.add(render);
         } else if (poseStack != null) {
@@ -85,14 +80,12 @@ public class RenderProjectionUtil {
     public static void renderTarget(RenderTarget target, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to) {
         ShaderTypeHandler.SCREEN_PROJECTION.setSampler("ProjectedTarget", target.getColorTextureId());
 
-        Vec3 minPos = new Vec3(Math.min(from.x, to.x), Math.min(from.y, to.y), Math.min(from.z, to.z));
-        Vec3 maxPos = new Vec3(Math.max(from.x, to.x), Math.max(from.y, to.y), Math.max(from.z, to.z));
-        float minX = (float)minPos.x;
-        float minY = (float)minPos.y;
-        float minZ = (float)minPos.z;
-        float maxX = (float)maxPos.x;
-        float maxY = (float)maxPos.y;
-        float maxZ = (float)maxPos.z;
+        float minX = (float)from.x;
+        float minY = (float)from.y;
+        float minZ = (float)from.z;
+        float maxX = (float)to.x;
+        float maxY = (float)to.y;
+        float maxZ = (float)to.z;
         VertexConsumer consumer = source.getBuffer(RenderTypeHandler.SCREEN_PROJECTION);
 
         poseStack.pushPose();
@@ -124,13 +117,17 @@ public class RenderProjectionUtil {
     }
     private static class ProjectionRender {
         Consumer<GuiGraphics> graphics;
+        Consumer<PoseStack> applyPoseStackTransformations;
+        Consumer<PoseStack> undoPoseStackTransformations;
         MultiBufferSource.BufferSource source;
         Vec3 from;
         Vec3 to;
         int width;
         int height;
-        public ProjectionRender(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
+        public ProjectionRender(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
             this.graphics = graphics;
+            this.applyPoseStackTransformations = applyPoseStackTransformations;
+            this.undoPoseStackTransformations = undoPoseStackTransformations;
             this.source = source;
             this.from = from;
             this.to = to;
@@ -194,7 +191,17 @@ public class RenderProjectionUtil {
             matrix4fstack.set(mat);
             RenderSystem.applyModelViewMatrix();
 
+            poseStack.pushPose();
+            Vec3 middle = from.lerp(to, 0.5);
+            Vec3 from = this.from.subtract(middle);
+            Vec3 to = this.to.subtract(middle);
+            poseStack.translate(middle.x, middle.y, middle.z);
+            poseStack.pushPose();
+            applyPoseStackTransformations.accept(poseStack);
             RenderProjectionUtil.renderTarget(target, source, poseStack, from, to);
+            undoPoseStackTransformations.accept(poseStack);
+            poseStack.popPose();
+            poseStack.popPose();
 
             pool.unmarkUse(target, use);
         }

@@ -6,6 +6,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class WorldGui {
     public WorldGuiEntity entity;
@@ -19,6 +23,9 @@ public abstract class WorldGui {
     public void leftClick(Player player, int x, int y) {}
     public void rightClick(Player player, int x, int y) {}
     public void tick() {}
+    public List<Vec3> applyRotations() {
+        return new ArrayList<>();
+    }
     public void sync() {
         entity.syncData();
     }

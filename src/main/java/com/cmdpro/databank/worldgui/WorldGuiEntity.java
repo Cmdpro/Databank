@@ -2,6 +2,8 @@ package com.cmdpro.databank.worldgui;
 
 import com.cmdpro.databank.DatabankRegistries;
 import com.cmdpro.databank.registry.EntityRegistry;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -12,6 +14,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+
+import java.util.List;
 
 public class WorldGuiEntity extends Entity {
     public WorldGuiEntity(EntityType<?> entityType, Level level) {
@@ -108,7 +115,16 @@ public class WorldGuiEntity extends Entity {
     public Vec3 getBoundsCorner(float multX, float multY) {
         Vec2 size = guiType.getMenuWorldSize(this).scale(0.5f);
         size = new Vec2(size.x*multX, size.y*multY);
-        Vec3 corner = position().add(size.x, size.y, 0);
+        Vector3f vec3 = new Vector3f(size.x, size.y, 0);
+        List<Vec3> rotations = gui.applyRotations();
+        Matrix3f matrix = new Matrix3f();
+        for (Vec3 i : rotations) {
+            matrix.rotate(Axis.YP.rotation((float)i.y));
+            matrix.rotate(Axis.XP.rotation((float)i.x));
+            matrix.rotate(Axis.ZP.rotation((float)i.z));
+        }
+        vec3.mul(matrix);
+        Vec3 corner = position().add(vec3.x, vec3.y, vec3.z);
         return corner;
     }
 
@@ -126,35 +142,30 @@ public class WorldGuiEntity extends Entity {
     }
 
     public WorldGuiIntersectionResult getLineIntersectResult(Vec3 lineStart, Vec3 lineEnd) {
-        Vec3 topLeft = getBoundsCorner(-1, 1);
+        Vec3 topLeft = getBoundsCorner(1, -1);
         Vec3 topRight = getBoundsCorner(1, 1);
         Vec3 bottomLeft = getBoundsCorner(-1, -1);
 
-        // 1.
         Vec3 dS21 = topRight.subtract(topLeft);
         Vec3 dS31 = bottomLeft.subtract(topLeft);
         Vec3 n = dS21.cross(dS31);
 
-        // 2.
         Vec3 dR = lineStart.subtract(lineEnd);
 
         double ndotdR = n.dot(dR);
 
-        if (Math.abs(ndotdR) < 1e-6f) { // Choose your tolerance
+        if (Math.abs(ndotdR) < 1e-6f) {
             return null;
         }
 
         double t = -n.dot(lineStart.subtract(topLeft)) / ndotdR;
         Vec3 M = lineStart.add(dR.scale(t));
 
-        // 3.
         Vec3 dMS1 = M.subtract(topLeft);
         double u = dMS1.dot(dS21);
         double v = dMS1.dot(dS31);
 
-        // 4.
-        if ((u >= 0.0f && u <= dS21.dot(dS21)
-                && v >= 0.0f && v <= dS31.dot(dS31))) {
+        if ((u >= 0.0f && u <= dS21.dot(dS21) && v >= 0.0f && v <= dS31.dot(dS31))) {
             return new WorldGuiIntersectionResult(new Vec2((float)u, (float)v), M);
         }
         return null;
