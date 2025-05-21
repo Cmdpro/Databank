@@ -47,6 +47,7 @@ public class Databank
         BlockEntityRegistry.BLOCK_ENTITIES.register(bus);
         MultiblockPredicateRegistry.MULTIBLOCK_PREDICATE_TYPES.register(bus);
         AttachmentTypeRegistry.ATTACHMENT_TYPES.register(bus);
+        EntityRegistry.ENTITY_TYPES.register(bus);
 
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "and"), AndCondition.AndConditionSerializer.INSTANCE);
         HiddenBlockConditions.conditions.put(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "or"), OrCondition.OrConditionSerializer.INSTANCE);
