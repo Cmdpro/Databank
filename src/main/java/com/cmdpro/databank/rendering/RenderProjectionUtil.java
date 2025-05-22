@@ -153,6 +153,7 @@ public class RenderProjectionUtil {
 
             Matrix4f projMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
             VertexSorting sorting = RenderSystem.getVertexSorting();
+            float fogStart = RenderSystem.getShaderFogStart();
 
             Matrix4f matrix4f = new Matrix4f()
                     .setOrtho(
@@ -171,6 +172,7 @@ public class RenderProjectionUtil {
             matrix4fstack.translation(0.0F, 0.0F, 10000F - net.neoforged.neoforge.client.ClientHooks.getGuiFarPlane());
             RenderSystem.applyModelViewMatrix();
             Lighting.setupFor3DItems();
+            FogRenderer.setupNoFog();
 
             RenderSystem.depthMask(true);
             RenderSystem.enableBlend();
@@ -182,6 +184,7 @@ public class RenderProjectionUtil {
             Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
             RenderSystem.depthMask(false);
 
+            RenderSystem.setShaderFogStart(fogStart);
             RenderSystem.setShader(() -> shader);
             RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
             Lighting.setupLevel();
