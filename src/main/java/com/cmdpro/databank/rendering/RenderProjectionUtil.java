@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -32,7 +33,7 @@ import java.util.function.Supplier;
 @EventBusSubscriber(value = Dist.CLIENT, modid = Databank.MOD_ID)
 public class RenderProjectionUtil {
     private static final RenderTargetPool pool = new RenderTargetPool();
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (ShaderHelper.shouldUseAlternateRendering()) {
             if (event.getStage().equals(RenderLevelStageEvent.Stage.AFTER_LEVEL)) {

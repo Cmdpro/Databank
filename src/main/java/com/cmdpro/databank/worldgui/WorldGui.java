@@ -7,6 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ public abstract class WorldGui {
     public void leftClick(Player player, int x, int y) {}
     public void rightClick(Player player, int x, int y) {}
     public void tick() {}
-    public List<Vec3> applyRotations() {
+    public List<Matrix3f> getMatrixs() {
         return new ArrayList<>();
     }
     public void sync() {

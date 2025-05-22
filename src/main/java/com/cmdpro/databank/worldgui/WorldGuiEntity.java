@@ -16,10 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 
 import java.util.List;
 
@@ -118,13 +115,11 @@ public class WorldGuiEntity extends Entity {
     public Vec3 getBoundsCorner(float multX, float multY) {
         Vec2 size = guiType.getMenuWorldSize(this).scale(0.5f);
         size = new Vec2(size.x*multX, size.y*multY);
-        Vector3f vec3 = new Vector3f(size.x, size.y, 0);
-        List<Vec3> rotations = gui.applyRotations();
-        Matrix3f matrix = new Matrix3f();
-        for (Vec3 i : rotations) {
-            matrix.rotateZYX((float)i.z, (float)i.y, (float)i.x);
+        Vector3f vec3 = new Vector3f(size.x, size.y, 0f);
+        List<Matrix3f> matrixs = gui.getMatrixs();
+        for (Matrix3f i : matrixs) {
+            i.transform(vec3);
         }
-        matrix.transform(vec3);
         Vec3 corner = position().add(vec3.x, vec3.y, vec3.z);
         return corner;
     }
