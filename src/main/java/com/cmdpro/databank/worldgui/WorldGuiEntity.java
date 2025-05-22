@@ -1,5 +1,6 @@
 package com.cmdpro.databank.worldgui;
 
+import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankRegistries;
 import com.cmdpro.databank.registry.EntityRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -142,31 +143,58 @@ public class WorldGuiEntity extends Entity {
     }
 
     public WorldGuiIntersectionResult getLineIntersectResult(Vec3 lineStart, Vec3 lineEnd) {
-        Vec3 topLeft = getBoundsCorner(1, -1);
-        Vec3 topRight = getBoundsCorner(1, 1);
-        Vec3 bottomLeft = getBoundsCorner(-1, -1);
-
-        Vec3 dS21 = topRight.subtract(topLeft);
-        Vec3 dS31 = bottomLeft.subtract(topLeft);
-        Vec3 n = dS21.cross(dS31);
-
-        Vec3 dR = lineStart.subtract(lineEnd);
-
-        double ndotdR = n.dot(dR);
-
-        if (Math.abs(ndotdR) < 1e-6f) {
-            return null;
+        Vector3f topLeft = getBoundsCorner(-1, 1).toVector3f();
+        Vector3f topRight = getBoundsCorner(1, 1).toVector3f();
+        Vector3f bottomLeft = getBoundsCorner(-1, -1).toVector3f();
+        Vector3f bottomRight = getBoundsCorner(1, -1).toVector3f();
+        Vector3f start = lineStart.toVector3f();
+        WorldGuiIntersectionResult result1 = intersectTriangle(start, lineStart.vectorTo(lineEnd).toVector3f(), (float)lineStart.distanceTo(lineEnd), topLeft, topRight, bottomLeft);
+        if (result1 != null) {
+            result1 = new WorldGuiIntersectionResult(new Vec2(1f-result1.normal.x, result1.normal.y), result1.pos);
+            if (result1.normal.length() >= 1) {
+                result1.normal = result1.normal.normalized();
+            }
+            return result1;
         }
+        WorldGuiIntersectionResult result2 = intersectTriangle(start, lineStart.vectorTo(lineEnd).toVector3f(), (float)lineStart.distanceTo(lineEnd), bottomRight, bottomLeft, topRight);
+        if (result2 != null) {
+            result2 = new WorldGuiIntersectionResult(new Vec2(result2.normal.x, 1f-result2.normal.y), result2.pos);
+            if (result2.normal.length() >= 1) {
+                result2.normal = result2.normal.normalized();
+            }
+            return result2;
+        }
+        return null;
+    }
+    private WorldGuiIntersectionResult intersectTriangle(Vector3f rayStart, Vector3f direction, float maxDistance, Vector3f triangle1, Vector3f triangle2, Vector3f triangle3) {
+        Vector3f e1 = new Vector3f(triangle2).sub(triangle1);
+        Vector3f e2 = new Vector3f(triangle3).sub(triangle1);
 
-        double t = -n.dot(lineStart.subtract(topLeft)) / ndotdR;
-        Vec3 M = lineStart.add(dR.scale(t));
+        Vector3f h = new Vector3f(direction).cross(e2);
+        float a = e1.dot(h);
 
-        Vec3 dMS1 = M.subtract(topLeft);
-        double u = dMS1.dot(dS21);
-        double v = dMS1.dot(dS31);
+        if (a > -0.00001f && a < 0.00001f)
+            return null;
 
-        if ((u >= 0.0f && u <= dS21.dot(dS21) && v >= 0.0f && v <= dS31.dot(dS31))) {
-            return new WorldGuiIntersectionResult(new Vec2(1f-(float)u, (float)v), M);
+        float f = 1f/a;
+        Vector3f s = new Vector3f(rayStart).sub(triangle1);
+        float u = f * (s.dot(h));
+
+        if (u < 0.0f || u > 1.0f)
+            return null;
+
+        Vector3f q = new Vector3f(s).cross(e1);
+        float v = f * direction.dot(q);
+
+        if (v < 0.0f || u + v > 1.0f)
+            return null;
+
+        float t = f * e2.dot(q);
+
+        Vector3f hitPos = new Vector3f(rayStart).add(new Vector3f(direction).mul(t));
+
+        if (t > 0.00001f && t <= maxDistance) {
+            return new WorldGuiIntersectionResult(new Vec2(u, v), new Vec3(hitPos.x, hitPos.y, hitPos.z));
         }
         return null;
     }
