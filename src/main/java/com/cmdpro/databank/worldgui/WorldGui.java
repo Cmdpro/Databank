@@ -3,6 +3,7 @@ package com.cmdpro.databank.worldgui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
@@ -27,6 +28,24 @@ public abstract class WorldGui {
     public void tick() {}
     public List<Matrix3f> getMatrixs() {
         return new ArrayList<>();
+    }
+    public void addMatrixsForFacingPlayer(List<Matrix3f> matrixs, boolean horizontal, boolean vertical) {
+        if (entity.level().isClientSide) {
+            Vec2 angle = ClientHandler.angleToClient(this);
+            matrixs.add(new Matrix3f()
+                    .rotateX((float)Math.toRadians(-90))
+            );
+            if (horizontal) {
+                matrixs.add(new Matrix3f()
+                        .rotateZ((float) Math.toRadians(-angle.y + 180))
+                );
+            }
+            if (vertical) {
+                matrixs.add(new Matrix3f()
+                        .rotateX((float)Math.toRadians(-angle.x))
+                );
+            }
+        }
     }
     public void sync() {
         entity.syncData();
@@ -66,6 +85,21 @@ public abstract class WorldGui {
                 }
             }
             return null;
+        }
+        public static Vec2 angleToClient(WorldGui gui) {
+            Vec3 pointA = gui.entity.position().multiply(1, 1, 1);
+            Vec3 pointB = Minecraft.getInstance().player.getEyePosition().multiply(1, 1, 1);
+            return calculateRotationVector(pointA, pointB);
+        }
+        private static Vec2 calculateRotationVector(Vec3 pVec, Vec3 pTarget) {
+            double d0 = pTarget.x - pVec.x;
+            double d1 = pTarget.y - pVec.y;
+            double d2 = pTarget.z - pVec.z;
+            double d3 = Math.sqrt(d0 * d0 + d2 * d2);
+            return new Vec2(
+                    Mth.wrapDegrees((float)(-(Mth.atan2(d1, d3) * (double)(180F / (float)Math.PI)))),
+                    Mth.wrapDegrees((float)(Mth.atan2(d2, d0) * (double)(180F / (float)Math.PI)) - 90.0F)
+            );
         }
     }
 }

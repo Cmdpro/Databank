@@ -113,13 +113,14 @@ public class WorldGuiEntity extends Entity {
         }
     }
     public Vec3 getBoundsCorner(float multX, float multY) {
-        Vec2 size = guiType.getMenuWorldSize(this).scale(0.5f);
-        size = new Vec2(size.x*multX, size.y*multY);
-        Vector3f vec3 = new Vector3f(size.x, size.y, 0f);
+        Vec2 size = guiType.getMenuWorldSize(this);
+        Vector3f vec3 = new Vector3f((size.x/2f)*multX, 0f, (size.y/2f)*multY);
+        Matrix3f matrix = new Matrix3f();
         List<Matrix3f> matrixs = gui.getMatrixs();
         for (Matrix3f i : matrixs) {
-            i.transform(vec3);
+            matrix.mul(i);
         }
+        matrix.transform(vec3);
         Vec3 corner = position().add(vec3.x, vec3.y, vec3.z);
         return corner;
     }

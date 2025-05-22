@@ -70,7 +70,7 @@ public class RenderTypeHandler {
             256,
             false,
             false,
-            RenderType.CompositeState.builder().setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).setShaderState(SCREEN_PROJECTION_SHADER).createCompositeState(false)), false);
+            RenderType.CompositeState.builder().setShaderState(SCREEN_PROJECTION_SHADER).createCompositeState(false)), false);
     public static RenderType registerRenderType(RenderType type, boolean isParticle) {
         renderTypes.add(type);
         if (isParticle) {

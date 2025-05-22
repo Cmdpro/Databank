@@ -61,45 +61,49 @@ public class RenderProjectionUtil {
         event.getPoseStack().popPose();
     }
     private static final List<ProjectionRender> queued = new ArrayList<>();
-    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
-        project(graphics, (stack) -> {}, (stack) -> {}, source, null, from, to, width, height, true);
+    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
+        project(graphics, (stack) -> {}, (stack) -> {}, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
-        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, from, to, width, height, true);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height) {
-        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, from, to, width, height, true);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to, int width, int height, boolean queue) {
-        ProjectionRender render = new ProjectionRender(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, from, to, width, height);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, boolean queue) {
+        ProjectionRender render = new ProjectionRender(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, topLeft, topRight, bottomRight, bottomLeft, width, height);
         if (queue) {
             queued.add(render);
         } else if (poseStack != null) {
             render.apply(poseStack);
         }
     }
-    public static void renderTarget(RenderTarget target, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 from, Vec3 to) {
+    public static void renderTarget(RenderTarget target, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft) {
         ShaderTypeHandler.SCREEN_PROJECTION.setSampler("ProjectedTarget", target.getColorTextureId());
 
-        float minX = (float)from.x;
-        float minY = (float)from.y;
-        float minZ = (float)from.z;
-        float maxX = (float)to.x;
-        float maxY = (float)to.y;
-        float maxZ = (float)to.z;
+        float tlX = (float)topLeft.x;
+        float tlY = (float)topLeft.y;
+        float tlZ = (float)topLeft.z;
+
+        float trX = (float)topRight.x;
+        float trY = (float)topRight.y;
+        float trZ = (float)topRight.z;
+
+        float brX = (float)bottomRight.x;
+        float brY = (float)bottomRight.y;
+        float brZ = (float)bottomRight.z;
+
+        float blX = (float)bottomLeft.x;
+        float blY = (float)bottomLeft.y;
+        float blZ = (float)bottomLeft.z;
         VertexConsumer consumer = source.getBuffer(RenderTypeHandler.SCREEN_PROJECTION);
 
         poseStack.pushPose();
         PoseStack.Pose pose = poseStack.last();
-        consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
-        consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
-        consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
-        consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
-
-        consumer.addVertex(pose, minX, minY, minZ).setUv(0, 1);
-        consumer.addVertex(pose, maxX, minY, maxZ).setUv(1, 1);
-        consumer.addVertex(pose, maxX, maxY, maxZ).setUv(1, 0);
-        consumer.addVertex(pose, minX, maxY, minZ).setUv(0, 0);
+        consumer.addVertex(pose, tlX, tlY, tlZ).setUv(0, 0);
+        consumer.addVertex(pose, trX, trY, trZ).setUv(1, 0);
+        consumer.addVertex(pose, brX, brY, brZ).setUv(1, 1);
+        consumer.addVertex(pose, blX, blY, blZ).setUv(0, 1);
         poseStack.popPose();
 
         source.endBatch(RenderTypeHandler.SCREEN_PROJECTION);
@@ -121,17 +125,21 @@ public class RenderProjectionUtil {
         Consumer<PoseStack> applyPoseStackTransformations;
         Consumer<PoseStack> undoPoseStackTransformations;
         MultiBufferSource.BufferSource source;
-        Vec3 from;
-        Vec3 to;
+        Vec3 topLeft;
+        Vec3 topRight;
+        Vec3 bottomRight;
+        Vec3 bottomLeft;
         int width;
         int height;
-        public ProjectionRender(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 from, Vec3 to, int width, int height) {
+        public ProjectionRender(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
             this.graphics = graphics;
             this.applyPoseStackTransformations = applyPoseStackTransformations;
             this.undoPoseStackTransformations = undoPoseStackTransformations;
             this.source = source;
-            this.from = from;
-            this.to = to;
+            this.topLeft = topLeft;
+            this.topRight = topRight;
+            this.bottomRight = bottomRight;
+            this.bottomLeft = bottomLeft;
             this.width = width;
             this.height = height;
         }
@@ -196,13 +204,31 @@ public class RenderProjectionUtil {
             RenderSystem.applyModelViewMatrix();
 
             poseStack.pushPose();
-            Vec3 middle = from.lerp(to, 0.5);
-            Vec3 from = middle.subtract(this.from);
-            Vec3 to = middle.subtract(this.to);
+
+            List<Vec3> vectors = new ArrayList<>();
+            vectors.add(topLeft);
+            vectors.add(topRight);
+            vectors.add(bottomRight);
+            vectors.add(bottomLeft);
+
+            Vec3 combinedVec = new Vec3(0, 0, 0);
+            for (Vec3 i : vectors) {
+                combinedVec = combinedVec.add(i);
+            }
+            Vec3 middle = combinedVec.scale(1.0f/(float)vectors.size());
+            Vec3 topLeft = middle.subtract(this.topLeft);
+            Vec3 topRight = middle.subtract(this.topRight);
+            Vec3 bottomRight = middle.subtract(this.bottomRight);
+            Vec3 bottomLeft = middle.subtract(this.bottomLeft);
+
             poseStack.translate(middle.x, middle.y, middle.z);
             poseStack.pushPose();
             applyPoseStackTransformations.accept(poseStack);
-            RenderProjectionUtil.renderTarget(target, source, poseStack, from, to);
+            RenderSystem.depthMask(true);
+            RenderSystem.enableDepthTest();
+            RenderProjectionUtil.renderTarget(target, source, poseStack, topLeft, topRight, bottomRight, bottomLeft);
+            RenderSystem.depthMask(false);
+            RenderSystem.disableDepthTest();
             undoPoseStackTransformations.accept(poseStack);
             poseStack.popPose();
             poseStack.popPose();
