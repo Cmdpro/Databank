@@ -7,7 +7,7 @@ import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
 import com.cmdpro.databank.hiddenblock.HiddenBlocksSerializer;
 import com.cmdpro.databank.networking.Message;
 import com.cmdpro.databank.worldgui.WorldGuiEntity;
-import net.minecraft.client.Minecraft;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponent;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -47,11 +47,21 @@ public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, 
             if (entity.gui != null) {
                 switch (interactionType) {
                     case 0: {
-                        entity.gui.leftClick(player, x, y);
+                        entity.gui.leftClick(false, player, x, y);
+                        for (WorldGuiComponent i : entity.gui.components.stream().toList()) {
+                            if (entity.gui.tryLeftClickComponent(false, player, i, x, y)) {
+                                i.leftClick(false, player, x, y);
+                            }
+                        }
                         break;
                     }
                     case 1: {
-                        entity.gui.rightClick(player, x, y);
+                        entity.gui.rightClick(false, player, x, y);
+                        for (WorldGuiComponent i : entity.gui.components.stream().toList()) {
+                            if (entity.gui.tryLeftClickComponent(false, player, i, x, y)) {
+                                i.leftClick(false, player, x, y);
+                            }
+                        }
                         break;
                     }
                 }

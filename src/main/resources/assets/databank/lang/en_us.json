@@ -7,5 +7,7 @@
   "block.databank.megastructure_save.finished": "Bounds are now from %1$s to %2$s",
   "block.databank.megastructure_save.saved": "Saved as %1$s",
 
-  "commands.databank.megastructure": "Spawned %1$s at %2$s"
+  "commands.databank.megastructure": "Spawned %1$s at %2$s",
+
+  "entity.databank.world_gui": "World Gui"
 }

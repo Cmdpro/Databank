@@ -4,17 +4,12 @@ import com.cmdpro.databank.rendering.RenderHandler;
 import com.cmdpro.databank.rendering.RenderProjectionUtil;
 import com.cmdpro.databank.worldgui.WorldGuiEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 public class WorldGuiRenderer extends EntityRenderer<WorldGuiEntity> {
     public WorldGuiRenderer(EntityRendererProvider.Context context) {
@@ -29,7 +24,7 @@ public class WorldGuiRenderer extends EntityRenderer<WorldGuiEntity> {
             Vec2 size = entity.guiType.getRenderSize();
             RenderProjectionUtil.project((graphics) -> {
                 if (entity.gui != null) {
-                    entity.gui.drawGui(graphics);
+                    entity.gui.renderGui(graphics);
                 }
             }, source, entity.getBoundsCorner(-1, 1), entity.getBoundsCorner(1, 1), entity.getBoundsCorner(1, -1), entity.getBoundsCorner(-1, -1), (int) size.x, (int) size.y);
         }

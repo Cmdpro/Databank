@@ -5,6 +5,7 @@ import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.WorldGuiInteractC2SPacket;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.cmdpro.databank.rendering.ShaderHelper;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponent;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -37,11 +38,21 @@ public class WorldGuiClientEvents {
                     int x = (int)(normal.x*entity.guiType.getRenderSize().x);
                     int y = (int)(normal.y*entity.guiType.getRenderSize().y);
                     if (event.getKeyMapping().equals(Minecraft.getInstance().options.keyAttack)) {
-                        entity.gui.leftClick(Minecraft.getInstance().player, x, y);
+                        entity.gui.leftClick(true, Minecraft.getInstance().player, x, y);
+                        for (WorldGuiComponent i : entity.gui.components.stream().toList()) {
+                            if (entity.gui.tryLeftClickComponent(true, Minecraft.getInstance().player, i, x, y)) {
+                                i.leftClick(true, Minecraft.getInstance().player, x, y);
+                            }
+                        }
                         ModMessages.sendToServer(new WorldGuiInteractC2SPacket(entity.getId(), 0, x, y));
                         event.setCanceled(true);
                     } else if (event.getKeyMapping().equals(Minecraft.getInstance().options.keyUse)) {
-                        entity.gui.rightClick(Minecraft.getInstance().player, x, y);
+                        entity.gui.rightClick(true, Minecraft.getInstance().player, x, y);
+                        for (WorldGuiComponent i : entity.gui.components.stream().toList()) {
+                            if (entity.gui.tryLeftClickComponent(true, Minecraft.getInstance().player, i, x, y)) {
+                                i.rightClick(true, Minecraft.getInstance().player, x, y);
+                            }
+                        }
                         ModMessages.sendToServer(new WorldGuiInteractC2SPacket(entity.getId(), 1, x, y));
                         event.setCanceled(true);
                     }

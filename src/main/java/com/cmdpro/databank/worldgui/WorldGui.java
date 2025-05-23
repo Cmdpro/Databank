@@ -1,30 +1,67 @@
 package com.cmdpro.databank.worldgui;
 
+import com.cmdpro.databank.DatabankRegistries;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponent;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
-import org.joml.Quaternionf;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
 
 public abstract class WorldGui {
     public WorldGuiEntity entity;
+    public List<WorldGuiComponent> components;
     public WorldGui(WorldGuiEntity entity) {
         this.entity = entity;
+        this.components = new ArrayList<>();
     }
+    public WorldGui addComponent(WorldGuiComponent component) {
+        if (!components.contains(component)) {
+            components.add(component);
+        }
+        return this;
+    }
+    public WorldGui removeComponent(WorldGuiComponent component) {
+        components.remove(component);
+        return this;
+    }
+    public WorldGui removeComponents(Predicate<WorldGuiComponent> predicate) {
+        components.removeAll(components.stream().filter(predicate).toList());
+        return this;
+    }
+    public void renderComponents(GuiGraphics guiGraphics) {
+        for (WorldGuiComponent i : entity.gui.components) {
+            i.render(guiGraphics);
+        }
+    }
+    public boolean tryLeftClickComponent(boolean isClient, Player player, WorldGuiComponent component, int x, int y) {
+        return true;
+    }
+    public boolean tryRightClickComponent(boolean isClient, Player player, WorldGuiComponent component, int x, int y) {
+        return true;
+    }
+    public abstract void addInitialComponents();
     public abstract WorldGuiType getType();
     public abstract void sendData(CompoundTag tag);
     public abstract void recieveData(CompoundTag tag);
-    public abstract void drawGui(GuiGraphics guiGraphics);
-    public void leftClick(Player player, int x, int y) {}
-    public void rightClick(Player player, int x, int y) {}
+    public void renderGui(GuiGraphics guiGraphics) {
+        renderComponents(guiGraphics);
+    }
+    public void leftClick(boolean isClient, Player player, int x, int y) {}
+    public void rightClick(boolean isClient, Player player, int x, int y) {}
     public void tick() {}
     public List<Matrix3f> getMatrixs() {
         return new ArrayList<>();

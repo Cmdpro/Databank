@@ -3,10 +3,14 @@ package com.cmdpro.databank.worldgui;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankRegistries;
 import com.cmdpro.databank.registry.EntityRegistry;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponent;
+import com.cmdpro.databank.worldgui.components.WorldGuiComponentType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public class WorldGuiEntity extends Entity {
     public WorldGuiEntity(EntityType<?> entityType, Level level) {
@@ -28,9 +33,18 @@ public class WorldGuiEntity extends Entity {
         this(EntityRegistry.WORLD_GUI.get(), level);
         setPos(position);
         this.guiType = type;
-        this.gui = type.createGui(this);
-        syncData();
     }
+
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
+        if (!level().isClientSide) {
+            this.gui = guiType.createGui(this);
+            this.gui.addInitialComponents();
+            syncData();
+        }
+    }
+
     public static final EntityDataAccessor<CompoundTag> GUI_DATA = SynchedEntityData.defineId(WorldGuiEntity.class, EntityDataSerializers.COMPOUND_TAG);
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -47,12 +61,48 @@ public class WorldGuiEntity extends Entity {
         saveGuiData(compound);
     }
 
+    public void sendComponentData(WorldGui gui, CompoundTag tag) {
+        ListTag components = new ListTag();
+        for (WorldGuiComponent i : gui.components) {
+            CompoundTag component = new CompoundTag();
+            i.sendData(component);
+            component.putUUID("uuid", i.uuid);
+            ResourceLocation id = DatabankRegistries.WORLD_GUI_COMPONENT_REGISTRY.getKey(i.getType());
+            if (id != null) {
+                component.putString("id", id.toString());
+            }
+            components.add(component);
+        }
+        tag.put("components", components);
+    }
+    public void recieveComponentData(WorldGui gui, CompoundTag tag) {
+        ListTag components = (ListTag)tag.get("components");
+        if (components != null) {
+            for (Tag i : components) {
+                if (i instanceof CompoundTag compoundTag) {
+                    UUID uuid = compoundTag.getUUID("uuid");
+                    ResourceLocation id = ResourceLocation.tryParse(compoundTag.getString("id"));
+                    WorldGuiComponentType type = DatabankRegistries.WORLD_GUI_COMPONENT_REGISTRY.get(id);
+                    if (type != null) {
+                        WorldGuiComponent component = gui.components.stream().filter((j) -> j.uuid.equals(uuid)).findFirst().orElse(null);
+                        if (component == null) {
+                            component = type.createComponent(gui);
+                        }
+                        component.recieveData(compoundTag);
+                        component.uuid = uuid;
+                        gui.addComponent(component);
+                    }
+                }
+            }
+        }
+    }
     public CompoundTag getSyncData() {
         CompoundTag tag = new CompoundTag();
         if (guiType.saves()) {
             guiType.saveData(gui, tag);
         }
         gui.sendData(tag);
+        sendComponentData(gui, tag);
         ResourceLocation id = DatabankRegistries.WORLD_GUI_TYPE_REGISTRY.getKey(guiType);
         if (id != null) {
             tag.putString("id", id.toString());
@@ -77,6 +127,35 @@ public class WorldGuiEntity extends Entity {
         }
         if (gui != null) {
             gui.recieveData(tag);
+            recieveComponentData(gui, tag);
+        }
+    }
+    public void saveComponentData(WorldGui gui, CompoundTag tag) {
+        ListTag components = new ListTag();
+        for (WorldGuiComponent i : gui.components) {
+            CompoundTag component = new CompoundTag();
+            i.getType().saveData(i, component);
+            ResourceLocation id = DatabankRegistries.WORLD_GUI_COMPONENT_REGISTRY.getKey(i.getType());
+            if (id != null) {
+                component.putString("id", id.toString());
+            }
+            components.add(component);
+        }
+        tag.put("components", components);
+    }
+    public void loadComponentData(WorldGui gui, CompoundTag tag) {
+        ListTag components = (ListTag)tag.get("components");
+        if (components != null) {
+            for (Tag i : components) {
+                if (i instanceof CompoundTag compoundTag) {
+                    ResourceLocation id = ResourceLocation.tryParse(compoundTag.getString("id"));
+                    WorldGuiComponentType type = DatabankRegistries.WORLD_GUI_COMPONENT_REGISTRY.get(id);
+                    if (type != null) {
+                        WorldGuiComponent component = type.createComponent(gui);
+                        component.getType().loadData(gui, compoundTag);
+                    }
+                }
+            }
         }
     }
 
@@ -94,6 +173,7 @@ public class WorldGuiEntity extends Entity {
     public CompoundTag saveGuiData(CompoundTag tag) {
         ResourceLocation id = DatabankRegistries.WORLD_GUI_TYPE_REGISTRY.getKey(guiType);
         guiType.saveData(gui, tag);
+        saveComponentData(gui, tag);
         if (id != null) {
             tag.putString("id", id.toString());
         }
@@ -109,6 +189,7 @@ public class WorldGuiEntity extends Entity {
             if (type.saves()) {
                 guiType = type;
                 gui = type.loadData(this, tag);
+                loadComponentData(gui, tag);
             }
         }
     }
