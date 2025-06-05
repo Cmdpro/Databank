@@ -1,70 +1,62 @@
 package com.cmdpro.databank.model.animation;
 
-import com.cmdpro.databank.model.DatabankEntityModel;
-import com.cmdpro.databank.model.blockentity.BlockEntityKeyframeAnimations;
+import com.cmdpro.databank.model.DatabankModel;
 import com.mojang.blaze3d.Blaze3D;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.AnimationState;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class DatabankAnimationState {
-    public AnimationState state;
+    public double startTime;
     public String defaultAnim;
+    public double speed;
     private DatabankAnimationDefinition anim;
-    private HashMap<String, DatabankAnimationDefinition> anims;
+    private HashMap<String, DatabankAnimationDefinition> animDefinitions;
+    private HashMap<String, DatabankAnimationReference> anims;
     public DatabankAnimationState(String defaultAnim) {
-        state = new AnimationState();
+        animDefinitions = new HashMap<>();
         anims = new HashMap<>();
         this.defaultAnim = defaultAnim;
     }
-    public void updateAnimDefinitions(DatabankEntityModel model) {
-        for (Map.Entry<String, DatabankAnimationDefinition> i : anims.entrySet()) {
-            if (i.getValue().definition == null) {
-                i.getValue().definition = model.animations.getOrDefault(i.getKey(), null).createAnimationDefinition();
-            }
+    public void updateAnimDefinitions(DatabankModel model) {
+        for (DatabankAnimationReference i : anims.values()) {
+            animDefinitions.put(i.id, model.animations.getOrDefault(i.id, null).createAnimationDefinition(i.id));
         }
+    }
+    public double getProgress() {
+        if (anim != null && anim.animation.looping) {
+            return (getTime()-startTime) % anim.animation.length;
+        }
+        return getTime()-startTime;
+    }
+    public void start() {
+        startTime = getTime();
     }
     public void update() {
         if (anim == null) {
-            anim = anims.get(defaultAnim);
+            anim = animDefinitions.get(defaultAnim);
         }
-        state.startIfStopped(getTime());
         if (isDone()) {
-            anim.onEnd.call(this, anim);
+            anims.get(anim.id).onEnd.call(this, anim);
         }
-    }
-    public void fastForward(int duration, float speed) {
-        state.fastForward(duration, speed);
-    }
-    public long getAccumulatedTime() {
-        return state.getAccumulatedTime();
-    }
-    public boolean isStarted() {
-        return state.isStarted();
     }
     public void resetAnim() {
         if (anim != null) {
-            state.stop();
-            state.start(getTime());
-            anim.onStart.call(this, anim);
+            start();
+            anims.get(anim.id).onStart.call(this, anim);
         }
     }
     public void setAnim(String anim) {
         if (this.anim == null || !this.anim.id.equals(anim)) {
-            state.stop();
-            state.start(getTime());
-            this.anim = anims.get(anim);
-            this.anim.onStart.call(this, this.anim);
+            start();
+            this.anim = animDefinitions.get(anim);
+            anims.get(anim).onStart.call(this, this.anim);
         }
     }
     public boolean isDone() {
         if (anim == null) {
             return true;
         }
-        return BlockEntityKeyframeAnimations.isDone(anims.get(anim.id).definition, state.getAccumulatedTime());
+        return anim.animation.length <= getProgress() && !anim.animation.looping;
     }
     public DatabankAnimationDefinition getAnim() {
         return anim;
@@ -75,15 +67,15 @@ public class DatabankAnimationState {
         }
         return this.anim.id.equals(anim);
     }
-    public DatabankAnimationState addAnim(DatabankAnimationDefinition definition) {
-        anims.put(definition.id, definition);
+    public DatabankAnimationState addAnim(DatabankAnimationReference reference) {
+        anims.put(reference.id, reference);
         return this;
     }
     public DatabankAnimationState removeAnim(DatabankAnimationDefinition definition) {
         anims.remove(definition.id);
         return this;
     }
-    private int getTime() {
-        return (int)(Blaze3D.getTime() * (double)20.0F);
+    private double getTime() {
+        return Blaze3D.getTime();
     }
 }

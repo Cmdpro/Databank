@@ -1,5 +1,6 @@
 package com.cmdpro.databank.model;
 
+import com.cmdpro.databank.model.animation.DatabankAnimationDefinition;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -27,15 +28,9 @@ public class DatabankAnimation {
         this.looping = looping;
         this.animationParts = animationParts;
     }
-    public AnimationDefinition createAnimationDefinition() {
-        AnimationDefinition.Builder anim = AnimationDefinition.Builder.withLength(length);
-        if (looping) {
-            anim.looping();
-        }
-        for (AnimationPart i : animationParts) {
-            anim.addAnimation(i.bone, i.createAnimationChannel());
-        }
-        return anim.build();
+    public DatabankAnimationDefinition createAnimationDefinition(String id) {
+        DatabankAnimationDefinition anim = new DatabankAnimationDefinition(id, this);
+        return anim;
     }
     public static class AnimationPart {
         public static final Codec<AnimationPart> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
@@ -45,31 +40,24 @@ public class DatabankAnimation {
         ).apply(instance, AnimationPart::new));
         public String bone;
         public String targetString;
-        public AnimationChannel.Target target;
+        public Target target;
         public List<AnimationKeyframe> keyframes;
         public AnimationPart(String bone, String target, List<AnimationKeyframe> keyframes) {
             this.bone = bone;
             this.targetString = target;
             this.keyframes = keyframes;
             if (target.equalsIgnoreCase("POSITION")) {
-                this.target = AnimationChannel.Targets.POSITION;
+                this.target = POSITION;
             }
             if (target.equalsIgnoreCase("ROTATION")) {
-                this.target = AnimationChannel.Targets.ROTATION;
+                this.target = ROTATION;
             }
             if (target.equalsIgnoreCase("SCALE")) {
-                this.target = AnimationChannel.Targets.SCALE;
+                this.target = SCALE;
             }
             for (AnimationKeyframe i : keyframes) {
                 i.targetChannel = this.target;
             }
-        }
-        public AnimationChannel createAnimationChannel() {
-            List<Keyframe> keyframes = new ArrayList<>();
-            for (AnimationKeyframe i : this.keyframes) {
-                keyframes.add(i.createKeyframe());
-            }
-            return new AnimationChannel(target, keyframes.toArray(new Keyframe[0]));
         }
     }
     public static class AnimationKeyframe {
@@ -86,7 +74,7 @@ public class DatabankAnimation {
             this.target = target;
             this.interpolation = interpolation;
         }
-        public AnimationChannel.Target targetChannel;
+        public Target targetChannel;
         public Keyframe createKeyframe() {
             Vector3f target = getTarget();
             AnimationChannel.Interpolation interpolation = getInterpolation();
@@ -104,16 +92,22 @@ public class DatabankAnimation {
         }
         private Vector3f getTarget() {
             Vector3f target = this.target;
-            if (targetChannel == AnimationChannel.Targets.POSITION) {
+            if (targetChannel == POSITION) {
                 target = KeyframeAnimations.posVec(target.x, target.y, target.z);
             }
-            if (targetChannel == AnimationChannel.Targets.ROTATION) {
+            if (targetChannel == ROTATION) {
                 target = KeyframeAnimations.degreeVec(target.x, target.y, target.z);
             }
-            if (targetChannel == AnimationChannel.Targets.SCALE) {
+            if (targetChannel == SCALE) {
                 target = KeyframeAnimations.scaleVec(target.x, target.y, target.z);
             }
             return target;
         }
+    }
+    public static final Target POSITION = ModelPose.ModelPosePart::offsetPosition;
+    public static final Target ROTATION = ModelPose.ModelPosePart::offsetRotation;
+    public static final Target SCALE = ModelPose.ModelPosePart::offsetScale;
+    public interface Target {
+        void apply(ModelPose.ModelPosePart part, Vector3f vector);
     }
 }

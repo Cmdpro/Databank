@@ -131,6 +131,7 @@ function goThroughChildren(array, parentOffset) {
                 }
             }
             part.isCube = true
+            part.isMesh = false
             part.texOffset = [
                 element.uv_offset[0],
                 element.uv_offset[1]
@@ -184,9 +185,63 @@ function goThroughChildren(array, parentOffset) {
                 }
             }
             part.isCube = false
+            part.isMesh = false
             if (element.children != null) {
                 part.children = goThroughChildren(element.children, part.offset)
             }
+            parts.push(part)
+        } else if (element instanceof Mesh) {
+            var part = {}
+            part.name = getNewName(element.name)
+            part.rotation = [
+                Math.degToRad(-element.rotation[0]),
+                  Math.degToRad(-element.rotation[1]),
+                  Math.degToRad(element.rotation[2])
+            ]
+            part.offset = [
+                element.origin[0],
+                element.origin[1],
+                element.origin[2]
+            ]
+            if (element.parent instanceof Group) {
+                part.offset[0] -= element.parent.origin[0]
+                part.offset[1] -= element.parent.origin[1]
+                part.offset[2] -= element.parent.origin[2]
+            }
+            part.offset[0] *= -1;
+            if (Project.modded_entity_flip_y) {
+                part.offset[1] *= -1;
+                if (element.parent instanceof Group === false) {
+                    part.offset[1] += 24
+                }
+            }
+            part.isCube = false
+            part.isMesh = true
+            part.mirror = element.mirror_uv
+            var faces = []
+            for (var k in element.faces) {
+                var v = element.faces[k]
+                var face = []
+                var vertIndex = 0
+                v.getSortedVertices().forEach((j) => {
+                    var vertice = {}
+                    if (j in element.vertices) {
+                        var current = element.vertices[j]
+                        vertice.x = current[0]
+                        vertice.y = current[1]
+                        vertice.z = current[2]
+                        if (j in v.uv) {
+                            var uv = v.uv[j]
+                            vertice.u = uv[0]
+                            vertice.v = uv[1]
+                        }
+                    }
+                    face.push(vertice)
+                    vertIndex++
+                })
+                faces.push(face)
+            }
+            part.faces = faces
             parts.push(part)
         }
     });
@@ -219,6 +274,7 @@ Plugin.register('databank_blockbench', {
             animation_mode: true,
             display_mode: true,
             select_texture_for_particles: true,
+            meshes: true,
         })
         codec.format = modelFormat
         export_display = new Action({

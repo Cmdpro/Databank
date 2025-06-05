@@ -14,15 +14,13 @@ public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> impleme
     public DatabankBlockEntityRenderer(DatabankBlockEntityModel<T> model) {
         this.model = model;
     }
-    public abstract ResourceLocation getTextureLocation();
     @Override
     public void render(T pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
-        getModel().root().getAllParts().forEach(ModelPart::resetPose);
-        getModel().setupAnim(pBlockEntity);
-        getModel().renderToBuffer(pPoseStack, pBufferSource.getBuffer(getModel().renderType.apply(getTextureLocation())), pPackedLight, pPackedOverlay);
+        getModel().setupModelPose(pBlockEntity, pPartialTick);
+        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF);
         pPoseStack.popPose();
     }
     public DatabankBlockEntityModel<T> getModel() {

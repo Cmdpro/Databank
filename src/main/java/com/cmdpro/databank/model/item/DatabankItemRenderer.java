@@ -2,6 +2,7 @@ package com.cmdpro.databank.model.item;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -21,15 +22,14 @@ public abstract class DatabankItemRenderer<T extends Item> extends BlockEntityWi
         super(dispatcher, modelSet);
         this.model = model;
     }
-    public abstract ResourceLocation getTextureLocation();
     @Override
     public void renderByItem(ItemStack pStack, ItemDisplayContext pDisplayContext, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+        float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
-        getModel().root().getAllParts().forEach(ModelPart::resetPose);
-        getModel().setupAnim(pStack);
-        getModel().renderToBuffer(pPoseStack, pBuffer.getBuffer(getModel().renderType.apply(getTextureLocation())), pPackedLight, pPackedOverlay);
+        getModel().setupModelPose(pStack, partialTick);
+        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF);
         pPoseStack.popPose();
     }
 
