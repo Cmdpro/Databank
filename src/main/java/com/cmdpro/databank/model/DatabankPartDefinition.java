@@ -71,6 +71,14 @@ public class DatabankPartDefinition {
     public PartPose createPartPose() {
         return PartPose.offsetAndRotation(offset.x, offset.y, offset.z, rotation.x, rotation.y, rotation.z);
     }
+    public static class Face {
+        public List<DatabankPartDefinition.Vertex> vertices;
+        public Vec3 normal;
+        public Face(List<DatabankPartDefinition.Vertex> vertices, Vec3 normal) {
+            this.vertices = vertices;
+            this.normal = normal;
+        }
+    }
     public static class Vertex {
         public static final Codec<Vertex> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
                 Codec.DOUBLE.fieldOf("x").forGetter((vertice) -> vertice.pos.x),
