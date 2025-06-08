@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
     private DatabankBlockEntityModel<T> model;
@@ -20,7 +21,7 @@ public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> impleme
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pBlockEntity, pPartialTick);
-        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, false);
+        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, new Vec3(1, 1, 1));
         pPoseStack.popPose();
     }
     public DatabankBlockEntityModel<T> getModel() {

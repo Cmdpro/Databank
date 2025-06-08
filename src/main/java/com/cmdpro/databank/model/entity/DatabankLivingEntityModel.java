@@ -9,15 +9,16 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class DatabankLivingEntityModel<T extends LivingEntity> extends DatabankEntityModel<T> {
     @Override
-    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, boolean flipNormals) {
+    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult) {
         pPoseStack.pushPose();
         float scale = pEntity.getScale();
         pPoseStack.scale(scale, scale, scale);
         setupRotations(pEntity, pPoseStack, partialTick, scale);
-        super.renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, flipNormals);
+        super.renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, normalMult);
         pPoseStack.popPose();
     }
 

@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class DatabankItemRenderer<T extends Item> extends BlockEntityWithoutLevelRenderer {
     private DatabankItemModel<T> model;
@@ -29,7 +30,7 @@ public abstract class DatabankItemRenderer<T extends Item> extends BlockEntityWi
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pStack, partialTick);
-        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI);
+        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI ? new Vec3(1, -1, -1) : new Vec3(1, 1, 1));
         pPoseStack.popPose();
     }
 

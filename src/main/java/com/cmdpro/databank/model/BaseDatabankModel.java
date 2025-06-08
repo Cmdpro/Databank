@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionf;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public abstract class BaseDatabankModel<T> {
     private static final Vector3f VECTOR_CACHE = new Vector3f();
-    public void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, boolean flipNormals) {
+    public void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, Vec3 normalMult) {
         pPoseStack.pushPose();
         if (!part.part.isCube && !part.part.isMesh) {
             pPoseStack.translate((part.pos.x/16f), (part.pos.y/16f), (part.pos.z/16f));
@@ -29,10 +30,10 @@ public abstract class BaseDatabankModel<T> {
         }
         if (part.part.isCube || part.part.isMesh) {
             VertexConsumer consumer = pBuffer.getBuffer(getRenderType(obj, part));
-            part.render(getModel(), partialTick, pPoseStack, consumer, pPackedLight, pPackedOverlay, pColor, flipNormals);
+            part.render(getModel(), partialTick, pPoseStack, consumer, pPackedLight, pPackedOverlay, pColor, normalMult);
         }
         for (ModelPose.ModelPosePart i : part.children) {
-            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, flipNormals);
+            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, normalMult);
         }
         pPoseStack.popPose();
     }

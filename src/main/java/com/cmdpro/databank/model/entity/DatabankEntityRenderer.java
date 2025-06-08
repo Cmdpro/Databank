@@ -22,6 +22,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 
 public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRenderer<T> {
@@ -39,7 +40,7 @@ public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRen
         poseStack.translate(0, 1.5, 0);
         poseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pEntity, partialTick);
-        getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, false);
+        getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, new Vec3(1, 1, 1));
         poseStack.popPose();
     }
     public int getOverlayCoords(T entity) {
