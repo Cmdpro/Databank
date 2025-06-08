@@ -1,10 +1,6 @@
 package com.cmdpro.databank.networking.packet;
 
-import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
-import com.cmdpro.databank.hiddenblock.HiddenBlock;
-import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
-import com.cmdpro.databank.hiddenblock.HiddenBlocksSerializer;
 import com.cmdpro.databank.networking.Message;
 import com.cmdpro.databank.worldgui.WorldGuiEntity;
 import com.cmdpro.databank.worldgui.components.WorldGuiComponent;
@@ -12,13 +8,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-
-import java.util.List;
-import java.util.Map;
 
 public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, int y) implements Message {
 

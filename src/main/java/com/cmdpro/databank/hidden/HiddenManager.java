@@ -1,4 +1,4 @@
-package com.cmdpro.databank.hiddenblock;
+package com.cmdpro.databank.hidden;
 
 import com.cmdpro.databank.Databank;
 import com.google.gson.*;
@@ -7,27 +7,29 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class HiddenBlocksManager extends SimpleJsonResourceReloadListener {
+public class HiddenManager extends SimpleJsonResourceReloadListener {
     protected static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-    public static HiddenBlocksManager instance;
-    protected HiddenBlocksManager() {
-        super(GSON, "databank/hidden_blocks");
+    public static HiddenManager instance;
+    protected HiddenManager() {
+        super(GSON, "databank/hidden");
     }
-    public static HiddenBlocksManager getOrCreateInstance() {
+    public static HiddenManager getOrCreateInstance() {
         if (instance == null) {
-            instance = new HiddenBlocksManager();
+            instance = new HiddenManager();
         }
         return instance;
     }
-    public static Map<ResourceLocation, HiddenBlock> blocks = new HashMap<>();
+    public static Map<ResourceLocation, Hidden> hidden = new HashMap<>();
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        blocks = new HashMap<>();
-        Databank.LOGGER.info("[DATABANK] Adding Databank Hidden Blocks");
+        hidden = new HashMap<>();
+        Databank.LOGGER.info("[DATABANK] Adding Databank Hidden Entries");
         for (Map.Entry<ResourceLocation, JsonElement> i : pObject.entrySet()) {
             ResourceLocation location = i.getKey();
             if (location.getPath().startsWith("_")) {
@@ -36,13 +38,17 @@ public class HiddenBlocksManager extends SimpleJsonResourceReloadListener {
 
             try {
                 JsonObject obj = i.getValue().getAsJsonObject();
-                HiddenBlock block = serializer.read(i.getKey(), obj);
-                blocks.put(i.getKey(), block);
+                Hidden value = serializer.read(i.getKey(), obj);
+                if (value == null) {
+                    continue;
+                }
+                value.id = i.getKey();
+                hidden.put(i.getKey(), value);
             } catch (IllegalArgumentException | JsonParseException e) {
-                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading hidden block type {}", location, e);
+                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading hidden entry {}", location, e);
             }
         }
-        Databank.LOGGER.info("[DATABANK] Loaded {} hidden blocks", blocks.size());
+        Databank.LOGGER.info("[DATABANK] Loaded {} hidden entries", hidden.size());
     }
-    public static HiddenBlocksSerializer serializer = new HiddenBlocksSerializer();
+    public static HiddenSerializer serializer = new HiddenSerializer();
 }

@@ -1,13 +1,16 @@
 package com.cmdpro.databank.music.conditions;
 
-import com.cmdpro.databank.music.MusicConditions;
+import com.cmdpro.databank.music.MusicCondition;
+import com.cmdpro.databank.music.MusicSerializer;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 
-public class OrMusicCondition extends MusicConditions.MusicCondition {
-    public MusicConditions.MusicCondition conditionA;
-    public MusicConditions.MusicCondition conditionB;
-    public OrMusicCondition(MusicConditions.MusicCondition conditionA, MusicConditions.MusicCondition conditionB) {
+public class OrMusicCondition extends MusicCondition {
+    public MusicCondition conditionA;
+    public MusicCondition conditionB;
+    public OrMusicCondition(MusicCondition conditionA, MusicCondition conditionB) {
         this.conditionA = conditionA;
         this.conditionB = conditionB;
     }
@@ -19,15 +22,15 @@ public class OrMusicCondition extends MusicConditions.MusicCondition {
     public Serializer getSerializer() {
         return OrConditionSerializer.INSTANCE;
     }
-    public static class OrConditionSerializer extends Serializer {
+    public static class OrConditionSerializer extends Serializer<OrMusicCondition> {
         public static final OrConditionSerializer INSTANCE = new OrConditionSerializer();
+        public static final MapCodec<OrMusicCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                MusicSerializer.MUSIC_CONDITION_CODEC.fieldOf("conditionA").forGetter((condition) -> condition.conditionA),
+                MusicSerializer.MUSIC_CONDITION_CODEC.fieldOf("conditionB").forGetter((condition) -> condition.conditionB)
+        ).apply(instance, OrMusicCondition::new));
         @Override
-        public MusicConditions.MusicCondition deserialize(JsonObject json) {
-            ResourceLocation conditionA = ResourceLocation.tryParse(json.get("conditionA").getAsString());
-            JsonObject conditionAData = json.get("conditionAData").getAsJsonObject();
-            ResourceLocation conditionB = ResourceLocation.tryParse(json.get("conditionB").getAsString());
-            JsonObject conditionBData = json.get("conditionBData").getAsJsonObject();
-            return new AndMusicCondition(MusicConditions.conditions.get(conditionA).deserialize(conditionAData), MusicConditions.conditions.get(conditionB).deserialize(conditionBData));
+        public MapCodec<OrMusicCondition> codec() {
+            return CODEC;
         }
     }
 }

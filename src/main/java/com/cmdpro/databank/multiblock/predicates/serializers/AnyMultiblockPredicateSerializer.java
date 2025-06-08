@@ -14,6 +14,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
 public class AnyMultiblockPredicateSerializer extends MultiblockPredicateSerializer<AnyMultiblockPredicate> {
+    public static final AnyMultiblockPredicateSerializer INSTANCE = new AnyMultiblockPredicateSerializer();
     public static TagKey<Block> getTagFromString(String str) {
         return TagKey.create(Registries.BLOCK, ResourceLocation.tryParse(str));
     }

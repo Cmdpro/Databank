@@ -8,13 +8,16 @@
     "ItemRendererAccessor"
   ],
   "client": [
+    "client.BlockColorsMixin",
     "client.BlockMixin",
     "client.BlockModelShaperMixin",
     "client.BufferSourceMixin",
     "client.GameRendererMixin",
-    "client.LevelRendererMixin",
     "client.ItemBlockRenderTypesMixin",
-    "client.BlockColorsMixin",
-    "client.RenderBuffersMixin"
+    "client.ItemMixin",
+    "client.ItemModelShaperMixin",
+    "client.LevelRendererMixin",
+    "client.RenderBuffersMixin",
+    "client.ItemColorsMixin"
   ]
 }

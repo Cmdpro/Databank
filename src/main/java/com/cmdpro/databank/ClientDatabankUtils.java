@@ -1,8 +1,8 @@
 package com.cmdpro.databank;
 
-import com.cmdpro.databank.hiddenblock.ClientHiddenBlocks;
-import com.cmdpro.databank.hiddenblock.HiddenBlock;
-import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
+import com.cmdpro.databank.hidden.ClientHidden;
+import com.cmdpro.databank.hidden.Hidden;
+import com.cmdpro.databank.hidden.HiddenManager;
 import com.cmdpro.databank.mixin.ItemRendererAccessor;
 import com.cmdpro.databank.rendering.ColorUtil;
 import com.cmdpro.databank.rendering.ShaderHelper;
@@ -33,29 +33,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
 public class ClientDatabankUtils {
-    public static Block getHiddenBlock(Block block) {
-        for (Map.Entry<ResourceLocation, HiddenBlock> i : HiddenBlocksManager.blocks.entrySet()) {
-            if (i.getValue().originalBlock == null || i.getValue().hiddenAs == null) {
-                continue;
-            }
-            if (i.getValue().originalBlock.equals(block)) {
-                if (!ClientHiddenBlocks.unlocked.contains(i.getKey())) {
-                    return i.getValue().hiddenAs;
-                }
-                break;
-            }
-        }
-        return null;
-    }
     public static void updateWorld() {
         if (ShaderHelper.isSodiumActive()) {
             int viewDistance = Minecraft.getInstance().options.renderDistance().get();

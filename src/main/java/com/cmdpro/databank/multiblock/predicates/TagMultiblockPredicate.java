@@ -26,7 +26,7 @@ public class TagMultiblockPredicate extends MultiblockPredicate {
     }
 
     @Override
-    public MultiblockPredicateSerializer getSerializer() {
+    public MultiblockPredicateSerializer<?> getSerializer() {
         return MultiblockPredicateRegistry.TAG.get();
     }
     @Override

@@ -15,7 +15,7 @@ public class AnyMultiblockPredicate extends MultiblockPredicate {
     }
 
     @Override
-    public MultiblockPredicateSerializer getSerializer() {
+    public MultiblockPredicateSerializer<?> getSerializer() {
         return MultiblockPredicateRegistry.ANY.get();
     }
 

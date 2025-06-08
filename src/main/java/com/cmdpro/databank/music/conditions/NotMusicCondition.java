@@ -1,12 +1,15 @@
 package com.cmdpro.databank.music.conditions;
 
-import com.cmdpro.databank.music.MusicConditions;
+import com.cmdpro.databank.music.MusicCondition;
+import com.cmdpro.databank.music.MusicSerializer;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 
-public class NotMusicCondition extends MusicConditions.MusicCondition {
-    public MusicConditions.MusicCondition condition;
-    public NotMusicCondition(MusicConditions.MusicCondition condition) {
+public class NotMusicCondition extends MusicCondition {
+    public MusicCondition condition;
+    public NotMusicCondition(MusicCondition condition) {
         this.condition = condition;
     }
     @Override
@@ -17,13 +20,14 @@ public class NotMusicCondition extends MusicConditions.MusicCondition {
     public Serializer getSerializer() {
         return NotConditionSerializer.INSTANCE;
     }
-    public static class NotConditionSerializer extends Serializer {
+    public static class NotConditionSerializer extends Serializer<NotMusicCondition> {
         public static final NotConditionSerializer INSTANCE = new NotConditionSerializer();
+        public static final MapCodec<NotMusicCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                MusicSerializer.MUSIC_CONDITION_CODEC.fieldOf("condition").forGetter((condition) -> condition.condition)
+        ).apply(instance, NotMusicCondition::new));
         @Override
-        public MusicConditions.MusicCondition deserialize(JsonObject json) {
-            ResourceLocation condition = ResourceLocation.tryParse(json.get("condition").getAsString());
-            JsonObject conditionData = json.get("conditionData").getAsJsonObject();
-            return new NotMusicCondition(MusicConditions.conditions.get(condition).deserialize(conditionData));
+        public MapCodec<NotMusicCondition> codec() {
+            return CODEC;
         }
     }
 }

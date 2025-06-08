@@ -34,7 +34,7 @@ public class BlockstateMultiblockPredicate extends MultiblockPredicate {
     }
 
     @Override
-    public MultiblockPredicateSerializer getSerializer() {
+    public MultiblockPredicateSerializer<?> getSerializer() {
         return MultiblockPredicateRegistry.BLOCKSTATE.get();
     }
 

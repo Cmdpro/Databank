@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockstateMultiblockPredicateSerializer extends MultiblockPredicateSerializer<BlockstateMultiblockPredicate> {
-
+    public static final BlockstateMultiblockPredicateSerializer INSTANCE = new BlockstateMultiblockPredicateSerializer();
     public static BlockState getBlockStateFromBuf(FriendlyByteBuf buf) {
         try {
             return BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), buf.readUtf(), false).blockState();

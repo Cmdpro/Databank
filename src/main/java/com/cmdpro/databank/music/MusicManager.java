@@ -1,8 +1,6 @@
 package com.cmdpro.databank.music;
 
 import com.cmdpro.databank.Databank;
-import com.cmdpro.databank.hiddenblock.HiddenBlock;
-import com.cmdpro.databank.hiddenblock.HiddenBlocksSerializer;
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -37,8 +35,10 @@ public class MusicManager extends SimpleJsonResourceReloadListener {
             }
 
             try {
-                JsonObject obj = i.getValue().getAsJsonObject();
-                MusicController music = serializer.read(i.getKey(), obj);
+                MusicController music = serializer.read(i.getKey(), i.getValue().getAsJsonObject());
+                if (music == null) {
+                    continue;
+                }
                 musicControllers.put(i.getKey(), music);
             } catch (IllegalArgumentException | JsonParseException e) {
                 Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading music controller type {}", location, e);

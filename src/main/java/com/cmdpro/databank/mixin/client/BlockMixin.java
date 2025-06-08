@@ -1,9 +1,8 @@
 package com.cmdpro.databank.mixin.client;
 
-import com.cmdpro.databank.ClientDatabankUtils;
+import com.cmdpro.databank.hidden.types.BlockHiddenType;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,9 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BlockMixin {
     @Inject(method = "getName", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getName(CallbackInfoReturnable<MutableComponent> cir) {
-        Block block = ClientDatabankUtils.getHiddenBlock((Block)(Object)this);
+        Block block = BlockHiddenType.getHiddenBlockClient((Block)(Object)this);
         if (block != null) {
-            cir.setReturnValue(block.getName());
+            cir.setReturnValue(BlockHiddenType.getHiddenBlockNameOverride(block).orElse(block.getName()).copy());
         }
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -55,9 +54,9 @@ public class ModMessages {
                 .versioned("1.0");
 
         //S2C
-        registrar.playToClient(UnlockedHiddenBlocksSyncS2CPacket.TYPE, getNetworkCodec(UnlockedHiddenBlocksSyncS2CPacket::read, UnlockedHiddenBlocksSyncS2CPacket::write), Handler::handle);
-        registrar.playToClient(UnlockHiddenBlockSyncS2CPacket.TYPE, getNetworkCodec(UnlockHiddenBlockSyncS2CPacket::read, UnlockHiddenBlockSyncS2CPacket::write), Handler::handle);
-        registrar.playToClient(HiddenBlockSyncS2CPacket.TYPE, getNetworkCodec(HiddenBlockSyncS2CPacket::read, HiddenBlockSyncS2CPacket::write), Handler::handle);
+        registrar.playToClient(UnlockedHiddenSyncS2CPacket.TYPE, getNetworkCodec(UnlockedHiddenSyncS2CPacket::read, UnlockedHiddenSyncS2CPacket::write), Handler::handle);
+        registrar.playToClient(UnlockHiddenSyncS2CPacket.TYPE, getNetworkCodec(UnlockHiddenSyncS2CPacket::read, UnlockHiddenSyncS2CPacket::write), Handler::handle);
+        registrar.playToClient(HiddenSyncS2CPacket.TYPE, getNetworkCodec(HiddenSyncS2CPacket::read, HiddenSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(MultiblockSyncS2CPacket.TYPE, getNetworkCodec(MultiblockSyncS2CPacket::read, MultiblockSyncS2CPacket::write), Handler::handle);
 
         //C2S

@@ -1,33 +1,25 @@
 package com.cmdpro.databank.events;
 
-import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
-import com.cmdpro.databank.hiddenblock.HiddenBlocksManager;
+import com.cmdpro.databank.hidden.HiddenManager;
 import com.cmdpro.databank.megastructures.MegastructureManager;
-import com.cmdpro.databank.model.DatabankModels;
 import com.cmdpro.databank.multiblock.MultiblockManager;
 import com.cmdpro.databank.networking.ModMessages;
-import com.cmdpro.databank.networking.packet.HiddenBlockSyncS2CPacket;
+import com.cmdpro.databank.networking.packet.HiddenSyncS2CPacket;
 import com.cmdpro.databank.networking.packet.MultiblockSyncS2CPacket;
-import com.cmdpro.databank.networking.packet.UnlockedHiddenBlocksSyncS2CPacket;
-import com.cmdpro.databank.registry.AttachmentTypeRegistry;
-import com.cmdpro.databank.registry.BlockRegistry;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 @EventBusSubscriber(modid = Databank.MOD_ID)
 public class ModEvents {
     @SubscribeEvent
     public static void addReloadListenerEvent(AddReloadListenerEvent event) {
-        event.addListener(HiddenBlocksManager.getOrCreateInstance());
+        event.addListener(HiddenManager.getOrCreateInstance());
         event.addListener(MultiblockManager.getOrCreateInstance());
         event.addListener(MegastructureManager.getOrCreateInstance());
     }
@@ -42,12 +34,12 @@ public class ModEvents {
         }
     }
     protected static void syncToPlayer(ServerPlayer player) {
-        ModMessages.sendToPlayer(new HiddenBlockSyncS2CPacket(HiddenBlocksManager.blocks), player);
+        ModMessages.sendToPlayer(new HiddenSyncS2CPacket(HiddenManager.hidden), player);
         ModMessages.sendToPlayer(new MultiblockSyncS2CPacket(MultiblockManager.multiblocks), player);
-        DatabankUtils.updateHiddenBlocks(player);
+        DatabankUtils.updateHidden(player);
     }
     @SubscribeEvent
     public static void onAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
-        DatabankUtils.updateHiddenBlocks(event.getEntity());
+        DatabankUtils.updateHidden(event.getEntity());
     }
 }
