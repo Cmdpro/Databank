@@ -20,7 +20,7 @@ public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> impleme
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pBlockEntity, pPartialTick);
-        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF);
+        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, false);
         pPoseStack.popPose();
     }
     public DatabankBlockEntityModel<T> getModel() {

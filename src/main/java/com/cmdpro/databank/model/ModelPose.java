@@ -41,7 +41,7 @@ public class ModelPose {
         public void offsetScale(Vector3f offset) {
             scale.add(offset);
         }
-        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor) {
+        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, boolean flipNormals) {
             pPoseStack.pushPose();
             List<DatabankPartDefinition.Face> faces = null;
             if (part.isCube) {
@@ -130,12 +130,13 @@ public class ModelPose {
                 }
 
                 faces = new ArrayList<>();
-                if (facesVisible[0]) { faces.add(new DatabankPartDefinition.Face(down, new Vec3(0, -1, 0))); }
-                if (facesVisible[1]) { faces.add(new DatabankPartDefinition.Face(up, new Vec3(0, 1, 0))); }
-                if (facesVisible[2]) { faces.add(new DatabankPartDefinition.Face(west, new Vec3(-1, 0, 0))); }
-                if (facesVisible[3]) { faces.add(new DatabankPartDefinition.Face(north, new Vec3(0, 0, -1))); }
-                if (facesVisible[4]) { faces.add(new DatabankPartDefinition.Face(east, new Vec3(1, 0, 0))); }
-                if (facesVisible[5]) { faces.add(new DatabankPartDefinition.Face(south, new Vec3(0, 0, 1))); }
+                float normalMult = flipNormals ? -1 : 1;
+                if (facesVisible[0]) { faces.add(new DatabankPartDefinition.Face(down, new Vec3(0, -1*normalMult, 0))); }
+                if (facesVisible[1]) { faces.add(new DatabankPartDefinition.Face(up, new Vec3(0, 1*normalMult, 0))); }
+                if (facesVisible[2]) { faces.add(new DatabankPartDefinition.Face(west, new Vec3(-1*normalMult, 0, 0))); }
+                if (facesVisible[3]) { faces.add(new DatabankPartDefinition.Face(north, new Vec3(0, 0, -1*normalMult))); }
+                if (facesVisible[4]) { faces.add(new DatabankPartDefinition.Face(east, new Vec3(1*normalMult, 0, 0))); }
+                if (facesVisible[5]) { faces.add(new DatabankPartDefinition.Face(south, new Vec3(0, 0, 1*normalMult))); }
                 Matrix4f matrix4f = new Matrix4f();
                 matrix4f.rotateZYX(part.rotation.z, part.rotation.y, part.rotation.x);
                 for (DatabankPartDefinition.Face i : faces) {

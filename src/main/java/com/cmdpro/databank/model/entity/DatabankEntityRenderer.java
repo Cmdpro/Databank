@@ -39,7 +39,7 @@ public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRen
         poseStack.translate(0, 1.5, 0);
         poseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pEntity, partialTick);
-        getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF);
+        getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, false);
         poseStack.popPose();
     }
     public int getOverlayCoords(T entity) {

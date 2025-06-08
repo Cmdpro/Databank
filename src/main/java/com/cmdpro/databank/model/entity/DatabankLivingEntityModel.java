@@ -12,12 +12,12 @@ import net.minecraft.world.phys.Vec2;
 
 public abstract class DatabankLivingEntityModel<T extends LivingEntity> extends DatabankEntityModel<T> {
     @Override
-    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor) {
+    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, boolean flipNormals) {
         pPoseStack.pushPose();
         float scale = pEntity.getScale();
         pPoseStack.scale(scale, scale, scale);
         setupRotations(pEntity, pPoseStack, partialTick, scale);
-        super.renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor);
+        super.renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, flipNormals);
         pPoseStack.popPose();
     }
 

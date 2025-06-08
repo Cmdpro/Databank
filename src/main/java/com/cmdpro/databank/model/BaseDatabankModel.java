@@ -20,7 +20,7 @@ import java.util.List;
 
 public abstract class BaseDatabankModel<T> {
     private static final Vector3f VECTOR_CACHE = new Vector3f();
-    public void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part) {
+    public void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, boolean flipNormals) {
         pPoseStack.pushPose();
         if (!part.part.isCube && !part.part.isMesh) {
             pPoseStack.translate((part.pos.x/16f), (part.pos.y/16f), (part.pos.z/16f));
@@ -29,10 +29,10 @@ public abstract class BaseDatabankModel<T> {
         }
         if (part.part.isCube || part.part.isMesh) {
             VertexConsumer consumer = pBuffer.getBuffer(getRenderType(obj, part));
-            part.render(getModel(), partialTick, pPoseStack, consumer, pPackedLight, pPackedOverlay, pColor);
+            part.render(getModel(), partialTick, pPoseStack, consumer, pPackedLight, pPackedOverlay, pColor, flipNormals);
         }
         for (ModelPose.ModelPosePart i : part.children) {
-            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i);
+            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, flipNormals);
         }
         pPoseStack.popPose();
     }

@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.function.Function;
 
 public abstract class DatabankBlockEntityModel<T extends BlockEntity> extends BaseDatabankModel<T> {
-    public void render(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor) {
-        renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor);
+    public void render(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, boolean flipNormals) {
+        renderModel(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, flipNormals);
     }
-    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor) {
+    public void renderModel(T pEntity, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, boolean flipNormals) {
         for (ModelPose.ModelPosePart i : modelPose.parts) {
-            renderPartAndChildren(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i);
+            renderPartAndChildren(pEntity, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, flipNormals);
         }
     }
 }
