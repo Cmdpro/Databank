@@ -1,7 +1,7 @@
 ### Additions
-- Added the ability to use meshes in models
+- Added the "databank:actual_player" and "databank:always_true" hidden conditions
+- Added "drop_original_loot_condition" to block hidden types
+- Added "should_overwrite_loot_if_hidden" to block hidden types
 
 ### Changes
-- Swapped the databank models to fully custom model rendering
-- Reworked the internals of the music system
-- Reworked the hidden block system to no longer just be limited to blocks and is now simply called the "hidden system"
+- Made hidden conditions require a stream codec to properly send data to client
