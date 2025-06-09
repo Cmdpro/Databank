@@ -21,11 +21,6 @@ public record HiddenSyncS2CPacket(Map<ResourceLocation, Hidden> hidden) implemen
     public static HiddenSyncS2CPacket read(FriendlyByteBuf buf) {
         Map<ResourceLocation, Hidden> blocks = buf.readMap(FriendlyByteBuf::readResourceLocation, (buf2) -> HiddenSerializer.STREAM_CODEC.decode((RegistryFriendlyByteBuf)buf2));
         for (Map.Entry<ResourceLocation, Hidden> i : blocks.entrySet()) {
-            if (i.getValue().condition == null) {
-                if (HiddenManager.hidden.containsKey(i.getKey())) {
-                    i.getValue().condition = HiddenManager.hidden.get(i.getKey()).condition;
-                }
-            }
             i.getValue().id = i.getKey();
         }
         return new HiddenSyncS2CPacket(blocks);

@@ -29,10 +29,15 @@ public class HiddenSerializer {
     public static final StreamCodec<RegistryFriendlyByteBuf, Hidden> STREAM_CODEC = StreamCodec.of((buf, value) -> {
         buf.writeResourceKey(DatabankRegistries.HIDDEN_TYPE_REGISTRY.getResourceKey(value.type.getType()).orElseThrow());
         value.type.getType().streamCodec().encode(buf, value.type);
+        buf.writeResourceKey(DatabankRegistries.HIDDEN_CONDITION_REGISTRY.getResourceKey(value.condition.getSerializer()).orElseThrow());
+        value.condition.getSerializer().streamCodec().encode(buf, value.condition);
     }, (buf) -> {
         ResourceKey<HiddenTypeInstance.HiddenType<?>> key = buf.readResourceKey(DatabankRegistries.HIDDEN_TYPE_REGISTRY_KEY);
         HiddenTypeInstance.HiddenType<?> serializer = DatabankRegistries.HIDDEN_TYPE_REGISTRY.get(key);
         HiddenTypeInstance<?> type = serializer.streamCodec().decode(buf);
-        return new Hidden(type, null);
+        ResourceKey<HiddenCondition.Serializer<?>> conditionKey = buf.readResourceKey(DatabankRegistries.HIDDEN_CONDITION_REGISTRY_KEY);
+        HiddenCondition.Serializer<?> conditionSerializer = DatabankRegistries.HIDDEN_CONDITION_REGISTRY.get(conditionKey);
+        HiddenCondition condition = conditionSerializer.streamCodec().decode(buf);
+        return new Hidden(type, condition);
     });
 }
