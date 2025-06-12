@@ -91,9 +91,9 @@ public class ModelPose {
                 down.add(new DatabankPartDefinition.Vertex(x0y0z1, uMax, vMin));
                 down.add(new DatabankPartDefinition.Vertex(x0y0z0, uMax, vMax));
                 down.add(new DatabankPartDefinition.Vertex(x1y0z0, uMin, vMax));
-                uMin = part.texOffset.x;
+                uMin = part.texOffset.x + part.dimensions.z;
                 vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x + part.dimensions.z;
+                uMax = part.texOffset.x;
                 vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
 
                 if (part.mirror) {
@@ -125,9 +125,9 @@ public class ModelPose {
                 north.add(new DatabankPartDefinition.Vertex(x0y0z0, uMax, vMax));
                 north.add(new DatabankPartDefinition.Vertex(x1y0z0, uMin, vMax));
 
-                uMin = part.texOffset.x + part.dimensions.z + part.dimensions.x;
+                uMin = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.z;
                 vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.z;
+                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x;
                 vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
 
                 if (part.mirror) {
