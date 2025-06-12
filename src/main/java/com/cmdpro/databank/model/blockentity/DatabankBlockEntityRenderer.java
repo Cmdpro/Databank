@@ -18,8 +18,7 @@ public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> impleme
     @Override
     public void render(T pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
         pPoseStack.pushPose();
-        pPoseStack.translate(0.5, 1.5, 0.5);
-        pPoseStack.mulPose(Axis.XP.rotationDegrees(180));
+        pPoseStack.translate(0.5, 0, 0.5);
         getModel().setupModelPose(pBlockEntity, pPartialTick);
         getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, new Vec3(1, 1, 1));
         pPoseStack.popPose();

@@ -44,7 +44,9 @@ public class DatabankModel {
         HashMap<String, ModelPose.ModelPosePart> stringToPart = new HashMap<>();
         List<ModelPose.ModelPosePart> children = new ArrayList<>();
         for (DatabankPartDefinition i : parts) {
-            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), new Vector3f(i.offset), new Vector3f(i.rotation), new Vector3f(i.dimensions));
+            Vector3f offset = new Vector3f(i.offset).mul(1, 1, 1);
+            Vector3f rotation = new Vector3f(i.rotation).mul(1, 1, 1);
+            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.dimensions));
             children.add(part);
             stringToPart.put(i.name, part);
         }
@@ -53,7 +55,9 @@ public class DatabankModel {
     private List<ModelPose.ModelPosePart> goThroughChildrenForModelPose(HashMap<String, ModelPose.ModelPosePart> stringToPart, DatabankPartDefinition parent) {
         List<ModelPose.ModelPosePart> children = new ArrayList<>();
         for (DatabankPartDefinition i : parent.children) {
-            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), new Vector3f(i.offset), new Vector3f(i.rotation), new Vector3f(i.dimensions));
+            Vector3f offset = new Vector3f(i.offset).mul(1, 1, 1);
+            Vector3f rotation = new Vector3f(i.rotation).mul(1, 1, 1);
+            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.dimensions));
             children.add(part);
             stringToPart.put(i.name, part);
         }

@@ -109,27 +109,16 @@ function goThroughChildren(array, parentOffset) {
             var part = {}
             part.name = getNewName(element.name)
             part.rotation = [
-                Math.degToRad(-element.rotation[0]),
-                Math.degToRad(-element.rotation[1]),
+                Math.degToRad(element.rotation[0]),
+                Math.degToRad(element.rotation[1]),
                 Math.degToRad(element.rotation[2])
             ]
+            console.log(parentOffset);
             part.offset = [
-                element.origin[0],
-                element.origin[1],
-                element.origin[2]
+                element.origin[0]-parentOffset[0],
+                element.origin[1]-parentOffset[1],
+                element.origin[2]-parentOffset[2]
             ]
-            if (element.parent instanceof Group) {
-                part.offset[0] -= element.parent.origin[0]
-                part.offset[1] -= element.parent.origin[1]
-                part.offset[2] -= element.parent.origin[2]
-            }
-            part.offset[0] *= -1;
-            if (Project.modded_entity_flip_y) {
-                part.offset[1] *= -1;
-                if (element.parent instanceof Group === false) {
-                    part.offset[1] += 24
-                }
-            }
             part.isCube = true
             part.isMesh = false
             part.texOffset = [
@@ -137,21 +126,11 @@ function goThroughChildren(array, parentOffset) {
                 element.uv_offset[1]
             ]
             part.mirror = element.mirror_uv
-            if (element.parent instanceof Group) {
-                if (Project.modded_entity_flip_y) {
-                    part.origin = [
-                        element.origin[0] - element.to[0],
-                        -element.from[1] - element.size(1) + element.origin[1],
-                        element.from[2] - element.origin[2]
-                    ]
-                } else {
-                    part.origin = [
-                        element.origin[0] - element.to[0],
-                        element.from[1] - element.origin[1],
-                        element.from[2] - element.origin[2]
-                    ]
-                }
-            }
+            part.origin = [
+                element.from[0] - element.origin[0],
+                element.from[1] - element.origin[1],
+                element.from[2] - element.origin[2]
+            ]
             part.dimensions = [
                 element.size(0, false),
                 element.size(1, false),
@@ -163,58 +142,34 @@ function goThroughChildren(array, parentOffset) {
             var part = {}
             part.name = element.name
             part.rotation = [
-                Math.degToRad(-element.rotation[0]),
-                Math.degToRad(-element.rotation[1]),
+                Math.degToRad(element.rotation[0]),
+                Math.degToRad(element.rotation[1]),
                 Math.degToRad(element.rotation[2])
             ]
             part.offset = [
-                element.origin[0],
-                element.origin[1],
-                element.origin[2]
+                element.origin[0]-parentOffset[0],
+                element.origin[1]-parentOffset[1],
+                element.origin[2]-parentOffset[2]
             ]
-            if (element.parent instanceof Group) {
-                part.offset[0] -= element.parent.origin[0]
-                part.offset[1] -= element.parent.origin[1]
-                part.offset[2] -= element.parent.origin[2]
-            }
-            part.offset[0] *= -1;
-            if (Project.modded_entity_flip_y) {
-                part.offset[1] *= -1;
-                if (element.parent instanceof Group === false) {
-                    part.offset[1] += 24
-                }
-            }
             part.isCube = false
             part.isMesh = false
             if (element.children != null) {
-                part.children = goThroughChildren(element.children, part.offset)
+                part.children = goThroughChildren(element.children, [ element.origin[0], element.origin[1], element.origin[2] ])
             }
             parts.push(part)
         } else if (element instanceof Mesh) {
             var part = {}
             part.name = getNewName(element.name)
             part.rotation = [
-                Math.degToRad(-element.rotation[0]),
-                  Math.degToRad(-element.rotation[1]),
+                    Math.degToRad(element.rotation[0]),
+                  Math.degToRad(element.rotation[1]),
                   Math.degToRad(element.rotation[2])
             ]
             part.offset = [
-                element.origin[0],
-                element.origin[1],
-                element.origin[2]
+                element.origin[0]-parentOffset[0],
+                element.origin[1]-parentOffset[1],
+                element.origin[2]-parentOffset[2]
             ]
-            if (element.parent instanceof Group) {
-                part.offset[0] -= element.parent.origin[0]
-                part.offset[1] -= element.parent.origin[1]
-                part.offset[2] -= element.parent.origin[2]
-            }
-            part.offset[0] *= -1;
-            if (Project.modded_entity_flip_y) {
-                part.offset[1] *= -1;
-                if (element.parent instanceof Group === false) {
-                    part.offset[1] += 24
-                }
-            }
             part.isCube = false
             part.isMesh = true
             part.mirror = element.mirror_uv
@@ -320,12 +275,15 @@ Plugin.register('databank_blockbench', {
                                             interpolation: interpolationStr
                                         })
                                     }
-                                    addKeyframe(keyframe.time, keyframe.calc('x'), keyframe.calc('y'), keyframe.calc('z'), keyframe.interpolation);
+                                    var xMult = 1;
+                                    var yMult = 1;
+                                    var zMult = 1;
+                                    addKeyframe(keyframe.time, keyframe.calc('x')*xMult, keyframe.calc('y')*yMult, keyframe.calc('z')*zMult, keyframe.interpolation);
                                     if (keyframe.data_points[1]) {
-                                        addKeyframe(kf.time+0.001, keyframe.calc('x', 1), keyframe.calc('y', 1), keyframe.calc('z', 1), keyframe.interpolation);
+                                        addKeyframe(kf.time+0.001, keyframe.calc('x', 1)*xMult, keyframe.calc('y', 1)*yMult, keyframe.calc('z', 1)*zMult, keyframe.interpolation);
                                     } else if (keyframe.interpolation == 'step' && currentKeyframes[i+1]) {
                                         let next = currentKeyframes[i+1];
-                                        addKeyframe(next.time-0.001, keyframe.calc('x'), keyframe.calc('y'), keyframe.calc('z'), 'linear');
+                                        addKeyframe(next.time-0.001, keyframe.calc('x')*xMult, keyframe.calc('y')*yMult, keyframe.calc('z')*zMult, 'linear');
                                     }
 
                                 })
@@ -353,7 +311,7 @@ Plugin.register('databank_blockbench', {
                         rootGroups.push(element)
                     }
                 })
-                var parts = goThroughChildren(rootGroups, parts)
+                var parts = goThroughChildren(rootGroups, [0, 0, 0])
                 model.parts = parts
 
                 model.textureSize = [

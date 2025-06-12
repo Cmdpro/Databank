@@ -37,8 +37,6 @@ public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRen
     public void render(T pEntity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         super.render(pEntity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.pushPose();
-        poseStack.translate(0, 1.5, 0);
-        poseStack.mulPose(Axis.XP.rotationDegrees(180));
         getModel().setupModelPose(pEntity, partialTick);
         getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, new Vec3(1, 1, 1));
         poseStack.popPose();
