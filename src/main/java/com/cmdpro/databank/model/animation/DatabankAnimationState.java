@@ -82,11 +82,14 @@ public class DatabankAnimationState {
         return this;
     }
     protected double getTime() {
-        if (level.isClientSide) {
-            return ClientHandler.getTime()/20d;
-        } else {
-            return level.getGameTime()/20d;
+        if (level != null) {
+            if (level.isClientSide) {
+                return ClientHandler.getTime();
+            } else {
+                return level.getGameTime() / 20d;
+            }
         }
+        return 0;
     }
     public void setLevel(Level level) {
         this.level = level;
