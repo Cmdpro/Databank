@@ -2,10 +2,16 @@ package com.cmdpro.databank.model.animation;
 
 import com.cmdpro.databank.model.DatabankModel;
 import com.mojang.blaze3d.Blaze3D;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.HashMap;
 
 public class DatabankAnimationState {
+    public Level level;
     public double startTime;
     public String defaultAnim;
     public double speed;
@@ -75,7 +81,19 @@ public class DatabankAnimationState {
         anims.remove(definition.id);
         return this;
     }
-    private double getTime() {
-        return Blaze3D.getTime();
+    protected double getTime() {
+        if (level.isClientSide) {
+            return ClientHandler.getTime()/20d;
+        } else {
+            return level.getGameTime()/20d;
+        }
+    }
+    public void setLevel(Level level) {
+        this.level = level;
+    }
+    private static class ClientHandler {
+        public static double getTime() {
+            return Blaze3D.getTime();
+        }
     }
 }

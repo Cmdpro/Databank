@@ -25,7 +25,7 @@ public abstract class BaseDatabankModel<T> {
         pPoseStack.pushPose();
         if (!part.part.isCube && !part.part.isMesh) {
             pPoseStack.translate((part.pos.x/16f), (part.pos.y/16f), (part.pos.z/16f));
-            pPoseStack.mulPose(new Quaternionf().rotationZYX(part.rotation.z, part.rotation.y, part.rotation.x));
+            pPoseStack.mulPose(new Quaternionf().rotationZYX(part.rotation.z, -part.rotation.y, -part.rotation.x));
             pPoseStack.scale(part.scale.x, part.scale.y, part.scale.z);
         }
         if (part.part.isCube || part.part.isMesh) {
@@ -64,15 +64,17 @@ public abstract class BaseDatabankModel<T> {
                     current = j;
                 }
             }
+            boolean forceNextToCurrent = false;
             if (current == null) {
                 if (!databankKeyframes.isEmpty()) {
                     current = databankKeyframes.getFirst();
+                    forceNextToCurrent = true;
                 }
             }
             if (current != null) {
                 int currentIndex = databankKeyframes.indexOf(current);
-                int nextIndex = keyframes.size() > currentIndex + 1 ? currentIndex + 1 : currentIndex;
-                DatabankAnimation.AnimationKeyframe next = databankKeyframes.get(nextIndex);
+                int nextIndex = forceNextToCurrent ? currentIndex : keyframes.size() > currentIndex + 1 ? currentIndex + 1 : currentIndex;
+                DatabankAnimation.AnimationKeyframe next = forceNextToCurrent ? current : databankKeyframes.get(nextIndex);
                 Keyframe keyframe = keyframes.get(current);
                 Keyframe nextKeyframe = keyframes.get(next);
                 AnimationChannel.Interpolation interpolation = keyframe.interpolation();

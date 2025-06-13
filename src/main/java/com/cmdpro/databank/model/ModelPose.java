@@ -37,7 +37,7 @@ public class ModelPose {
             pos.add(-offset.x, -offset.y, -offset.z);
         }
         public void offsetRotation(Vector3f offset) {
-            rotation.add(new Vector3f(offset).mul(-1, 1, 1));
+            rotation.add(new Vector3f(offset).mul(1, 1, 1));
         }
         public void offsetScale(Vector3f offset) {
             scale.add(offset);
