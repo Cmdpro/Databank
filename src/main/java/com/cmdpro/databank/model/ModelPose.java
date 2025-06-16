@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -204,19 +205,11 @@ public class ModelPose {
                 List<List<DatabankPartDefinition.Vertex>> faces2 = part.faces.orElse(null);
                 if (faces2 != null) {
                     faces = new ArrayList<>();
-                    Vector3f middle = faces2.getFirst().getFirst().pos.toVector3f();
                     for (List<DatabankPartDefinition.Vertex> i : faces2) {
                         if (i.size() == 3 || i.size() == 4) {
-                            for (DatabankPartDefinition.Vertex j : i) {
-                                middle.lerp(j.pos.toVector3f(), 0.5f);
-                            }
-                            Vector3f faceMiddle = i.getFirst().pos.toVector3f();
-                            for (DatabankPartDefinition.Vertex j : i) {
-                                faceMiddle.lerp(j.pos.toVector3f(), 0.5f);
-                            }
-                            pPoseStack.last().pose().transformPosition(middle);
-                            pPoseStack.last().pose().transformPosition(faceMiddle);
-                            Vector3f normal = new Vector3f(faceMiddle).sub(middle).normalize();
+                            Vec3 vecA = i.get(1).pos.subtract(i.get(0).pos);
+                            Vec3 vecB = i.get(2).pos.subtract(i.get(0).pos);
+                            Vector3f normal = vecA.cross(vecB).toVector3f().normalize();
                             faces.add(new DatabankPartDefinition.Face(i, new Vec3(normal.x, normal.y, normal.z)));
                         }
                     }
