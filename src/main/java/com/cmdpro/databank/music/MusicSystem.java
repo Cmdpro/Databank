@@ -55,7 +55,7 @@ public class MusicSystem {
             SoundEvent mus = null;
             List<MusicController> sortedControllers = MusicManager.musicControllers.values().stream().sorted((a, b) -> Integer.compare(b.priority, a.priority)).toList();
             for (MusicController i : sortedControllers) {
-                SoundEvent getMusic = i.music;
+                SoundEvent getMusic = i.getMusic();
                 if (i.condition.isPlaying()) {
                     SoundEvent override = i.condition.getMusicOverride(i);
                     mus = override == null ? getMusic : override;

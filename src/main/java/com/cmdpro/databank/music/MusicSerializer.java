@@ -20,7 +20,7 @@ public class MusicSerializer {
     public static final Codec<MusicCondition> MUSIC_CONDITION_CODEC = DatabankRegistries.MUSIC_CONDITION_REGISTRY.byNameCodec().dispatch(MusicCondition::getSerializer, MusicCondition.Serializer::codec);
     public static final Codec<MusicController> ORIGINAL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             MUSIC_CONDITION_CODEC.fieldOf("condition").forGetter((controller) -> controller.condition),
-            ResourceKey.codec(Registries.SOUND_EVENT).fieldOf("music").xmap(BuiltInRegistries.SOUND_EVENT::get, (i) -> BuiltInRegistries.SOUND_EVENT.getResourceKey(i).orElseThrow()).forGetter((controller) -> controller.music),
+            ResourceKey.codec(Registries.SOUND_EVENT).fieldOf("music").forGetter((controller) -> controller.music),
             Codec.INT.fieldOf("priority").forGetter((controller) -> controller.priority)
     ).apply(instance, MusicController::new));
     public static final Codec<Optional<WithConditions<MusicController>>> CODEC = ConditionalOps.createConditionalCodecWithConditions(ORIGINAL_CODEC);
