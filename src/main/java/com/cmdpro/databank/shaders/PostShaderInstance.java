@@ -70,9 +70,13 @@ public abstract class PostShaderInstance {
     }
     public void processPostChain() {
         getDepthBackupTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+        RenderSystem.resetTextureMatrix();
         postChain.process(Minecraft.getInstance().getTimer().getGameTimeDeltaTicks());
         Minecraft.getInstance().getMainRenderTarget().copyDepthFrom(getDepthBackupTarget());
-        GlStateManager._glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Minecraft.getInstance().getMainRenderTarget().frameBufferId);
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
     }
     private static RenderTarget depthBackupTarget;
     protected static RenderTarget getDepthBackupTarget() {
