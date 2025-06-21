@@ -47,7 +47,8 @@ public class CollisionTestCube {
         return getEntitiesOfClass(entityClass, level, alignEntityHitboxes, EntitySelector.NO_SPECTATORS);
     }
     public <T extends Entity> List<T> getEntitiesOfClass(Class<T> entityClass, Level level, boolean alignEntityHitboxes, Predicate<? super T> filter) {
-        return level.getEntitiesOfClass(entityClass, AABB.ofSize(new Vec3(center.x, center.y, center.z), size.x*2, size.y*2, size.z*2), (entity) -> {
+        float testAABBSize = Math.max(Math.max(size.x, size.y), size.z)*2f;
+        return level.getEntitiesOfClass(entityClass, AABB.ofSize(new Vec3(center.x, center.y, center.z), testAABBSize, testAABBSize, testAABBSize), (entity) -> {
             if (filter.test(entity)) {
                 CollisionTestCube cube = new CollisionTestCube(entity.getBoundingBox(), alignEntityHitboxes ? new Quaternionf(rotation) : new Quaternionf());
                 return cube.intersects(this);
