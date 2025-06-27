@@ -1,4 +1,3 @@
 ### Fixes
-- Fixed resourcepacks being unable to add music controllers with a custom sound
-- Fixed shaders being weird if a vanilla mc shader was active
-- Fixed collision test cubes not working properly if it wasnt a full cube
+- Fixed world gui components not handling right clicks on server properly
+- Fixed world guis not properly removing components on the client that were removed on the server

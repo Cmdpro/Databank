@@ -22,6 +22,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,6 +79,7 @@ public class WorldGuiEntity extends Entity {
     public void recieveComponentData(WorldGui gui, CompoundTag tag) {
         ListTag components = (ListTag)tag.get("components");
         if (components != null) {
+            List<WorldGuiComponent> currentComponents = new ArrayList<>();
             for (Tag i : components) {
                 if (i instanceof CompoundTag compoundTag) {
                     UUID uuid = compoundTag.getUUID("uuid");
@@ -91,9 +93,11 @@ public class WorldGuiEntity extends Entity {
                         component.recieveData(compoundTag);
                         component.uuid = uuid;
                         gui.addComponent(component);
+                        currentComponents.add(component);
                     }
                 }
             }
+            gui.removeComponents((i) -> !currentComponents.contains(i));
         }
     }
     public CompoundTag getSyncData() {

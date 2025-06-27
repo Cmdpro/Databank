@@ -48,7 +48,7 @@ public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, 
                         entity.gui.rightClick(false, player, x, y);
                         for (WorldGuiComponent i : entity.gui.components.stream().toList()) {
                             if (entity.gui.tryLeftClickComponent(false, player, i, x, y)) {
-                                i.leftClick(false, player, x, y);
+                                i.rightClick(false, player, x, y);
                             }
                         }
                         break;
