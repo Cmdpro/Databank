@@ -16,7 +16,7 @@ public class DatabankEntityAnimationState extends DatabankAnimationState {
     }
 
     @Override
-    protected double getTime() {
+    public double getTime() {
         float partialTicks = 0;
         if (level.isClientSide) {
             partialTicks = ClientHandler.getPartialTicks();

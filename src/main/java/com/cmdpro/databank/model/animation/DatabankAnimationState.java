@@ -81,7 +81,7 @@ public class DatabankAnimationState {
         anims.remove(definition.id);
         return this;
     }
-    protected double getTime() {
+    public double getTime() {
         if (level != null) {
             if (level.isClientSide) {
                 return ClientHandler.getTime();

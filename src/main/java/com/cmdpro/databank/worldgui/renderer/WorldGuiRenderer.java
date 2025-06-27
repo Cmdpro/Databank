@@ -26,7 +26,7 @@ public class WorldGuiRenderer extends EntityRenderer<WorldGuiEntity> {
                 if (entity.gui != null) {
                     entity.gui.renderGui(graphics);
                 }
-            }, source, entity.getBoundsCorner(-1, 1), entity.getBoundsCorner(1, 1), entity.getBoundsCorner(1, -1), entity.getBoundsCorner(-1, -1), (int) size.x, (int) size.y);
+            }, source, entity.getBoundsCorner(-1, 1), entity.getBoundsCorner(1, 1), entity.getBoundsCorner(1, -1), entity.getBoundsCorner(-1, -1), (int) size.x, (int) size.y, entity.guiType.getViewScale());
         }
     }
     @Override

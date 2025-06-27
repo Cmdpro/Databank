@@ -10,4 +10,7 @@ public abstract class WorldGuiType {
     public abstract Vec2 getMenuWorldSize(WorldGuiEntity entity);
     public abstract Vec2 getRenderSize();
     public boolean saves() { return false; }
+    public float getViewScale() {
+        return 1;
+    }
 }

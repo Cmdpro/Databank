@@ -62,16 +62,25 @@ public class RenderProjectionUtil {
     }
     private static final List<ProjectionRender> queued = new ArrayList<>();
     public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
-        project(graphics, (stack) -> {}, (stack) -> {}, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
+        project(graphics, (stack) -> {}, (stack) -> {}, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, 1, true);
+    }
+    public static void project(Consumer<GuiGraphics> graphics, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, float viewScale) {
+        project(graphics, (stack) -> {}, (stack) -> {}, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, viewScale, true);
     }
     public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
-        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, 1, true);
+    }
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, float viewScale) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, null, topLeft, topRight, bottomRight, bottomLeft, width, height, viewScale, true);
     }
     public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
-        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, topLeft, topRight, bottomRight, bottomLeft, width, height, true);
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, topLeft, topRight, bottomRight, bottomLeft, width, height, 1, true);
     }
-    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, boolean queue) {
-        ProjectionRender render = new ProjectionRender(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, topLeft, topRight, bottomRight, bottomLeft, width, height);
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, float viewScale) {
+        project(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, poseStack, topLeft, topRight, bottomRight, bottomLeft, width, height, viewScale, true);
+    }
+    public static void project(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, PoseStack poseStack, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, float viewScale, boolean queue) {
+        ProjectionRender render = new ProjectionRender(graphics, applyPoseStackTransformations, undoPoseStackTransformations, source, topLeft, topRight, bottomRight, bottomLeft, width, height, viewScale);
         if (queue) {
             queued.add(render);
         } else if (poseStack != null) {
@@ -131,7 +140,8 @@ public class RenderProjectionUtil {
         Vec3 bottomLeft;
         int width;
         int height;
-        public ProjectionRender(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height) {
+        float viewScale;
+        public ProjectionRender(Consumer<GuiGraphics> graphics, Consumer<PoseStack> applyPoseStackTransformations, Consumer<PoseStack> undoPoseStackTransformations, MultiBufferSource.BufferSource source, Vec3 topLeft, Vec3 topRight, Vec3 bottomRight, Vec3 bottomLeft, int width, int height, float viewScale) {
             this.graphics = graphics;
             this.applyPoseStackTransformations = applyPoseStackTransformations;
             this.undoPoseStackTransformations = undoPoseStackTransformations;
@@ -142,6 +152,7 @@ public class RenderProjectionUtil {
             this.bottomLeft = bottomLeft;
             this.width = width;
             this.height = height;
+            this.viewScale = viewScale;
         }
         public void apply(PoseStack poseStack) {
             ShaderInstance shader = RenderSystem.getShader();
@@ -149,12 +160,15 @@ public class RenderProjectionUtil {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
+            int viewWidth = (int)(width*viewScale);
+            int viewHeight = (int)(height*viewScale);
+
             Supplier<RenderTarget> targetCreationSupplier = () -> {
-                RenderTarget target = new MainTarget(width, height);
+                RenderTarget target = new MainTarget(viewWidth, viewHeight);
                 target.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
                 return target;
             };
-            RenderTarget target = pool.getTarget((renderTarget) -> renderTarget.width == width && renderTarget.height == height, targetCreationSupplier);
+            RenderTarget target = pool.getTarget((renderTarget) -> renderTarget.width == viewWidth && renderTarget.height == viewHeight, targetCreationSupplier);
             ResourceLocation use = pool.generateRandomUseId(Databank.MOD_ID);
             target.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             pool.markUse(target, use);
@@ -167,8 +181,8 @@ public class RenderProjectionUtil {
             Matrix4f matrix4f = new Matrix4f()
                     .setOrtho(
                             0.0F,
-                            width,
-                            height,
+                            viewWidth,
+                            viewHeight,
                             0.0F,
                             1000.0F,
                             net.neoforged.neoforge.client.ClientHooks.getGuiFarPlane()
@@ -188,7 +202,10 @@ public class RenderProjectionUtil {
             target.clear(Minecraft.ON_OSX);
             target.bindWrite(true);
             GuiGraphics guiGraphics = new GuiGraphics(Minecraft.getInstance(), projectionSource);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().scale(viewScale, viewScale, viewScale);
             graphics.accept(guiGraphics);
+            guiGraphics.pose().popPose();
             guiGraphics.flush();
             Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
             RenderSystem.depthMask(false);

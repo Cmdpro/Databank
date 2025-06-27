@@ -124,8 +124,8 @@ public abstract class WorldGui {
             return null;
         }
         public static Vec2 angleToClient(WorldGui gui) {
-            Vec3 pointA = gui.entity.position().multiply(1, 1, 1);
-            Vec3 pointB = Minecraft.getInstance().player.getEyePosition().multiply(1, 1, 1);
+            Vec3 pointA = gui.entity.position();
+            Vec3 pointB = Minecraft.getInstance().player.getEyePosition();
             return calculateRotationVector(pointA, pointB);
         }
         private static Vec2 calculateRotationVector(Vec3 pVec, Vec3 pTarget) {
