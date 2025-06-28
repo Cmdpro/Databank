@@ -53,8 +53,6 @@ import org.joml.Matrix4f;
 import java.util.*;
 @EventBusSubscriber(value = Dist.CLIENT, modid = Databank.MOD_ID)
 public class MultiblockRenderer {
-    protected static Map<BlockPos, BlockEntity> blockEntityCache = new Object2ObjectOpenHashMap<>();
-    protected static Set<BlockEntity> erroredBlockEntities = Collections.newSetFromMap(new WeakHashMap<>());
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage().equals(RenderLevelStageEvent.Stage.AFTER_PARTICLES)) {
@@ -171,8 +169,8 @@ public class MultiblockRenderer {
             }
         }
         if (block.getBlock() instanceof EntityBlock entityBlock) {
-            var be = blockEntityCache.computeIfAbsent(pos.immutable(), p -> entityBlock.newBlockEntity(p, block));
-            if (be != null && !erroredBlockEntities.contains(be)) {
+            var be = multiblock.blockEntityCache.computeIfAbsent(pos.immutable(), p -> entityBlock.newBlockEntity(p, block));
+            if (be != null && !multiblock.erroredBlockEntities.contains(be)) {
                 be.setLevel(Minecraft.getInstance().level);
 
                 // fake cached state in case the renderer checks it as we don't want to query the actual world
@@ -185,7 +183,7 @@ public class MultiblockRenderer {
                         renderer.render(be, partialTick.getGameTimeDeltaTicks(), stack, bufferSource, 0xF000F0, OverlayTexture.NO_OVERLAY);
                     }
                 } catch (Exception e) {
-                    erroredBlockEntities.add(be);
+                    multiblock.erroredBlockEntities.add(be);
                     Databank.LOGGER.error("[DATABANK ERROR] Error rendering block entity", e);
                 }
             }

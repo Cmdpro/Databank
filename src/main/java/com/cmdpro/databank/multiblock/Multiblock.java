@@ -2,6 +2,7 @@ package com.cmdpro.databank.multiblock;
 
 import com.cmdpro.databank.multiblock.predicates.AnyMultiblockPredicate;
 import com.cmdpro.databank.multiblock.predicates.BlockstateMultiblockPredicate;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Multiblock implements BlockAndTintGetter {
+    public Map<BlockPos, BlockEntity> blockEntityCache = new Object2ObjectOpenHashMap<>();
+    public Set<BlockEntity> erroredBlockEntities = Collections.newSetFromMap(new WeakHashMap<>());
     public String[][] multiblockLayers;
     public Map<Character, MultiblockPredicate> key;
     public BlockPos center;
@@ -141,7 +144,7 @@ public class Multiblock implements BlockAndTintGetter {
     public BlockEntity getBlockEntity(BlockPos pos) {
         BlockState state = this.getBlockState(pos);
         if (state.getBlock() instanceof EntityBlock eb) {
-            return MultiblockRenderer.blockEntityCache.computeIfAbsent(pos.immutable(), p -> eb.newBlockEntity(p, state));
+            return blockEntityCache.computeIfAbsent(pos.immutable(), p -> eb.newBlockEntity(p, state));
         }
         return null;
     }
