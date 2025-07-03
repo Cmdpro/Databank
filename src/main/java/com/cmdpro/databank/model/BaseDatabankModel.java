@@ -30,12 +30,24 @@ public abstract class BaseDatabankModel<T> {
         }
         if (part.part.isCube || part.part.isMesh) {
             VertexConsumer consumer = pBuffer.getBuffer(getRenderType(obj, part));
-            part.render(getModel(), partialTick, pPoseStack, consumer, pPackedLight, pPackedOverlay, pColor, normalMult);
+            part.render(getModel(), partialTick, pPoseStack, consumer, getPackedLight(obj, part, pPackedLight), getPackedOverlay(obj, part, pPackedOverlay), getColor(obj, part, pColor), normalMult, isShadedByNormal(obj, part));
         }
         for (ModelPose.ModelPosePart i : part.children) {
             renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, normalMult);
         }
         pPoseStack.popPose();
+    }
+    public boolean isShadedByNormal(T obj, ModelPose.ModelPosePart part) {
+        return true;
+    }
+    public int getColor(T obj, ModelPose.ModelPosePart part, int original) {
+        return original;
+    }
+    public int getPackedLight(T obj, ModelPose.ModelPosePart part, int original) {
+        return original;
+    }
+    public int getPackedOverlay(T obj, ModelPose.ModelPosePart part, int original) {
+        return original;
     }
     public RenderType getRenderType(T obj, ModelPose.ModelPosePart part) {
         return getRenderType(obj);

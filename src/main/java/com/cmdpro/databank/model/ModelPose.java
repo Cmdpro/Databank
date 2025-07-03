@@ -43,7 +43,7 @@ public class ModelPose {
         public void offsetScale(Vector3f offset) {
             scale.add(offset);
         }
-        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult) {
+        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult, boolean isShadedByNormal) {
             pPoseStack.pushPose();
             List<DatabankPartDefinition.Face> faces = null;
             if (part.isCube) {
@@ -169,6 +169,11 @@ public class ModelPose {
                         new Vec3(1*normalMult.x, 0, 0),
                         new Vec3(0, 0, 1*normalMult.z)
                 };
+                if (!isShadedByNormal) {
+                    for (int i = 0; i < normals.length; i++) {
+                        normals[i] = new Vec3(0, 1, 0);
+                    }
+                }
 
                 if (part.dimensions.x+part.inflate <= 0.001 && part.dimensions.x+part.inflate >= -0.001) {
                     facesVisible[2] = false;
@@ -210,6 +215,9 @@ public class ModelPose {
                             Vec3 vecA = i.get(1).pos.subtract(i.get(0).pos);
                             Vec3 vecB = i.get(2).pos.subtract(i.get(0).pos);
                             Vector3f normal = vecA.cross(vecB).toVector3f().normalize();
+                            if (!isShadedByNormal) {
+                                normal = new Vector3f(0, 1, 0);
+                            }
                             faces.add(new DatabankPartDefinition.Face(i, new Vec3(normal.x, normal.y, normal.z)));
                         }
                     }
