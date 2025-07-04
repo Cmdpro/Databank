@@ -22,18 +22,22 @@ import java.util.List;
 public abstract class BaseDatabankModel<T> {
     private static final Vector3f VECTOR_CACHE = new Vector3f();
     public void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, Vec3 normalMult) {
+        renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, part, normalMult, new Quaternionf());
+    }
+    private void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, Vec3 normalMult, Quaternionf quaternionf) {
         pPoseStack.pushPose();
         if (!part.part.isCube && !part.part.isMesh) {
             pPoseStack.translate((part.pos.x/16f), (part.pos.y/16f), (part.pos.z/16f));
             pPoseStack.mulPose(new Quaternionf().rotationZYX(part.rotation.z, -part.rotation.y, -part.rotation.x));
             pPoseStack.scale(part.scale.x, part.scale.y, part.scale.z);
+            quaternionf.rotateZYX(part.rotation.z, -part.rotation.y, -part.rotation.x);
         }
         if (part.part.isCube || part.part.isMesh) {
             VertexConsumer consumer = pBuffer.getBuffer(getRenderType(obj, part));
-            part.render(getModel(), partialTick, pPoseStack, consumer, getPackedLight(obj, part, pPackedLight), getPackedOverlay(obj, part, pPackedOverlay), getColor(obj, part, pColor), normalMult, isShadedByNormal(obj, part));
+            part.render(getModel(), partialTick, pPoseStack, consumer, getPackedLight(obj, part, pPackedLight), getPackedOverlay(obj, part, pPackedOverlay), getColor(obj, part, pColor), normalMult, isShadedByNormal(obj, part), new Quaternionf(quaternionf));
         }
         for (ModelPose.ModelPosePart i : part.children) {
-            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, normalMult);
+            renderPartAndChildren(obj, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pColor, i, normalMult, new Quaternionf(quaternionf));
         }
         pPoseStack.popPose();
     }

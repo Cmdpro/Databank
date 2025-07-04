@@ -4,3 +4,4 @@
 
 ### Fixes
 - Fixed world guis showing their details in jade
+- Fixed lighting on models for hopefully the final time

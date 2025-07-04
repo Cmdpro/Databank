@@ -29,7 +29,7 @@ public abstract class DatabankItemRenderer<T extends Item> extends BlockEntityWi
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 0, 0.5);
         getModel().setupModelPose(pStack, partialTick);
-        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI ? new Vec3(1, -1, -1) : new Vec3(1, 1, 1));
+        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI ? new Vec3(-1, -1, 1) : new Vec3(1, 1, 1));
         pPoseStack.popPose();
     }
 

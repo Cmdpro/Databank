@@ -38,12 +38,12 @@ public class ModelPose {
             pos.add(-offset.x, -offset.y, offset.z);
         }
         public void offsetRotation(Vector3f offset) {
-            rotation.add(new Vector3f(offset).mul(1, 1, 1));
+            rotation.add(offset);
         }
         public void offsetScale(Vector3f offset) {
             scale.add(offset);
         }
-        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult, boolean isShadedByNormal) {
+        public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult, boolean isShadedByNormal, Quaternionf quaternionf) {
             pPoseStack.pushPose();
             List<DatabankPartDefinition.Face> faces = null;
             if (part.isCube) {
@@ -164,16 +164,11 @@ public class ModelPose {
                 Vec3[] normals = new Vec3[] {
                         new Vec3(0, 1*normalMult.y, 0),
                         new Vec3(0, -1*normalMult.y, 0),
-                        new Vec3(-1*normalMult.x, 0, 0),
-                        new Vec3(0, 0, -1*normalMult.z),
                         new Vec3(1*normalMult.x, 0, 0),
+                        new Vec3(0, 0, -1*normalMult.z),
+                        new Vec3(-1*normalMult.x, 0, 0),
                         new Vec3(0, 0, 1*normalMult.z)
                 };
-                if (!isShadedByNormal) {
-                    for (int i = 0; i < normals.length; i++) {
-                        normals[i] = new Vec3(0, 1, 0);
-                    }
-                }
 
                 if (part.dimensions.x+part.inflate <= 0.001 && part.dimensions.x+part.inflate >= -0.001) {
                     facesVisible[2] = false;
@@ -194,6 +189,7 @@ public class ModelPose {
                 if (facesVisible[5]) { faces.add(new DatabankPartDefinition.Face(south, normals[5])); }
                 Matrix4f matrix4f = new Matrix4f();
                 matrix4f.rotateZYX(part.rotation.z, part.rotation.y, part.rotation.x);
+                quaternionf.rotateZYX(part.rotation.z, -part.rotation.y, part.rotation.x);
                 for (DatabankPartDefinition.Face i : faces) {
                     for (DatabankPartDefinition.Vertex j : i.vertices) {
                         Vector3f pos = j.pos.toVector3f();
@@ -207,6 +203,7 @@ public class ModelPose {
             if (part.isMesh) {
                 pPoseStack.translate(pos.x/16f, pos.y/16f, pos.z/16f);
                 pPoseStack.mulPose(new Quaternionf().rotationZYX(rotation.z, rotation.y, rotation.x));
+                quaternionf.rotateZYX(rotation.z, rotation.y, rotation.x);
                 List<List<DatabankPartDefinition.Vertex>> faces2 = part.faces.orElse(null);
                 if (faces2 != null) {
                     faces = new ArrayList<>();
@@ -215,9 +212,6 @@ public class ModelPose {
                             Vec3 vecA = i.get(1).pos.subtract(i.get(0).pos);
                             Vec3 vecB = i.get(2).pos.subtract(i.get(0).pos);
                             Vector3f normal = vecA.cross(vecB).toVector3f().normalize();
-                            if (!isShadedByNormal) {
-                                normal = new Vector3f(0, 1, 0);
-                            }
                             faces.add(new DatabankPartDefinition.Face(i, new Vec3(normal.x, normal.y, normal.z)));
                         }
                     }
@@ -226,6 +220,10 @@ public class ModelPose {
             if (faces != null) {
                 for (DatabankPartDefinition.Face i : faces) {
                     if (i.vertices.size() == 3 || i.vertices.size() == 4) {
+                        Vector3f normal = i.normal.toVector3f().rotate(quaternionf);
+                        if (!isShadedByNormal) {
+                            normal = new Vector3f(0, 1, 0);
+                        }
                         for (DatabankPartDefinition.Vertex j : i.vertices) {
                             float x = (float)j.pos.x() / 16f;
                             float y = (float)(j.pos.y()) / 16f;
@@ -235,7 +233,7 @@ public class ModelPose {
                             pConsumer.setUv((float)j.u/(float)model.textureSize.x, (float)j.v/(float)model.textureSize.y);
                             pConsumer.setOverlay(pPackedOverlay);
                             pConsumer.setLight(pPackedLight);
-                            pConsumer.setNormal((float)i.normal.x, (float)i.normal.y, (float)i.normal.z);
+                            pConsumer.setNormal(normal.x, normal.y, normal.z);
                         }
                         if (i.vertices.size() == 3) {
                             DatabankPartDefinition.Vertex j = i.vertices.getLast();
@@ -247,7 +245,7 @@ public class ModelPose {
                             pConsumer.setUv((float)j.u/(float)model.textureSize.x, (float)j.v/(float)model.textureSize.y);
                             pConsumer.setOverlay(pPackedOverlay);
                             pConsumer.setLight(pPackedLight);
-                            pConsumer.setNormal((float)i.normal.x, (float)i.normal.y, (float)i.normal.z);
+                            pConsumer.setNormal(normal.x, normal.y, normal.z);
                         }
                     }
                 }
