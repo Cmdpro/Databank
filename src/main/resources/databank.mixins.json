@@ -18,6 +18,10 @@
     "client.ItemModelShaperMixin",
     "client.LevelRendererMixin",
     "client.RenderBuffersMixin",
-    "client.ItemColorsMixin"
+    "client.ItemColorsMixin",
+    "client.SoundEngineMixin",
+    "client.ChannelMixin",
+    "client.SoundManagerMixin",
+    "client.ChannelHandleMixin"
   ]
 }
