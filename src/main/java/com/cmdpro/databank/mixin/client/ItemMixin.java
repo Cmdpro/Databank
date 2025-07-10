@@ -16,7 +16,9 @@ public class ItemMixin {
         Item thisItem = (Item)(Object)this;
         Item item = ItemHiddenType.getHiddenItemClient(thisItem);
         if (item != null) {
-            cir.setReturnValue(ItemHiddenType.getHiddenItemNameOverride(thisItem).orElse(item.getName(stack)).copy());
+            if (item != stack.getItem())
+                cir.setReturnValue(ItemHiddenType.getHiddenItemNameOverride(thisItem).orElse(item.getName(stack)).copy());
+            cir.setReturnValue(ItemHiddenType.getHiddenItemNameOverride(thisItem).get().copy());
         }
     }
 }
