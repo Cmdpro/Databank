@@ -33,7 +33,7 @@ public abstract class BlockColorsMixin {
     public void getColor(BlockState state, Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (state != null) {
             Block block = BlockHiddenType.getHiddenBlockClient(state.getBlock());
-            if (block != null) {
+            if ((block != null) && (block != state.getBlock())) {
                 BlockState state2 = DatabankUtils.changeBlockType(state, block);
                 BlockColor blockcolor = blockColors.get(state2.getBlock());
                 if (blockcolor != null) {
@@ -49,7 +49,7 @@ public abstract class BlockColorsMixin {
     public void getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex, CallbackInfoReturnable<Integer> cir) {
         if (state != null) {
             Block block = BlockHiddenType.getHiddenBlockClient(state.getBlock());
-            if (block != null) {
+            if ((block != null) && (block != state.getBlock())) {
                 BlockState state2 = DatabankUtils.changeBlockType(state, block);
                 BlockColor blockcolor = this.blockColors.get(state2.getBlock());
                 cir.setReturnValue(blockcolor == null ? -1 : blockcolor.getColor(state2, level, pos, tintIndex));
@@ -60,7 +60,7 @@ public abstract class BlockColorsMixin {
     public void getColoringProperties(Block block, CallbackInfoReturnable<Set<Property<?>>> cir) {
         if (block != null) {
             Block block2 = BlockHiddenType.getHiddenBlockClient(block);
-            if (block2 != null) {
+            if ((block2 != null) && (block2 != block)) {
                 cir.setReturnValue(coloringStates.getOrDefault(block2, ImmutableSet.of()));
             }
         }
