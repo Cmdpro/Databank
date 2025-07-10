@@ -16,7 +16,7 @@ public class BlockModelShaperMixin {
     @Inject(method = "getBlockModel", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getBlockModel(BlockState pState, CallbackInfoReturnable<BakedModel> cir) {
         Block block = BlockHiddenType.getHiddenBlockClient(pState.getBlock());
-        if (block != null) {
+        if ((block != null) && (block != pState.getBlock())) {
             BlockModelShaper shaper = (BlockModelShaper)(Object)this;
             cir.setReturnValue(shaper.getBlockModel(DatabankUtils.changeBlockType(pState, block)));
         }

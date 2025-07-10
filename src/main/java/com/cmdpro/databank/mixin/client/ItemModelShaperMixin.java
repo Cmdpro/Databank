@@ -18,7 +18,7 @@ public class ItemModelShaperMixin {
     @Inject(method = "getItemModel(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/client/resources/model/BakedModel;", at = @At(value = "HEAD"), cancellable = true, remap = false)
     private void getItemModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         Item hiddenItem = ItemHiddenType.getHiddenItemClient(stack.getItem());
-        if (hiddenItem != null) {
+        if ((hiddenItem != null) && (hiddenItem != stack.getItem())) {
             ItemModelShaper shaper = (ItemModelShaper)(Object)this;
             ItemStack stack2 = new ItemStack(Holder.direct(hiddenItem), stack.getCount(), stack.getComponentsPatch());
             cir.setReturnValue(shaper.getItemModel(stack2));

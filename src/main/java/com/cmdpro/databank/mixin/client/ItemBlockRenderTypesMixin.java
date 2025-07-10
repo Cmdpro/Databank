@@ -16,7 +16,7 @@ public class ItemBlockRenderTypesMixin {
     @Inject(method = "getRenderLayers", at = @At(value = "HEAD"), cancellable = true, remap = false)
     private static void getRenderLayers(BlockState pState, CallbackInfoReturnable<ChunkRenderTypeSet> cir) {
         Block block = BlockHiddenType.getHiddenBlockClient(pState.getBlock());
-        if (block != null) {
+        if ((block != null) && (block != pState.getBlock())) {
             cir.setReturnValue(ItemBlockRenderTypes.getRenderLayers(DatabankUtils.changeBlockType(pState, block)));
         }
     }
