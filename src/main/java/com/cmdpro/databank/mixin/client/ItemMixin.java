@@ -15,7 +15,7 @@ public class ItemMixin {
     public void getName(ItemStack stack, CallbackInfoReturnable<MutableComponent> cir) {
         Item thisItem = (Item)(Object)this;
         Item item = ItemHiddenType.getHiddenItemClient(thisItem);
-        if (item != null) {
+        if ((item != null) && (item != stack.getItem())) {
             cir.setReturnValue(ItemHiddenType.getHiddenItemNameOverride(thisItem).orElse(item.getName(stack)).copy());
         }
     }
