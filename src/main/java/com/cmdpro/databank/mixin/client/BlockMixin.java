@@ -1,6 +1,7 @@
 package com.cmdpro.databank.mixin.client;
 
 import com.cmdpro.databank.hidden.types.BlockHiddenType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +9,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Optional;
 
 @Mixin(Block.class)
 public abstract class BlockMixin {
@@ -19,7 +22,12 @@ public abstract class BlockMixin {
         if (block != null) {
             if (block != this.asBlock())
                 cir.setReturnValue(BlockHiddenType.getHiddenBlockNameOverride(block).orElse(block.getName()).copy());
-            cir.setReturnValue(BlockHiddenType.getHiddenBlockNameOverride(block).get().copy());
+            else {
+                Optional<Component> override = BlockHiddenType.getHiddenBlockNameOverride(this.asBlock());
+                if (override.isPresent()) {
+                    cir.setReturnValue(override.get().copy());
+                }
+            }
         }
     }
 }
