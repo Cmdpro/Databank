@@ -34,7 +34,7 @@ public abstract class ItemColorsMixin {
     public void getColor(ItemStack stack, int tintIndex, CallbackInfoReturnable<Integer> cir) {
         if (stack != null) {
             Item item = ItemHiddenType.getHiddenItemClient(stack.getItem());
-            if (item != null) {
+            if ((item != null) && (item != stack.getItem())) {
                 ItemColors itemColors = (ItemColors)(Object)this;
                 ItemStack stack2 = new ItemStack(Holder.direct(item), stack.getCount(), stack.getComponentsPatch());
                 cir.setReturnValue(itemColors.getColor(stack2, tintIndex));
