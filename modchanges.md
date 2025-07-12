@@ -1,2 +1,2 @@
 ### Fixes
-- Fixed Crash when hiding a block or item as itself
+- Fixed Crash when getting loot from mining a block that is hidden as itself
