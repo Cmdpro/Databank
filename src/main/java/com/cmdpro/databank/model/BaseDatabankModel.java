@@ -42,6 +42,15 @@ public abstract class BaseDatabankModel<T> {
         pPoseStack.popPose();
     }
     public boolean isShadedByNormal(T obj, ModelPose.ModelPosePart part) {
+        if (part.part.dimensions.x+part.part.inflate <= 0.001 && part.part.dimensions.x+part.part.inflate >= -0.001) {
+            return false;
+        }
+        if (part.part.dimensions.y+part.part.inflate <= 0.001 && part.part.dimensions.y+part.part.inflate >= -0.001) {
+            return false;
+        }
+        if (part.part.dimensions.z+part.part.inflate <= 0.001 && part.part.dimensions.z+part.part.inflate >= -0.001) {
+            return false;
+        }
         return true;
     }
     public int getColor(T obj, ModelPose.ModelPosePart part, int original) {

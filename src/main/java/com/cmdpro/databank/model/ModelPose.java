@@ -222,7 +222,7 @@ public class ModelPose {
                     if (i.vertices.size() == 3 || i.vertices.size() == 4) {
                         Vector3f normal = i.normal.toVector3f().rotate(quaternionf);
                         if (!isShadedByNormal) {
-                            normal = new Vector3f(0, 1, 0);
+                            normal = new Vec3(0, 1, 0).multiply(normalMult).toVector3f();
                         }
                         for (DatabankPartDefinition.Vertex j : i.vertices) {
                             float x = (float)j.pos.x() / 16f;
