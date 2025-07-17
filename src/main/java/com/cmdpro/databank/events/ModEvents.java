@@ -40,6 +40,12 @@ public class ModEvents {
     }
     @SubscribeEvent
     public static void onAdvancement(AdvancementEvent.AdvancementProgressEvent event) {
-        DatabankUtils.updateHidden(event.getEntity());
+        if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.GRANT) {
+            if (event.getAdvancementProgress().isDone()) {
+                DatabankUtils.updateHidden(event.getEntity());
+            }
+        } else if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.REVOKE) {
+            DatabankUtils.updateHidden(event.getEntity());
+        }
     }
 }
