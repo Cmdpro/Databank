@@ -1,2 +1,2 @@
 ### Fixes
-- Improved lighting on models
+- Fixed hidden blocks not updating if the advancement didn't have a display

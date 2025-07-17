@@ -39,7 +39,7 @@ public class ModEvents {
         DatabankUtils.updateHidden(player);
     }
     @SubscribeEvent
-    public static void onAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
+    public static void onAdvancement(AdvancementEvent.AdvancementProgressEvent event) {
         DatabankUtils.updateHidden(event.getEntity());
     }
 }
