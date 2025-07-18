@@ -1,2 +1,3 @@
-### Fixes
-- Fixed crashing if a hidden block is hidden as something with fewer properties
+### Additions
+- Added overrides to hidden block types
+- Implemented block shapes being the same as the hidden block

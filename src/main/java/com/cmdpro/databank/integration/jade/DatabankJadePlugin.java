@@ -14,7 +14,7 @@ public class DatabankJadePlugin implements IWailaPlugin {
     public void registerClient(IWailaClientRegistration registration) {
         registration.addRayTraceCallback((hitResult, accessor, accessor1) -> {
             if (accessor instanceof BlockAccessor accessor2) {
-                Block block = BlockHiddenType.getHiddenBlockClient(accessor2.getBlock());
+                Block block = BlockHiddenType.getHiddenBlockClient(accessor2.getBlock(), BlockHiddenType.getProperties(accessor2.getBlockState()));
                 if (block != null) {
                     return registration.blockAccessor().from(accessor2).blockState(DatabankUtils.changeBlockType(accessor2.getBlockState(), block)).build();
                 }
