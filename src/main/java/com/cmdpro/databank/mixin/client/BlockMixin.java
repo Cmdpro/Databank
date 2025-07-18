@@ -18,12 +18,12 @@ public abstract class BlockMixin {
 
     @Inject(method = "getName", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getName(CallbackInfoReturnable<MutableComponent> cir) {
-        Block block = BlockHiddenType.getHiddenBlockClient((Block)(Object)this, new String[0]);
+        Block block = BlockHiddenType.getHiddenBlockClient((Block)(Object)this);
         if (block != null) {
             if (block != this.asBlock())
-                cir.setReturnValue(BlockHiddenType.getHiddenBlockNameOverride(block, new String[0]).orElse(block.getName()).copy());
+                cir.setReturnValue(BlockHiddenType.getHiddenBlockNameOverride(block).orElse(block.getName()).copy());
             else {
-                Optional<Component> override = BlockHiddenType.getHiddenBlockNameOverride(this.asBlock(), new String[0]);
+                Optional<Component> override = BlockHiddenType.getHiddenBlockNameOverride(this.asBlock());
                 if (override.isPresent()) {
                     cir.setReturnValue(override.get().copy());
                 }

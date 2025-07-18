@@ -32,7 +32,7 @@ public abstract class BlockColorsMixin {
     @Inject(method = "getColor(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)I", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getColor(BlockState state, Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (state != null) {
-            Block block = BlockHiddenType.getHiddenBlockClient(state.getBlock(), BlockHiddenType.getProperties(state));
+            Block block = BlockHiddenType.getHiddenBlockClient(state);
             if ((block != null) && (block != state.getBlock())) {
                 BlockState state2 = DatabankUtils.changeBlockType(state, block);
                 BlockColor blockcolor = blockColors.get(state2.getBlock());
@@ -48,7 +48,7 @@ public abstract class BlockColorsMixin {
     @Inject(method = "getColor(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/core/BlockPos;I)I", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tintIndex, CallbackInfoReturnable<Integer> cir) {
         if (state != null) {
-            Block block = BlockHiddenType.getHiddenBlockClient(state.getBlock(), BlockHiddenType.getProperties(state));
+            Block block = BlockHiddenType.getHiddenBlockClient(state);
             if ((block != null) && (block != state.getBlock())) {
                 BlockState state2 = DatabankUtils.changeBlockType(state, block);
                 BlockColor blockcolor = this.blockColors.get(state2.getBlock());
@@ -59,7 +59,7 @@ public abstract class BlockColorsMixin {
     @Inject(method = "getColoringProperties", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getColoringProperties(Block block, CallbackInfoReturnable<Set<Property<?>>> cir) {
         if (block != null) {
-            Block block2 = BlockHiddenType.getHiddenBlockClient(block, new String[0]);
+            Block block2 = BlockHiddenType.getHiddenBlockClient(block);
             if ((block2 != null) && (block2 != block)) {
                 cir.setReturnValue(coloringStates.getOrDefault(block2, ImmutableSet.of()));
             }

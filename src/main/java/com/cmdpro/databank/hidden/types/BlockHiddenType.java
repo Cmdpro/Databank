@@ -7,6 +7,7 @@ import com.cmdpro.databank.hidden.conditions.ActualPlayerCondition;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -72,32 +73,38 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         ClientDatabankUtils.updateWorld();
     }
 
-    public static Block getHiddenBlock(Block block, String[] properties, Player player) {
+    public static Block getHiddenBlock(Block block, Player player) {
+        return getHiddenBlock(block.defaultBlockState(), player);
+    }
+    public static Block getHiddenBlock(BlockState block, Player player) {
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null || i.condition == null) {
                     continue;
                 }
-                if (type.isHidden(block, player)) {
-                    BlockHiddenOverride override = findOverride(type, properties);
+                if (type.isHidden(block.getBlock(), player)) {
+                    BlockHiddenOverride override = findOverride(type, block);
                     return override != null ? override.hiddenAs : type.hiddenAs;
-                } else if (type.matches(block)) {
+                } else if (type.matches(block.getBlock())) {
                     break;
                 }
             }
         }
         return null;
     }
-    public static boolean shouldDropOriginalBlock(Block block, String[] properties, Player player) {
+    public static boolean shouldDropOriginalBlock(Block block, Player player) {
+        return shouldDropOriginalBlock(block.defaultBlockState(), player);
+    }
+    public static boolean shouldDropOriginalBlock(BlockState block, Player player) {
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null || i.condition == null) {
                     continue;
                 }
-                if (type.isHidden(block, player) && type.shouldOverwriteLootIfHidden) {
+                if (type.isHidden(block.getBlock(), player) && type.shouldOverwriteLootIfHidden) {
                     return false;
-                } else if (type.matches(block)) {
-                    BlockHiddenOverride override = findOverride(type, properties);
+                } else if (type.matches(block.getBlock())) {
+                    BlockHiddenOverride override = findOverride(type, block);
                     return override != null ? override.dropOriginalLootCondition.isUnlocked(player) : type.dropOriginalLootCondition.isUnlocked(player);
                 }
             }
@@ -105,14 +112,17 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return false;
     }
 
-    public static Block getHiddenBlock(Block block, String[] properties) {
+    public static Block getHiddenBlock(Block block) {
+        return getHiddenBlock(block.defaultBlockState());
+    }
+    public static Block getHiddenBlock(BlockState block) {
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null || i.condition == null) {
                     continue;
                 }
-                if (type.matches(block)) {
-                    BlockHiddenOverride override = findOverride(type, properties);
+                if (type.matches(block.getBlock())) {
+                    BlockHiddenOverride override = findOverride(type, block);
                     return override != null ? override.hiddenAs : type.hiddenAs;
                 }
             }
@@ -120,14 +130,17 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return null;
     }
 
-    public static Optional<Component> getHiddenBlockNameOverride(Block block, String[] properties) {
+    public static Optional<Component> getHiddenBlockNameOverride(Block block) {
+        return getHiddenBlockNameOverride(block.defaultBlockState());
+    }
+    public static Optional<Component> getHiddenBlockNameOverride(BlockState block) {
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null) {
                     continue;
                 }
-                if (type.matches(block)) {
-                    BlockHiddenOverride override = findOverride(type, properties);
+                if (type.matches(block.getBlock())) {
+                    BlockHiddenOverride override = findOverride(type, block);
                     return override != null ? override.nameOverride : type.nameOverride;
                 }
             }
@@ -135,43 +148,27 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return Optional.empty();
     }
 
-    public static BlockHiddenOverride findOverride(BlockHiddenTypeInstance instance, String[] blockProperties) {
+    public static BlockHiddenOverride findOverride(BlockHiddenTypeInstance instance, BlockState state) {
         for (BlockHiddenOverride j : instance.overrides) {
-            boolean valid = true;
-            String[] split = j.properties.split(",");
-            for (String k : split) {
-                String[] split2 = k.split("=");
-                if (Arrays.stream(blockProperties).noneMatch((a) -> {
-                    String[] split3 = a.split("=");
-                    return split3[0].equals(split2[0]) && split3[1].equals(split2[1]);
-                })) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (valid) {
+            if (j.predicate.matches(state)) {
                 return j;
             }
         }
         return null;
     }
-    public static String[] getProperties(BlockState state) {
-        List<String> strings = new ArrayList<>();
-        for (Property<?> i : state.getProperties()) {
-            strings.add(i.getName() + "=" + state.getValue(i));
-        }
-        return strings.toArray(new String[0]);
+    public static Block getHiddenBlockClient(Block block) {
+        return getHiddenBlockClient(block.defaultBlockState());
     }
-    public static Block getHiddenBlockClient(Block block, String[] properties) {
+    public static Block getHiddenBlockClient(BlockState block) {
         for (Map.Entry<ResourceLocation, Hidden> i : HiddenManager.hidden.entrySet()) {
             if (i.getValue().type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null) {
                     continue;
                 }
-                if (type.isHiddenClient(block)) {
-                    BlockHiddenOverride override = findOverride(type, properties);
+                if (type.isHiddenClient(block.getBlock())) {
+                    BlockHiddenOverride override = findOverride(type, block);
                     return override != null ? override.hiddenAs : type.hiddenAs;
-                } else if (type.matches(block)) {
+                } else if (type.matches(block.getBlock())) {
                     break;
                 }
             }
@@ -205,27 +202,27 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         }
     }
     public static class BlockHiddenOverride {
-        public final String properties;
+        public final StatePropertiesPredicate predicate;
         public Block hiddenAs;
         public Optional<Component> nameOverride;
         public HiddenCondition dropOriginalLootCondition;
         public boolean shouldOverwriteLootIfHidden;
-        public BlockHiddenOverride(String properties, Block hiddenAs, Optional<Component> nameOverride, HiddenCondition dropOriginalLootCondition, boolean shouldOverwiteLootIfHidden) {
-            this.properties = properties;
+        public BlockHiddenOverride(StatePropertiesPredicate predicate, Block hiddenAs, Optional<Component> nameOverride, HiddenCondition dropOriginalLootCondition, boolean shouldOverwiteLootIfHidden) {
+            this.predicate = predicate;
             this.hiddenAs = hiddenAs;
             this.nameOverride = nameOverride;
             this.dropOriginalLootCondition = dropOriginalLootCondition;
             this.shouldOverwriteLootIfHidden = shouldOverwiteLootIfHidden;
         }
         public static final StreamCodec<RegistryFriendlyByteBuf, BlockHiddenOverride> STREAM_CODEC = StreamCodec.of((buf, val) -> {
-            buf.writeUtf(val.properties);
+            StatePropertiesPredicate.STREAM_CODEC.encode(buf, val.predicate);
             buf.writeResourceKey(BuiltInRegistries.BLOCK.getResourceKey(val.hiddenAs).orElseThrow());
             buf.writeOptional(val.nameOverride, (buf2, val2) -> ComponentSerialization.STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf2, val2));
             buf.writeResourceKey(DatabankRegistries.HIDDEN_CONDITION_REGISTRY.getResourceKey(val.dropOriginalLootCondition.getSerializer()).orElseThrow());
             val.dropOriginalLootCondition.getSerializer().streamCodec().encode(buf, val.dropOriginalLootCondition);
             buf.writeBoolean(val.shouldOverwriteLootIfHidden);
         }, (buf) -> {
-            String properties = buf.readUtf();
+            StatePropertiesPredicate predicate = StatePropertiesPredicate.STREAM_CODEC.decode(buf);
             ResourceKey<Block> hiddenAsKey = buf.readResourceKey(Registries.BLOCK);
             Block hiddenAs = BuiltInRegistries.BLOCK.get(hiddenAsKey);
             Optional<Component> nameOverride = buf.readOptional((buf2) -> ComponentSerialization.STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf2));
@@ -233,10 +230,10 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
             HiddenCondition.Serializer<?> dropConditionSerializer = DatabankRegistries.HIDDEN_CONDITION_REGISTRY.get(dropConditionKey);
             HiddenCondition dropCondition = dropConditionSerializer.streamCodec().decode(buf);
             boolean shouldOverwriteLootIfHidden = buf.readBoolean();
-            return new BlockHiddenOverride(properties, hiddenAs, nameOverride, dropCondition, shouldOverwriteLootIfHidden);
+            return new BlockHiddenOverride(predicate, hiddenAs, nameOverride, dropCondition, shouldOverwriteLootIfHidden);
         });
         public static final MapCodec<BlockHiddenOverride> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Codec.STRING.fieldOf("properties").forGetter((type) -> type.properties),
+                StatePropertiesPredicate.CODEC.fieldOf("predicate").forGetter((type) -> type.predicate),
                 ResourceKey.codec(Registries.BLOCK).fieldOf("hidden_as").xmap(BuiltInRegistries.BLOCK::get, (i) -> BuiltInRegistries.BLOCK.getResourceKey(i).orElseThrow()).forGetter((type) -> type.hiddenAs),
                 ComponentSerialization.CODEC.optionalFieldOf("name_override").forGetter((type) -> type.nameOverride),
                 HiddenSerializer.HIDDEN_CONDITION_CODEC.optionalFieldOf("drop_original_loot_condition", new ActualPlayerCondition()).forGetter((type) -> type.dropOriginalLootCondition),

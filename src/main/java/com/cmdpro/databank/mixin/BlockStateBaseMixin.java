@@ -32,12 +32,12 @@ public abstract class BlockStateBaseMixin {
             if (contextEntity instanceof Player player) {
                 if ((Object)this instanceof BlockState state) {
                     if (player.level().isClientSide) {
-                        Block block = BlockHiddenType.getHiddenBlockClient(state.getBlock(), BlockHiddenType.getProperties(state));
+                        Block block = BlockHiddenType.getHiddenBlockClient(state);
                         if (block != null && block != state.getBlock()) {
                             cir.setReturnValue(DatabankUtils.changeBlockType(state, block).getShape(level, pos, context));
                         }
                     } else {
-                        Block block = BlockHiddenType.getHiddenBlock(state.getBlock(), BlockHiddenType.getProperties(state), player);
+                        Block block = BlockHiddenType.getHiddenBlock(state, player);
                         if (block != null && block != state.getBlock()) {
                             cir.setReturnValue(DatabankUtils.changeBlockType(state, block).getShape(level, pos, context));
                         }
