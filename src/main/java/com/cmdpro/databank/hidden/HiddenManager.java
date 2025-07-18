@@ -44,7 +44,7 @@ public class HiddenManager extends SimpleJsonResourceReloadListener {
                 }
                 value.id = i.getKey();
                 hidden.put(i.getKey(), value);
-            } catch (IllegalArgumentException | JsonParseException e) {
+            } catch (Exception e) {
                 Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading hidden entry {}", location, e);
             }
         }
