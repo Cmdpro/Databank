@@ -32,6 +32,7 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
             ComponentSerialization.CODEC.optionalFieldOf("name_override").forGetter((type) -> type.nameOverride),
             HiddenSerializer.HIDDEN_CONDITION_CODEC.optionalFieldOf("drop_original_loot_condition", new ActualPlayerCondition()).forGetter((type) -> type.dropOriginalLootCondition),
             Codec.BOOL.optionalFieldOf("should_overwrite_loot_if_hidden", true).forGetter((type) -> type.shouldOverwriteLootIfHidden),
+            StatePropertiesPredicate.CODEC.optionalFieldOf("should_apply_predicate").forGetter((type) -> type.shouldApplyPredicate),
             BlockHiddenOverride.CODEC.codec().listOf().optionalFieldOf("overrides", new ArrayList<>()).forGetter((type) -> type.overrides)
     ).apply(instance, BlockHiddenTypeInstance::new));
 
@@ -48,6 +49,7 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         buf.writeResourceKey(DatabankRegistries.HIDDEN_CONDITION_REGISTRY.getResourceKey(val.dropOriginalLootCondition.getSerializer()).orElseThrow());
         val.dropOriginalLootCondition.getSerializer().streamCodec().encode(buf, val.dropOriginalLootCondition);
         buf.writeBoolean(val.shouldOverwriteLootIfHidden);
+        buf.writeOptional(val.shouldApplyPredicate, StatePropertiesPredicate.STREAM_CODEC);
         buf.writeCollection(val.overrides, (buf2, override) -> BlockHiddenOverride.STREAM_CODEC.encode((RegistryFriendlyByteBuf)buf2, override));
     }, (buf) -> {
         ResourceKey<Block> originalKey = buf.readResourceKey(Registries.BLOCK);
@@ -59,8 +61,9 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         HiddenCondition.Serializer<?> dropConditionSerializer = DatabankRegistries.HIDDEN_CONDITION_REGISTRY.get(dropConditionKey);
         HiddenCondition dropCondition = dropConditionSerializer.streamCodec().decode(buf);
         boolean shouldOverwriteLootIfHidden = buf.readBoolean();
+        Optional<StatePropertiesPredicate> shouldApplyPredicate = buf.readOptional(StatePropertiesPredicate.STREAM_CODEC);
         List<BlockHiddenOverride> overrides = buf.readList((buf2) -> BlockHiddenOverride.STREAM_CODEC.decode((RegistryFriendlyByteBuf)buf2));
-        return new BlockHiddenTypeInstance(original, hiddenAs, nameOverride, dropCondition, shouldOverwriteLootIfHidden, overrides);
+        return new BlockHiddenTypeInstance(original, hiddenAs, nameOverride, dropCondition, shouldOverwriteLootIfHidden, shouldApplyPredicate, overrides);
     });
 
     @Override
@@ -83,8 +86,14 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                     continue;
                 }
                 if (type.isHidden(block.getBlock(), player)) {
-                    BlockHiddenOverride override = findOverride(type, block);
-                    return override != null ? override.hiddenAs : type.hiddenAs;
+                    boolean applies = true;
+                    if (type.shouldApplyPredicate.isPresent()) {
+                        applies = type.shouldApplyPredicate.get().matches(block);
+                    }
+                    if (applies) {
+                        BlockHiddenOverride override = findOverride(type, block);
+                        return override != null ? override.hiddenAs : type.hiddenAs;
+                    }
                 } else if (type.matches(block.getBlock())) {
                     break;
                 }
@@ -104,8 +113,14 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                 if (type.isHidden(block.getBlock(), player) && type.shouldOverwriteLootIfHidden) {
                     return false;
                 } else if (type.matches(block.getBlock())) {
-                    BlockHiddenOverride override = findOverride(type, block);
-                    return override != null ? override.dropOriginalLootCondition.isUnlocked(player) : type.dropOriginalLootCondition.isUnlocked(player);
+                    boolean applies = true;
+                    if (type.shouldApplyPredicate.isPresent()) {
+                        applies = type.shouldApplyPredicate.get().matches(block);
+                    }
+                    if (applies) {
+                        BlockHiddenOverride override = findOverride(type, block);
+                        return override != null ? override.dropOriginalLootCondition.isUnlocked(player) : type.dropOriginalLootCondition.isUnlocked(player);
+                    }
                 }
             }
         }
@@ -122,8 +137,14 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                     continue;
                 }
                 if (type.matches(block.getBlock())) {
-                    BlockHiddenOverride override = findOverride(type, block);
-                    return override != null ? override.hiddenAs : type.hiddenAs;
+                    boolean applies = true;
+                    if (type.shouldApplyPredicate.isPresent()) {
+                        applies = type.shouldApplyPredicate.get().matches(block);
+                    }
+                    if (applies) {
+                        BlockHiddenOverride override = findOverride(type, block);
+                        return override != null ? override.hiddenAs : type.hiddenAs;
+                    }
                 }
             }
         }
@@ -140,8 +161,14 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                     continue;
                 }
                 if (type.matches(block.getBlock())) {
-                    BlockHiddenOverride override = findOverride(type, block);
-                    return override != null ? override.nameOverride : type.nameOverride;
+                    boolean applies = true;
+                    if (type.shouldApplyPredicate.isPresent()) {
+                        applies = type.shouldApplyPredicate.get().matches(block);
+                    }
+                    if (applies) {
+                        BlockHiddenOverride override = findOverride(type, block);
+                        return override != null ? override.nameOverride : type.nameOverride;
+                    }
                 }
             }
         }
@@ -166,8 +193,14 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                     continue;
                 }
                 if (type.isHiddenClient(block.getBlock())) {
-                    BlockHiddenOverride override = findOverride(type, block);
-                    return override != null ? override.hiddenAs : type.hiddenAs;
+                    boolean applies = true;
+                    if (type.shouldApplyPredicate.isPresent()) {
+                        applies = type.shouldApplyPredicate.get().matches(block);
+                    }
+                    if (applies) {
+                        BlockHiddenOverride override = findOverride(type, block);
+                        return override != null ? override.hiddenAs : type.hiddenAs;
+                    }
                 } else if (type.matches(block.getBlock())) {
                     break;
                 }
@@ -181,13 +214,15 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         public Optional<Component> nameOverride;
         public HiddenCondition dropOriginalLootCondition;
         public boolean shouldOverwriteLootIfHidden;
+        public Optional<StatePropertiesPredicate> shouldApplyPredicate;
         public List<BlockHiddenOverride> overrides;
-        public BlockHiddenTypeInstance(Block original, Block hiddenAs, Optional<Component> nameOverride, HiddenCondition dropOriginalLootCondition, boolean shouldOverwiteLootIfHidden, List<BlockHiddenOverride> overrides) {
+        public BlockHiddenTypeInstance(Block original, Block hiddenAs, Optional<Component> nameOverride, HiddenCondition dropOriginalLootCondition, boolean shouldOverwiteLootIfHidden, Optional<StatePropertiesPredicate> shouldApplyPredicate, List<BlockHiddenOverride> overrides) {
             this.original = original;
             this.hiddenAs = hiddenAs;
             this.nameOverride = nameOverride;
             this.dropOriginalLootCondition = dropOriginalLootCondition;
             this.shouldOverwriteLootIfHidden = shouldOverwiteLootIfHidden;
+            this.shouldApplyPredicate = shouldApplyPredicate;
             this.overrides = overrides;
         }
 
@@ -202,7 +237,7 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         }
     }
     public static class BlockHiddenOverride {
-        public final StatePropertiesPredicate predicate;
+        public StatePropertiesPredicate predicate;
         public Block hiddenAs;
         public Optional<Component> nameOverride;
         public HiddenCondition dropOriginalLootCondition;
