@@ -1,2 +1,2 @@
 ### Fixes
-- Fixed hidden blocks not updating if the advancement didn't have a display
+- Fixed crashing if a hidden block is hidden as something with fewer properties

@@ -25,7 +25,7 @@ public class DatabankUtils {
         return state;
     }
     private static <T extends Comparable<T>> BlockState copyProperty(Property<T> property, BlockState original, BlockState newState) {
-        if (original.hasProperty(property)) {
+        if (original.hasProperty(property) && newState.hasProperty(property)) {
             return newState.setValue(property, original.getValue(property));
         }
         return newState;
