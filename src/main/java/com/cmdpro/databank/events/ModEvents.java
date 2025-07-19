@@ -8,6 +8,7 @@ import com.cmdpro.databank.multiblock.MultiblockManager;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.HiddenSyncS2CPacket;
 import com.cmdpro.databank.networking.packet.MultiblockSyncS2CPacket;
+import com.cmdpro.databank.registry.CriteriaTriggerRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -45,6 +46,8 @@ public class ModEvents {
         if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.GRANT) {
             if (event.getAdvancementProgress().isDone()) {
                 DatabankUtils.sendUnlockAdvancement(event.getEntity(), event.getAdvancement().id());
+                CriteriaTriggerRegistry.HAS_ADVANCEMENT.get().trigger((ServerPlayer)event.getEntity(), event.getAdvancement().id());
+                CriteriaTriggerRegistry.HAS_ADVANCEMENTS.get().trigger((ServerPlayer)event.getEntity());
             }
         } else if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.REVOKE) {
             if (!event.getAdvancementProgress().isDone()) {
