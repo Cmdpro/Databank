@@ -202,17 +202,23 @@ public class ModelPose {
             }
             if (part.isMesh) {
                 pPoseStack.translate(pos.x/16f, pos.y/16f, pos.z/16f);
-                pPoseStack.mulPose(new Quaternionf().rotationZYX(rotation.z, rotation.y, rotation.x));
-                quaternionf.rotateZYX(rotation.z, rotation.y, rotation.x);
+                Matrix4f matrix4f = new Matrix4f();
+                matrix4f.rotateXYZ(rotation.x, -rotation.y, rotation.z);
+                quaternionf.rotateXYZ(rotation.x, rotation.y, rotation.z);
                 List<List<DatabankPartDefinition.Vertex>> faces2 = part.faces.orElse(null);
                 if (faces2 != null) {
                     faces = new ArrayList<>();
                     for (List<DatabankPartDefinition.Vertex> i : faces2) {
                         if (i.size() == 3 || i.size() == 4) {
+                            List<DatabankPartDefinition.Vertex> verts = new ArrayList<>();
+                            for (DatabankPartDefinition.Vertex j : i) {
+                                Vector3f pos = matrix4f.transformPosition(j.pos.toVector3f());
+                                verts.add(new DatabankPartDefinition.Vertex(new Vec3(pos.x, pos.y, pos.z), j.u, j.v));
+                            }
                             Vec3 vecA = i.get(1).pos.subtract(i.get(0).pos);
                             Vec3 vecB = i.get(2).pos.subtract(i.get(0).pos);
                             Vector3f normal = vecA.cross(vecB).toVector3f().normalize();
-                            faces.add(new DatabankPartDefinition.Face(i, new Vec3(normal.x, normal.y, normal.z)));
+                            faces.add(new DatabankPartDefinition.Face(verts, new Vec3(normal.x, normal.y, normal.z)));
                         }
                     }
                 }
