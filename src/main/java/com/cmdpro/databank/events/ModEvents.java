@@ -36,11 +36,20 @@ public class ModEvents {
     protected static void syncToPlayer(ServerPlayer player) {
         ModMessages.sendToPlayer(new HiddenSyncS2CPacket(HiddenManager.hidden), player);
         ModMessages.sendToPlayer(new MultiblockSyncS2CPacket(MultiblockManager.multiblocks), player);
-        DatabankUtils.updateHidden(player);
+        DatabankUtils.updateHidden(player, false);
     }
 
     @SubscribeEvent
     public static void onAdvancement(AdvancementEvent.AdvancementProgressEvent event) {
         DatabankUtils.updateHidden(event.getEntity());
+        if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.GRANT) {
+            if (event.getAdvancementProgress().isDone()) {
+                DatabankUtils.sendUnlockAdvancement(event.getEntity(), event.getAdvancement().id());
+            }
+        } else if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.REVOKE) {
+            if (!event.getAdvancementProgress().isDone()) {
+                DatabankUtils.sendLockAdvancement(event.getEntity(), event.getAdvancement().id());
+            }
+        }
     }
 }

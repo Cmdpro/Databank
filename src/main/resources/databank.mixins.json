@@ -23,6 +23,7 @@
     "client.SoundEngineMixin",
     "client.ChannelMixin",
     "client.SoundManagerMixin",
-    "client.ChannelHandleMixin"
+    "client.ChannelHandleMixin",
+    "client.ClientAdvancementsMixin"
   ]
 }

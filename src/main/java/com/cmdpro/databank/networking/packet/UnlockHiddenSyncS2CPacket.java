@@ -2,12 +2,16 @@ package com.cmdpro.databank.networking.packet;
 
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.hidden.ClientHidden;
+import com.cmdpro.databank.hidden.Hidden;
+import com.cmdpro.databank.hidden.ClientHiddenListener;
 import com.cmdpro.databank.hidden.HiddenManager;
 import com.cmdpro.databank.networking.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.List;
 
 public record UnlockHiddenSyncS2CPacket(ResourceLocation hidden) implements Message {
     public static UnlockHiddenSyncS2CPacket read(FriendlyByteBuf buf) {
@@ -28,6 +32,9 @@ public record UnlockHiddenSyncS2CPacket(ResourceLocation hidden) implements Mess
         if (!ClientHidden.unlocked.contains(hidden)) {
             if (HiddenManager.hidden.containsKey(hidden)) {
                 ClientHidden.unlocked.add(hidden);
+                Hidden hidden2 = HiddenManager.hidden.get(hidden);
+                ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onUnhide(hidden2));
+                ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onUnhide(List.of(hidden2)));
             }
         }
         if (HiddenManager.hidden.containsKey(hidden)) {

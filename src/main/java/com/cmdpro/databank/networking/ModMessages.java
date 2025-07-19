@@ -58,6 +58,8 @@ public class ModMessages {
         registrar.playToClient(UnlockHiddenSyncS2CPacket.TYPE, getNetworkCodec(UnlockHiddenSyncS2CPacket::read, UnlockHiddenSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(HiddenSyncS2CPacket.TYPE, getNetworkCodec(HiddenSyncS2CPacket::read, HiddenSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(MultiblockSyncS2CPacket.TYPE, getNetworkCodec(MultiblockSyncS2CPacket::read, MultiblockSyncS2CPacket::write), Handler::handle);
+        registrar.playToClient(LockAdvancementS2CPacket.TYPE, getNetworkCodec(LockAdvancementS2CPacket::read, LockAdvancementS2CPacket::write), Handler::handle);
+        registrar.playToClient(UnlockAdvancementS2CPacket.TYPE, getNetworkCodec(UnlockAdvancementS2CPacket::read, UnlockAdvancementS2CPacket::write), Handler::handle);
 
         //C2S
         registrar.playToServer(WorldGuiInteractC2SPacket.TYPE, getNetworkCodec(WorldGuiInteractC2SPacket::read, WorldGuiInteractC2SPacket::write), Handler::handle);
