@@ -76,6 +76,18 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         ClientDatabankUtils.updateWorld();
     }
 
+    public static boolean isVisible(Block block, Player player) {
+        return getHiddenBlock(block, player) == null;
+    }
+    public static boolean isVisible(BlockState block, Player player) {
+        return getHiddenBlock(block, player) == null;
+    }
+    public static boolean isVisibleClient(Block block) {
+        return getHiddenBlockClient(block) == null;
+    }
+    public static boolean isVisibleClient(BlockState block) {
+        return getHiddenBlockClient(block) == null;
+    }
     public static Block getHiddenBlock(Block block, Player player) {
         return getHiddenBlock(block.defaultBlockState(), player);
     }

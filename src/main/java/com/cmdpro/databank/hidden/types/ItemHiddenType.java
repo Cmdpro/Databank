@@ -16,6 +16,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +56,12 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
 
     @Override
     public void updateClient() {
+    }
+    public static boolean isVisible(Item item, Player player) {
+        return getHiddenItem(item, player) == null;
+    }
+    public static boolean isVisibleClient(Item item) {
+        return getHiddenItemClient(item) == null;
     }
     public static Item getHiddenItem(Item item, Player player) {
         for (Hidden i : HiddenManager.hidden.values()) {
