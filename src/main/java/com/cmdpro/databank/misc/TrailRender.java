@@ -22,22 +22,22 @@ import java.util.function.Function;
 public class TrailRender {
     public Vec3 offset = new Vec3(0, 0, 0);
     public Vec3 position;
-    public int maxSegments;
+    public int segments;
     public int time;
     public float size;
     public ResourceLocation texture;
     public RenderType renderType;
     private final List<Vec3> positions = new ArrayList<>();
     private boolean shrink;
-    public TrailRender(Vec3 position, int maxSegments, int time, float size, ResourceLocation texture) {
-        this(position, maxSegments, time, size, texture, RenderType.ENTITY_CUTOUT);
+    public TrailRender(Vec3 position, int segments, int time, float size, ResourceLocation texture) {
+        this(position, segments, time, size, texture, RenderType.ENTITY_CUTOUT);
     }
-    public TrailRender(Vec3 position, int maxSegments, int time, float size, ResourceLocation texture, Function<ResourceLocation, RenderType> renderType) {
-        this(position, maxSegments, time, size, texture, renderType.apply(texture));
+    public TrailRender(Vec3 position, int segments, int time, float size, ResourceLocation texture, Function<ResourceLocation, RenderType> renderType) {
+        this(position, segments, time, size, texture, renderType.apply(texture));
     }
-    public TrailRender(Vec3 position, int maxSegments, int time, float size, ResourceLocation texture, RenderType renderType) {
+    public TrailRender(Vec3 position, int segments, int time, float size, ResourceLocation texture, RenderType renderType) {
         this.position = position;
-        this.maxSegments = maxSegments;
+        this.segments = segments;
         this.time = time;
         this.size = size;
         this.texture = texture;
@@ -53,8 +53,8 @@ public class TrailRender {
         }
         List<Vector3f> segs = new ArrayList<>();
         segs.add(positions.getFirst().add(offset).toVector3f());
-        for (int i = 1; i < maxSegments; i++) {
-            segs.add(positions.get((int)(positions.size()*((float)i/(float)maxSegments))).add(offset).toVector3f());
+        for (int i = 1; i < segments; i++) {
+            segs.add(positions.get((int)(positions.size()*((float)i/(float)segments))).add(offset).toVector3f());
         }
         segs.add(positions.getLast().add(offset).toVector3f());
         VertexConsumer consumer = pBufferSource.getBuffer(renderType);
