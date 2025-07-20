@@ -77,9 +77,15 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
     }
 
     public static boolean isVisible(Block block, Player player) {
+        if (player.level().isClientSide) {
+            return isVisibleClient(block);
+        }
         return getHiddenBlock(block, player) == null;
     }
     public static boolean isVisible(BlockState block, Player player) {
+        if (player.level().isClientSide) {
+            return isVisibleClient(block);
+        }
         return getHiddenBlock(block, player) == null;
     }
     public static boolean isVisibleClient(Block block) {
@@ -89,9 +95,15 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return getHiddenBlockClient(block) == null;
     }
     public static Block getHiddenBlock(Block block, Player player) {
+        if (player.level().isClientSide) {
+            return getHiddenBlockClient(block);
+        }
         return getHiddenBlock(block.defaultBlockState(), player);
     }
     public static Block getHiddenBlock(BlockState block, Player player) {
+        if (player.level().isClientSide) {
+            return getHiddenBlockClient(block);
+        }
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null || i.condition == null) {

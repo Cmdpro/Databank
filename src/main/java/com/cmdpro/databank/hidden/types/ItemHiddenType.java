@@ -58,12 +58,18 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
     public void updateClient() {
     }
     public static boolean isVisible(Item item, Player player) {
+        if (player.level().isClientSide) {
+            return isVisibleClient(item);
+        }
         return getHiddenItem(item, player) == null;
     }
     public static boolean isVisibleClient(Item item) {
         return getHiddenItemClient(item) == null;
     }
     public static Item getHiddenItem(Item item, Player player) {
+        if (player.level().isClientSide) {
+            return getHiddenItemClient(item);
+        }
         for (Hidden i : HiddenManager.hidden.values()) {
             if (i.type instanceof ItemHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null || i.condition == null) {
