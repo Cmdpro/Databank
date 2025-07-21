@@ -51,7 +51,7 @@ public abstract class BaseGradient<T> {
         points.sort(Comparator.comparing((i) -> i.time));
         return this;
     }
-    public class GradientPoint {
+    protected class GradientPoint {
         public T value;
         public float time;
         public GradientPoint(T value, float time) {
