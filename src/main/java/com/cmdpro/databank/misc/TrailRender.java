@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -12,11 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 
 import java.awt.*;
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -73,13 +73,12 @@ public class TrailRender {
             Vector3f nextSeg = segs.size() > i+1 ? segs.get(i+1) : null;
             if (nextSeg != null) {
                 if (previousCenter == null) { previousCenter = new Vector3f(seg).sub(new Vector3f(nextSeg).sub(seg).normalize()); }
-                Vector3f segAfterNext = segs.size() > i+2 ? segs.get(i+2) : nextSeg.add(new Vector3f(nextSeg).sub(seg).normalize());
                 float wCur = shrink ? 1f-((float)i / (float)highestSeg) : 1f;
                 float wNext = shrink ? 1f-((float)(i+1) / (float)highestSeg) : 1f;
-                Vector3f currentTrailUpper = getTrailPos(seg, previousCenter, nextSeg, size*wCur);
-                Vector3f currentTrailLower = getTrailPos(seg, previousCenter, nextSeg, -size*wCur);
-                Vector3f nextTrailUpper = getTrailPos(nextSeg, seg, segAfterNext, size*wNext);
-                Vector3f nextTrailLower = getTrailPos(nextSeg, seg, segAfterNext, -size*wNext);
+                Vector3f currentTrailUpper = getTrailPos(seg, previousCenter, size*wCur);
+                Vector3f currentTrailLower = getTrailPos(seg, previousCenter, -size*wCur);
+                Vector3f nextTrailUpper = getTrailPos(nextSeg, seg, size*wNext);
+                Vector3f nextTrailLower = getTrailPos(nextSeg, seg, -size*wNext);
                 float uCur = ((float)i / (float)highestSeg);
                 float uNext = ((float)(i+1) / (float)highestSeg);
                 int colorCur = gradient.getColor((float)i / (float)highestSeg).getRGB();
@@ -98,28 +97,15 @@ public class TrailRender {
             positions.removeLast();
         }
     }
-    private Vector3f getTrailPos(Vector3f trailCenter, Vector3f previousCenter, Vector3f nextCenter, float size) {
+    private Vector3f getTrailPos(Vector3f trailCenter, Vector3f previousCenter, float size) {
         float sizeDiff = size/2f;
-        Quaternionf quaternionf = new Quaternionf();
-        if (previousCenter != null && nextCenter != null) {
-            Vec2 rot = calculateRotationVector(new Vec3(trailCenter.x, trailCenter.y, trailCenter.z), new Vec3(previousCenter.x, previousCenter.y, previousCenter.z));
-
-            Quaternionf quaternionf2 = new Quaternionf();
-            quaternionf2.rotateY((float) Math.toRadians(-rot.y + 180));
-            Quaternionf rotation = new Quaternionf().rotateX((float)Math.toRadians(-rot.x)).mul(quaternionf2);
-            quaternionf.mul(rotation);
-
-            Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-            Vector3f positiveZ = quaternionf.positiveZ(new Vector3f());
-            Quaternionf quaternionf4 = new Quaternionf().lookAlong(positiveZ, new Vector3f(0, 1, 0));
-            Vector3f vecToCamera = camera.getPosition().toVector3f().sub(trailCenter).normalize();
-            quaternionf4.transform(vecToCamera);
-            Vector3f pos = new Vector3f(0, 1, 0).rotate(quaternionf);
-            float angle = vecToCamera.angle(pos);
-            Quaternionf quaternionf3 = new Quaternionf().rotateZ(angle+(float)Math.toRadians(90)).mul(quaternionf2);
-            quaternionf.mul(quaternionf3);
-        }
-        return new Vector3f(trailCenter).add(new Vector3f(0, sizeDiff, 0).rotate(quaternionf));
+        Vec2 rot = calculateRotationVector(new Vec3(trailCenter.x, trailCenter.y, trailCenter.z), new Vec3(previousCenter.x, previousCenter.y, previousCenter.z));
+        Quaternionf quaternionf2 = new Quaternionf();
+        quaternionf2.rotateY((float) Math.toRadians(-rot.y + 180));
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Vector3f vecToCamera = camera.getPosition().toVector3f().sub(trailCenter).normalize();
+        Vector3f vecToPrev = new Vector3f(previousCenter).sub(trailCenter).normalize();
+        return new Vector3f(trailCenter).add(new Vector3f(vecToCamera).cross(vecToPrev).normalize().mul(sizeDiff));
     }
     private VertexConsumer addVertex(VertexConsumer consumer, PoseStack stack, Vector3f pos, float u, float v, int color, int packedLight) {
         return consumer.addVertex(stack.last(), pos)
