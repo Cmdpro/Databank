@@ -67,17 +67,19 @@ public class TrailRender {
         segs.add(positions.getLast().add(offset).toVector3f());
         VertexConsumer consumer = pBufferSource.getBuffer(renderType);
         int highestSeg = segs.size()-1;
+        Vector3f previousCenter = null;
         for (int i = 0; i < segs.size(); i++) {
             Vector3f seg = segs.get(i);
             Vector3f nextSeg = segs.size() > i+1 ? segs.get(i+1) : null;
             if (nextSeg != null) {
+                if (previousCenter == null) { previousCenter = new Vector3f(seg).sub(new Vector3f(nextSeg).sub(seg).normalize()); }
                 Vector3f segAfterNext = segs.size() > i+2 ? segs.get(i+2) : nextSeg.add(new Vector3f(nextSeg).sub(seg).normalize());
                 float wCur = shrink ? 1f-((float)i / (float)highestSeg) : 1f;
                 float wNext = shrink ? 1f-((float)(i+1) / (float)highestSeg) : 1f;
-                Vector3f currentTrailUpper = getTrailPos(seg, nextSeg, size*wCur);
-                Vector3f currentTrailLower = getTrailPos(seg, nextSeg, -size*wCur);
-                Vector3f nextTrailUpper = getTrailPos(nextSeg, segAfterNext, size*wNext);
-                Vector3f nextTrailLower = getTrailPos(nextSeg, segAfterNext, -size*wNext);
+                Vector3f currentTrailUpper = getTrailPos(seg, previousCenter, nextSeg, size*wCur);
+                Vector3f currentTrailLower = getTrailPos(seg, previousCenter, nextSeg, -size*wCur);
+                Vector3f nextTrailUpper = getTrailPos(nextSeg, seg, segAfterNext, size*wNext);
+                Vector3f nextTrailLower = getTrailPos(nextSeg, seg, segAfterNext, -size*wNext);
                 float uCur = ((float)i / (float)highestSeg);
                 float uNext = ((float)(i+1) / (float)highestSeg);
                 int colorCur = gradient.getColor((float)i / (float)highestSeg).getRGB();
@@ -86,6 +88,7 @@ public class TrailRender {
                 addVertex(consumer, pPoseStack, nextTrailUpper, uNext, 0f+((1f-wNext)/2f), colorNext, packedLight);
                 addVertex(consumer, pPoseStack, nextTrailLower, uNext, 1f-((1f-wNext)/2f), colorNext, packedLight);
                 addVertex(consumer, pPoseStack, currentTrailLower, uCur, 1f-((1f-wCur)/2f), colorCur, packedLight);
+                previousCenter = seg;
             }
         }
     }
@@ -95,12 +98,27 @@ public class TrailRender {
             positions.removeLast();
         }
     }
-    private Vector3f getTrailPos(Vector3f trailCenter, Vector3f nextCenter, float size) {
+    private Vector3f getTrailPos(Vector3f trailCenter, Vector3f previousCenter, Vector3f nextCenter, float size) {
         float sizeDiff = size/2f;
         Quaternionf quaternionf = new Quaternionf();
-        //Vec2 rot = calculateRotationVector(new Vec3(trailCenter.x, trailCenter.y, trailCenter.z), new Vec3(nextCenter.x, nextCenter.y, nextCenter.z));
-        //quaternionf.rotateZ((float) Math.toRadians(-rot.y + 180));
-        //quaternionf.rotateY((float)Math.toRadians(-rot.x));
+        if (previousCenter != null && nextCenter != null) {
+            Vec2 rot = calculateRotationVector(new Vec3(trailCenter.x, trailCenter.y, trailCenter.z), new Vec3(previousCenter.x, previousCenter.y, previousCenter.z));
+
+            Quaternionf quaternionf2 = new Quaternionf();
+            quaternionf2.rotateY((float) Math.toRadians(-rot.y + 180));
+            Quaternionf rotation = new Quaternionf().rotateX((float)Math.toRadians(-rot.x)).mul(quaternionf2);
+            quaternionf.mul(rotation);
+
+            Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+            Vector3f positiveZ = quaternionf.positiveZ(new Vector3f());
+            Quaternionf quaternionf4 = new Quaternionf().lookAlong(positiveZ, new Vector3f(0, 1, 0));
+            Vector3f vecToCamera = camera.getPosition().toVector3f().sub(trailCenter).normalize();
+            quaternionf4.transform(vecToCamera);
+            Vector3f pos = new Vector3f(0, 1, 0).rotate(quaternionf);
+            float angle = vecToCamera.angle(pos);
+            Quaternionf quaternionf3 = new Quaternionf().rotateZ(angle+(float)Math.toRadians(90)).mul(quaternionf2);
+            quaternionf.mul(quaternionf3);
+        }
         return new Vector3f(trailCenter).add(new Vector3f(0, sizeDiff, 0).rotate(quaternionf));
     }
     private VertexConsumer addVertex(VertexConsumer consumer, PoseStack stack, Vector3f pos, float u, float v, int color, int packedLight) {
@@ -110,7 +128,7 @@ public class TrailRender {
                 .setLight(packedLight)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setNormal(0, 1, 0);
-    }/*
+    }
     private static Vec2 calculateRotationVector(Vec3 pVec, Vec3 pTarget) {
         double d0 = pTarget.x - pVec.x;
         double d1 = pTarget.y - pVec.y;
@@ -120,5 +138,5 @@ public class TrailRender {
                 Mth.wrapDegrees((float)(-(Mth.atan2(d1, d3) * (double)(180F / (float)Math.PI)))),
                 Mth.wrapDegrees((float)(Mth.atan2(d2, d0) * (double)(180F / (float)Math.PI)) - 90.0F)
         );
-    }*/
+    }
 }
