@@ -53,9 +53,9 @@ public class TrailRender {
         render(pPoseStack, pBufferSource, packedLight, new Color(color));
     }
     public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, Color color) {
-        render(pPoseStack, pBufferSource, packedLight, Gradient.singleColor(color));
+        render(pPoseStack, pBufferSource, packedLight, ColorGradient.singleColor(color));
     }
-    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, Gradient gradient) {
+    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, ColorGradient gradient) {
         if (positions.isEmpty()) {
             return;
         }
@@ -81,8 +81,8 @@ public class TrailRender {
                 Vector3f nextTrailLower = getTrailPos(nextSeg, seg, -size*wNext);
                 float uCur = ((float)i / (float)highestSeg);
                 float uNext = ((float)(i+1) / (float)highestSeg);
-                int colorCur = gradient.getColor((float)i / (float)highestSeg).getRGB();
-                int colorNext = gradient.getColor((float)(i+1) / (float)highestSeg).getRGB();
+                int colorCur = gradient.getValue((float)i / (float)highestSeg).getRGB();
+                int colorNext = gradient.getValue((float)(i+1) / (float)highestSeg).getRGB();
                 addVertex(consumer, pPoseStack, currentTrailUpper, uCur, 0f+((1f-wCur)/2f), colorCur, packedLight);
                 addVertex(consumer, pPoseStack, nextTrailUpper, uNext, 0f+((1f-wNext)/2f), colorNext, packedLight);
                 addVertex(consumer, pPoseStack, nextTrailLower, uNext, 1f-((1f-wNext)/2f), colorNext, packedLight);
