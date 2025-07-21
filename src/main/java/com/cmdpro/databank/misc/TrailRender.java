@@ -49,6 +49,12 @@ public class TrailRender {
         this.shrink = shrink;
         return this;
     }
+    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, int color) {
+        render(pPoseStack, pBufferSource, packedLight, new Color(color));
+    }
+    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, Color color) {
+        render(pPoseStack, pBufferSource, packedLight, Gradient.singleColor(color));
+    }
     public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, Gradient gradient) {
         if (positions.isEmpty()) {
             return;

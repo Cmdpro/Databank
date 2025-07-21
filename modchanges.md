@@ -1,7 +1,5 @@
-### Fixes
-- Fixed mesh rotations
-- Made server methods redirect to the client methods in a few places
-- Fixed transparent and additive render types
+### Changes
+- Made trails use gradients instead of a single color
 
 ### Additions
-- Added utils for rendering trails (will get improved later)
+- Added utils for gradients
