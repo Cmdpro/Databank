@@ -1,5 +1,6 @@
 package com.cmdpro.databank.misc;
 
+import com.cmdpro.databank.rendering.ColorUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -15,6 +16,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -47,7 +49,7 @@ public class TrailRender {
         this.shrink = shrink;
         return this;
     }
-    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, int color) {
+    public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, Gradient gradient) {
         if (positions.isEmpty()) {
             return;
         }
@@ -72,10 +74,12 @@ public class TrailRender {
                 Vector3f nextTrailLower = getTrailPos(nextSeg, segAfterNext, -size*wNext);
                 float uCur = ((float)i / (float)highestSeg);
                 float uNext = ((float)(i+1) / (float)highestSeg);
-                addVertex(consumer, pPoseStack, currentTrailUpper, uCur, 0f+((1f-wCur)/2f), color, packedLight);
-                addVertex(consumer, pPoseStack, nextTrailUpper, uNext, 0f+((1f-wNext)/2f), color, packedLight);
-                addVertex(consumer, pPoseStack, nextTrailLower, uNext, 1f-((1f-wNext)/2f), color, packedLight);
-                addVertex(consumer, pPoseStack, currentTrailLower, uCur, 1f-((1f-wCur)/2f), color, packedLight);
+                int colorCur = gradient.getColor((float)i / (float)highestSeg).getRGB();
+                int colorNext = gradient.getColor((float)(i+1) / (float)highestSeg).getRGB();
+                addVertex(consumer, pPoseStack, currentTrailUpper, uCur, 0f+((1f-wCur)/2f), colorCur, packedLight);
+                addVertex(consumer, pPoseStack, nextTrailUpper, uNext, 0f+((1f-wNext)/2f), colorNext, packedLight);
+                addVertex(consumer, pPoseStack, nextTrailLower, uNext, 1f-((1f-wNext)/2f), colorNext, packedLight);
+                addVertex(consumer, pPoseStack, currentTrailLower, uCur, 1f-((1f-wCur)/2f), colorCur, packedLight);
             }
         }
     }
