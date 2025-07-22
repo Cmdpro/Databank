@@ -26,7 +26,7 @@ public class MusicManager extends SimpleJsonResourceReloadListener {
     }
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        musicControllers = new HashMap<>();
+        HashMap<ResourceLocation, MusicController> musicControllers = new HashMap<>();
         Databank.LOGGER.info("[DATABANK] Adding Databank Music");
         for (Map.Entry<ResourceLocation, JsonElement> i : pObject.entrySet()) {
             ResourceLocation location = i.getKey();
@@ -44,6 +44,7 @@ public class MusicManager extends SimpleJsonResourceReloadListener {
                 Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading music controller type {}", location, e);
             }
         }
+        MusicManager.musicControllers = musicControllers;
         Databank.LOGGER.info("[DATABANK] Loaded {} Music Controllers", musicControllers.size());
     }
     public static MusicSerializer serializer = new MusicSerializer();

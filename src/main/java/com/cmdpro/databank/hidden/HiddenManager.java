@@ -28,7 +28,7 @@ public class HiddenManager extends SimpleJsonResourceReloadListener {
     public static Map<ResourceLocation, Hidden> hidden = new HashMap<>();
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> pObject, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
-        hidden = new HashMap<>();
+        Map<ResourceLocation, Hidden> hidden = new HashMap<>();
         Databank.LOGGER.info("[DATABANK] Adding Databank Hidden Entries");
         for (Map.Entry<ResourceLocation, JsonElement> i : pObject.entrySet()) {
             ResourceLocation location = i.getKey();
@@ -48,6 +48,7 @@ public class HiddenManager extends SimpleJsonResourceReloadListener {
                 Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading hidden entry {}", location, e);
             }
         }
+        HiddenManager.hidden = hidden;
         Databank.LOGGER.info("[DATABANK] Loaded {} hidden entries", hidden.size());
     }
     public static HiddenSerializer serializer = new HiddenSerializer();

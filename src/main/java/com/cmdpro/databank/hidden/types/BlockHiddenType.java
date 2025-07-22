@@ -211,7 +211,7 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return getHiddenBlockClient(block.defaultBlockState());
     }
     public static Block getHiddenBlockClient(BlockState block) {
-        for (Map.Entry<ResourceLocation, Hidden> i : HiddenManager.hidden.entrySet()) {
+        for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
             if (i.getValue().type instanceof BlockHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null) {
                     continue;

@@ -19,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -114,7 +115,7 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
     }
 
     public static Item getHiddenItemClient(Item item) {
-        for (Map.Entry<ResourceLocation, Hidden> i : HiddenManager.hidden.entrySet()) {
+        for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
             if (i.getValue().type instanceof ItemHiddenTypeInstance type) {
                 if (type.original == null || type.hiddenAs == null) {
                     continue;
