@@ -98,6 +98,8 @@ public class TrailRender {
     public void tick() {
         if (positions.isEmpty() || positions.getFirst().distanceTo(position) > 0.01) {
             positions.addFirst(position);
+        } else if (!positions.isEmpty()) {
+            positions.removeLast();
         }
         while (positions.size() > time) {
             positions.removeLast();
