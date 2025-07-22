@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, int y) implements Message {
 
@@ -31,7 +32,7 @@ public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, 
     }
 
     @Override
-    public void handleServer(MinecraftServer server, ServerPlayer player) {
+    public void handleServer(MinecraftServer server, ServerPlayer player, IPayloadContext context) {
         if (player.level().getEntity(entity) instanceof WorldGuiEntity entity) {
             if (entity.gui != null) {
                 switch (interactionType) {

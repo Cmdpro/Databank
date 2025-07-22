@@ -1,2 +1,2 @@
 ### Fixes
-- Protected against CMEs more, now it shouldn't crash on reload
+- Hopefully finally fixed CMEs

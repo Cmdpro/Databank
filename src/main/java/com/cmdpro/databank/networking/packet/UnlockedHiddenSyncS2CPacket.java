@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public record UnlockedHiddenSyncS2CPacket(List<ResourceLocation> hidden, boolean
     }
 
     @Override
-    public void handleClient(Minecraft minecraft, Player player) {
+    public void handleClient(Minecraft minecraft, Player player, IPayloadContext context) {
         if (updateListeners) {
             List<Hidden> unlocked = hidden.stream().filter((i) -> !ClientHidden.unlocked.contains(i)).map((i) -> HiddenManager.hidden.get(i)).toList();
             List<Hidden> locked = ClientHidden.unlocked.stream().filter((i) -> !hidden.contains(i)).map((i) -> HiddenManager.hidden.get(i)).toList();

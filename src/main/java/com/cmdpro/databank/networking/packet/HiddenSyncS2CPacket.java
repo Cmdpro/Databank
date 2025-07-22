@@ -13,6 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Map;
 
@@ -35,11 +36,13 @@ public record HiddenSyncS2CPacket(Map<ResourceLocation, Hidden> hidden) implemen
     }
 
     @Override
-    public void handleClient(Minecraft minecraft, Player player) {
-        HiddenManager.hidden.clear();
-        HiddenManager.hidden.putAll(hidden);
-        for (HiddenTypeInstance.HiddenType<?> i : DatabankRegistries.HIDDEN_TYPE_REGISTRY.stream().toList()) {
-            i.updateClient();
-        }
+    public void handleClient(Minecraft minecraft, Player player, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            HiddenManager.hidden.clear();
+            HiddenManager.hidden.putAll(hidden);
+            for (HiddenTypeInstance.HiddenType<?> i : DatabankRegistries.HIDDEN_TYPE_REGISTRY.stream().toList()) {
+                i.updateClient();
+            }
+        });
     }
 }

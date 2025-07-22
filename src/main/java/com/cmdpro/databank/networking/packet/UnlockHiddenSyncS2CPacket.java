@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public record UnlockHiddenSyncS2CPacket(ResourceLocation hidden) implements Mess
     }
 
     @Override
-    public void handleClient(Minecraft minecraft, Player player) {
+    public void handleClient(Minecraft minecraft, Player player, IPayloadContext context) {
         if (!ClientHidden.unlocked.contains(hidden)) {
             if (HiddenManager.hidden.containsKey(hidden)) {
                 ClientHidden.unlocked.add(hidden);

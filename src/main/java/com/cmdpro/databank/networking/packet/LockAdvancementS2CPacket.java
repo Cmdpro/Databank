@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public record LockAdvancementS2CPacket(ResourceLocation advancement) implements 
     }
 
     @Override
-    public void handleClient(Minecraft minecraft, Player player) {
+    public void handleClient(Minecraft minecraft, Player player, IPayloadContext context) {
         ClientAdvancementListener.ADVANCEMENT_LISTENERS.forEach((listener) -> listener.onLock(advancement));
         ClientAdvancementListener.ADVANCEMENT_LISTENERS.forEach((listener) -> listener.onLock(List.of(advancement)));
     }
