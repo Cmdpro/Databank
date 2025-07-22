@@ -22,7 +22,7 @@ public class ColorGradient extends BaseGradient<Color> {
         for (GradientPoint i : points) {
             float progress = (i.time-startTime)/(endTime-startTime);
             float alpha = from+((to-from)*progress);
-            i.value = new Color(i.value.getRed(), i.value.getGreen(), i.value.getBlue(), (int)(alpha*255f));
+            i.value = new Color(i.value.getRed(), i.value.getGreen(), i.value.getBlue(), (int)((alpha*255f)*((float)i.value.getAlpha()/255f)));
         }
         sort();
         return this;

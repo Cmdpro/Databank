@@ -1,2 +1,2 @@
-### Fixes
-- Hopefully finally fixed CMEs
+### Additions
+- Added a reset method to trails

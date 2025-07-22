@@ -105,6 +105,9 @@ public class TrailRender {
             positions.removeLast();
         }
     }
+    public void reset() {
+        positions.clear();
+    }
     private Vector3f getTrailPos(Vector3f trailCenter, Vector3f previousCenter, float size) {
         float sizeDiff = size/2f;
         Vec2 rot = calculateRotationVector(new Vec3(trailCenter.x, trailCenter.y, trailCenter.z), new Vec3(previousCenter.x, previousCenter.y, previousCenter.z));
