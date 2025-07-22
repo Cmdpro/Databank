@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class DatabankUtils {
     }
     public static void updateHidden(Player player, boolean updateListeners) {
         List<ResourceLocation> unlocked = new ArrayList<>();
-        for (Map.Entry<ResourceLocation, Hidden> i : HiddenManager.hidden.entrySet()) {
+        for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
             if (i.getValue().condition.isUnlocked(player)) {
                 unlocked.add(i.getKey());
             }
