@@ -59,10 +59,14 @@ public class TrailRender {
         if (positions.isEmpty()) {
             return;
         }
+        List<Vec3> positions = new ArrayList<>(this.positions);
         List<Vector3f> segs = new ArrayList<>();
         segs.add(positions.getFirst().add(offset).toVector3f());
         for (int i = 1; i < segments; i++) {
-            segs.add(positions.get((int)(positions.size()*((float)i/(float)segments))).add(offset).toVector3f());
+            int index = (int)(time*((float)i/(float)segments));
+            if (positions.size()-1 >= index) {
+                segs.add(positions.get(index).add(offset).toVector3f());
+            }
         }
         segs.add(positions.getLast().add(offset).toVector3f());
         VertexConsumer consumer = pBufferSource.getBuffer(renderType);
@@ -92,7 +96,9 @@ public class TrailRender {
         }
     }
     public void tick() {
-        positions.addFirst(position);
+        if (positions.isEmpty() || positions.getFirst().distanceTo(position) > 0.01) {
+            positions.addFirst(position);
+        }
         while (positions.size() > time) {
             positions.removeLast();
         }
