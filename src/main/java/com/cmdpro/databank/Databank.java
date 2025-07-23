@@ -8,6 +8,7 @@ import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -39,6 +40,12 @@ public class Databank
         MusicConditionRegistry.MUSIC_CONDITIONS.register(bus);
         HiddenTypeRegistry.HIDDEN_TYPES.register(bus);
         CriteriaTriggerRegistry.TRIGGERS.register(bus);
+
+        boolean hasSodium = ModList.get().isLoaded("sodium");
+
+        if (hasSodium)
+            LOGGER.info("[DATABANK] Sodium detected; A mixin into sodium required for compatibility has been applied...");
+
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DatabankModels.init();
