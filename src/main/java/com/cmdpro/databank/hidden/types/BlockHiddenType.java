@@ -388,7 +388,9 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                                 hiddenAs = i.hiddenAs;
                             }
                         }
-                        return colors.getColor(DatabankUtils.changeBlockType(state, hiddenAs), level, pos, tintIndex);
+                        if (hiddenAs != finalType.original) {
+                            return colors.getColor(DatabankUtils.changeBlockType(state, hiddenAs), level, pos, tintIndex);
+                        }
                     }
                 }
                 if (original != null) {

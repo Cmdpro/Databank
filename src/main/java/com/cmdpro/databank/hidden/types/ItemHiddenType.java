@@ -211,7 +211,9 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
                 if (instance != null) {
                     if (instance.isHiddenClient(instance.original)) {
                         Item hiddenAs = instance.hiddenAs;
-                        return colors.getColor(DatabankUtils.changeItemType(stack, hiddenAs), tintIndex);
+                        if (hiddenAs != instance.original) {
+                            return colors.getColor(DatabankUtils.changeItemType(stack, hiddenAs), tintIndex);
+                        }
                     }
                 }
                 if (original != null) {
