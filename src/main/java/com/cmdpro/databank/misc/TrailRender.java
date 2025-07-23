@@ -44,9 +44,20 @@ public class TrailRender {
         this.size = size;
         this.texture = texture;
         this.renderType = renderType;
+        if (this.segments > this.time) {
+            throw new RuntimeException("Segments in a trail cannot be greater than time");
+        }
     }
     public TrailRender setShrink(boolean shrink) {
         this.shrink = shrink;
+        return this;
+    }
+    public TrailRender startTicking() {
+        TrailTickHandler.addTrail(this);
+        return this;
+    }
+    public TrailRender stopTicking() {
+        TrailTickHandler.removeTrail(this);
         return this;
     }
     public void render(PoseStack pPoseStack, MultiBufferSource pBufferSource, int packedLight, int color) {
@@ -107,6 +118,12 @@ public class TrailRender {
     }
     public void reset() {
         positions.clear();
+    }
+    public int getPositionCount() {
+        return positions.size();
+    }
+    public Vec3 getPosition(int index) {
+        return positions.get(index);
     }
     private Vector3f getTrailPos(Vector3f trailCenter, Vector3f previousCenter, float size) {
         float sizeDiff = size/2f;

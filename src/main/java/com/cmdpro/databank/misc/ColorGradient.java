@@ -19,9 +19,18 @@ public class ColorGradient extends BaseGradient<Color> {
     }
 
     public ColorGradient fadeAlpha(float from, float startTime, float to, float endTime) {
+        Color startColor = getValue(startTime);
+        Color endColor = getValue(endTime);
+        addPoint(startColor, startTime);
+        addPoint(endColor, endTime);
         for (GradientPoint i : points) {
             float progress = (i.time-startTime)/(endTime-startTime);
             float alpha = from+((to-from)*progress);
+            if (i.time > endTime) {
+                alpha = to;
+            } else if (i.time < startTime) {
+                alpha = from;
+            }
             i.value = new Color(i.value.getRed(), i.value.getGreen(), i.value.getBlue(), (int)((alpha*255f)*((float)i.value.getAlpha()/255f)));
         }
         sort();
