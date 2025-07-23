@@ -42,6 +42,7 @@ public record HiddenSyncS2CPacket(Map<ResourceLocation, Hidden> hidden) implemen
             HiddenManager.hidden.putAll(hidden);
             for (HiddenTypeInstance.HiddenType<?> i : DatabankRegistries.HIDDEN_TYPE_REGISTRY.stream().toList()) {
                 i.updateClient();
+                i.onRecieveClient();
             }
         });
     }

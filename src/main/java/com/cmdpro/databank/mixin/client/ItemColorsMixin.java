@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 import java.util.Set;
 
-@Mixin(ItemColors.class)
+@Mixin(value = ItemColors.class)
 public abstract class ItemColorsMixin {
     @Inject(method = "getColor", at = @At(value = "HEAD"), cancellable = true, remap = false)
     public void getColor(ItemStack stack, int tintIndex, CallbackInfoReturnable<Integer> cir) {
@@ -36,7 +36,7 @@ public abstract class ItemColorsMixin {
             Item item = ItemHiddenType.getHiddenItemClient(stack.getItem());
             if ((item != null) && (item != stack.getItem())) {
                 ItemColors itemColors = (ItemColors)(Object)this;
-                ItemStack stack2 = new ItemStack(Holder.direct(item), stack.getCount(), stack.getComponentsPatch());
+                ItemStack stack2 = DatabankUtils.changeItemType(stack, item);
                 cir.setReturnValue(itemColors.getColor(stack2, tintIndex));
             }
         }

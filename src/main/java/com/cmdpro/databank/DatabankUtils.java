@@ -11,10 +11,13 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -37,6 +40,9 @@ public class DatabankUtils {
             return newState.setValue(property, original.getValue(property));
         }
         return newState;
+    }
+    public static ItemStack changeItemType(ItemStack originalStack, Item newType) {
+        return new ItemStack(Holder.direct(newType), originalStack.getCount(), originalStack.getComponentsPatch());
     }
     public static void updateHidden(Player player) {
         updateHidden(player, true);

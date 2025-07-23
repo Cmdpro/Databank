@@ -28,6 +28,7 @@ public abstract class HiddenTypeInstance<T> {
         public abstract MapCodec<T> codec();
         public abstract StreamCodec<RegistryFriendlyByteBuf, T> streamCodec();
         public abstract void updateClient();
+        public void onRecieveClient() {}
         public HashMap<ResourceLocation, Hidden> getHiddenOfType() {
             HashMap<ResourceLocation, Hidden> hiddens = new HashMap<>();
             HiddenManager.hidden.forEach((k, v) -> { if (this.equals(v.type.getType())) { hiddens.put(k, v); } });

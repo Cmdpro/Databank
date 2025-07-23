@@ -25,6 +25,7 @@
     "client.SoundManagerMixin",
     "client.ChannelHandleMixin",
     "client.ClientAdvancementsMixin",
-    "client.compat.sodium.ColorProviderRegistryMixin"
+    "client.BlockColorsAccessor",
+    "client.ItemColorsAccessor"
   ]
 }

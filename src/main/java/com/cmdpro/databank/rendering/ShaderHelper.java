@@ -18,6 +18,9 @@ public class ShaderHelper {
     public static boolean isSodiumActive() {
         return ModList.get().isLoaded("sodium");
     }
+    public static boolean isSodiumOrSimilarActive() {
+        return ModList.get().isLoaded("sodium") || ModList.get().isLoaded("embeddium");
+    }
     public static class IrisHandler {
         public static boolean areShadersEnabled() {
             return IrisApi.getInstance().isShaderPackInUse();

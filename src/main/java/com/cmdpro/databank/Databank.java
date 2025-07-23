@@ -1,9 +1,11 @@
 package com.cmdpro.databank;
 
+import com.cmdpro.databank.config.DatabankClientConfig;
 import com.cmdpro.databank.model.DatabankModels;
 import com.cmdpro.databank.music.MusicSystem;
 import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
+import com.cmdpro.databank.rendering.ShaderHelper;
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -12,6 +14,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
@@ -30,6 +34,8 @@ public class Databank
     {
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
 
+        modLoadingContext.getActiveContainer().registerConfig(ModConfig.Type.CLIENT, DatabankClientConfig.CLIENT_SPEC, "databank-client.toml");
+
         ItemRegistry.ITEMS.register(bus);
         BlockRegistry.BLOCKS.register(bus);
         BlockEntityRegistry.BLOCK_ENTITIES.register(bus);
@@ -41,12 +47,6 @@ public class Databank
         HiddenTypeRegistry.HIDDEN_TYPES.register(bus);
         CriteriaTriggerRegistry.TRIGGERS.register(bus);
 
-        boolean hasSodium = ModList.get().isLoaded("sodium");
-
-        if (hasSodium)
-            LOGGER.info("[DATABANK] Sodium detected; A mixin into sodium required for compatibility has been applied...");
-
-
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DatabankModels.init();
             MusicSystem.init();
@@ -55,5 +55,12 @@ public class Databank
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
         RenderTypeHandler.load();
+    }
+    @SubscribeEvent
+    public static void onModConfigEvent(ModConfigEvent event) {
+        ModConfig config = event.getConfig();
+        if (config.getSpec() == DatabankClientConfig.CLIENT_SPEC) {
+            DatabankClientConfig.bake(config);
+        }
     }
 }
