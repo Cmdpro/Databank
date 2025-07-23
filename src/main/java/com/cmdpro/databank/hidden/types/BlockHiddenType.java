@@ -86,6 +86,7 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
 
     @Override
     public void updateClient() {
+        cache.clear();
         ClientDatabankUtils.updateWorld();
     }
 
@@ -229,11 +230,23 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
         return getHiddenBlockClient(block.defaultBlockState());
     }
     public static Block getHiddenBlockClient(BlockState block) {
-        for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
-            if (i.getValue().type instanceof BlockHiddenTypeInstance type) {
-                if (type.original == null || type.hiddenAs == null) {
-                    continue;
+        Hidden hidden = cache.get(block);
+        if (!cache.containsKey(block)) {
+            for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
+                if (i.getValue().type instanceof BlockHiddenTypeInstance type) {
+                    if (type.original == null || type.hiddenAs == null) {
+                        continue;
+                    }
+                    if (type.matches(block.getBlock())) {
+                        hidden = i.getValue();
+                        break;
+                    }
                 }
+            }
+            cache.put(block, hidden);
+        }
+        if (hidden != null) {
+            if (hidden.type instanceof BlockHiddenTypeInstance type) {
                 if (type.isHiddenClient(block.getBlock())) {
                     boolean applies = true;
                     if (type.shouldApplyPredicate.isPresent()) {
@@ -243,13 +256,12 @@ public class BlockHiddenType extends HiddenTypeInstance.HiddenType<BlockHiddenTy
                         BlockHiddenOverride override = findOverride(type, block);
                         return override != null ? override.hiddenAs : type.hiddenAs;
                     }
-                } else if (type.matches(block.getBlock())) {
-                    break;
                 }
             }
         }
         return null;
     }
+    private static HashMap<BlockState, Hidden> cache = new HashMap<>();
     public static class BlockHiddenTypeInstance extends HiddenTypeInstance<Block> {
         public Block original;
         public Block hiddenAs;

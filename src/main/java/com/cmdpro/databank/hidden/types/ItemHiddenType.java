@@ -25,6 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.*;
 
@@ -62,6 +63,7 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
 
     @Override
     public void updateClient() {
+        cache.clear();
     }
 
     @Override
@@ -126,21 +128,30 @@ public class ItemHiddenType extends HiddenTypeInstance.HiddenType<ItemHiddenType
     }
 
     public static Item getHiddenItemClient(Item item) {
-        for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
-            if (i.getValue().type instanceof ItemHiddenTypeInstance type) {
-                if (type.original == null || type.hiddenAs == null) {
-                    continue;
+        Hidden hidden = cache.get(item);
+        if (!cache.containsKey(item)) {
+            for (Map.Entry<ResourceLocation, Hidden> i : new HashMap<>(HiddenManager.hidden).entrySet()) {
+                if (i.getValue().type instanceof ItemHiddenTypeInstance type) {
+                    if (type.original == null || type.hiddenAs == null) {
+                        continue;
+                    }
+                    if (type.matches(item)) {
+                        hidden = i.getValue();
+                    }
                 }
+            }
+            cache.put(item, hidden);
+        }
+        if (hidden != null) {
+            if (hidden.type instanceof ItemHiddenTypeInstance type) {
                 if (type.isHiddenClient(item)) {
                     return type.hiddenAs;
-                } else if (type.matches(item)) {
-                    break;
                 }
             }
         }
         return null;
     }
-
+    private static HashMap<Item, Hidden> cache = new HashMap<>();
     public static class ItemHiddenTypeInstance extends HiddenTypeInstance<Item> {
         public Item original;
         public Item hiddenAs;
