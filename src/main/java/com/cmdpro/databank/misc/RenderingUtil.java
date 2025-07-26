@@ -1,9 +1,7 @@
 package com.cmdpro.databank.misc;
 
-import com.cmdpro.databank.ClientDatabankUtils;
-import com.cmdpro.databank.mixin.ItemRendererAccessor;
+import com.cmdpro.databank.mixin.client.ItemRendererAccessor;
 import com.cmdpro.databank.rendering.ColorUtil;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -30,11 +28,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class RenderingUtil {
     public static void renderAdvancedBeaconBeam(PoseStack pPoseStack, MultiBufferSource pBufferSource, ResourceLocation pBeamLocation, float pPartialTick, float pTextureScale, long pGameTime, Vec3 pointA, Vec3 pointB, Color color, float pBeamRadius, float pGlowRadius) {

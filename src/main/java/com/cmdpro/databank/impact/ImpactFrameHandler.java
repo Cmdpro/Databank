@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.SequencedMap;
 
 public class ImpactFrameHandler {
+    //TODO: Fix resize bug or whatever it is, basically not working until resized
     static {
         ResizeHelper.addListener((width, height) -> {
             getImpactTarget().resize(width, height, Minecraft.ON_OSX);

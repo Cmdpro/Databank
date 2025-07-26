@@ -5,8 +5,8 @@
   "minVersion": "0.8",
   "mixins": [
     "BlockBehaviourMixin",
-    "ItemRendererAccessor",
-    "BlockStateBaseMixin"
+    "BlockStateBaseMixin",
+    "PlayerAdvancementsAccessor"
   ],
   "client": [
     "client.BlockColorsMixin",
@@ -26,6 +26,7 @@
     "client.ChannelHandleMixin",
     "client.ClientAdvancementsMixin",
     "client.BlockColorsAccessor",
-    "client.ItemColorsAccessor"
+    "client.ItemColorsAccessor",
+    "client.ItemRendererAccessor"
   ]
 }

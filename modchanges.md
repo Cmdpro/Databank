@@ -7,3 +7,4 @@
 - Added getTime method to shader instances which will include the partial tick
 - Made in-game config editor appear
 - Added accessibility options to config
+- Added utils for calling code when your mods version changes for a level or player

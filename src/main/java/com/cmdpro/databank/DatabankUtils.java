@@ -2,9 +2,11 @@ package com.cmdpro.databank;
 
 import com.cmdpro.databank.hidden.Hidden;
 import com.cmdpro.databank.hidden.HiddenManager;
+import com.cmdpro.databank.mixin.PlayerAdvancementsAccessor;
 import com.cmdpro.databank.mixin.client.ClientAdvancementsMixin;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.*;
+import com.cmdpro.databank.registry.CriteriaTriggerRegistry;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementProgress;
@@ -100,6 +102,15 @@ public class DatabankUtils {
     }
     public static AdvancementProgress getAdvancementProgressClient(ResourceLocation advancement) {
         return ClientHandler.getProgress(advancement);
+    }
+    public static void recheckAdvancements(ServerPlayer player) {
+        Map<AdvancementHolder, AdvancementProgress> progress = ((PlayerAdvancementsAccessor)player.getAdvancements()).getProgress();
+        for (Map.Entry<AdvancementHolder, AdvancementProgress> i : progress.entrySet()) {
+            if (i.getValue().isDone()) {
+                CriteriaTriggerRegistry.HAS_ADVANCEMENT.get().trigger(player, i.getKey().id());
+                CriteriaTriggerRegistry.HAS_ADVANCEMENTS.get().trigger(player);
+            }
+        }
     }
     private static class ClientHandler {
         public static boolean isClientPlayer(Player player) {
