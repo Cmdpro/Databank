@@ -10,6 +10,7 @@ import com.cmdpro.databank.shaders.PostShaderInstance;
 import com.cmdpro.databank.shaders.PostShaderManager;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
@@ -28,6 +29,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,6 @@ import java.util.Map;
 import java.util.SequencedMap;
 
 public class ImpactFrameHandler {
-    //TODO: Fix resize bug or whatever it is, basically not working until resized
     static {
         ResizeHelper.addListener((width, height) -> {
             getImpactTarget().resize(width, height, Minecraft.ON_OSX);
@@ -112,14 +113,22 @@ public class ImpactFrameHandler {
     private static RenderTarget impactTarget;
     protected static RenderTarget getImpactTarget() {
         if (impactTarget == null) {
-            impactTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
+            int width = Minecraft.getInstance().getMainRenderTarget().width;
+            int height = Minecraft.getInstance().getMainRenderTarget().height;
+            impactTarget = new MainTarget(width, height);
+            //I have no idea why this is needed but it fixes a bug
+            impactTarget.resize(width, height, Minecraft.ON_OSX);
         }
         return impactTarget;
     }
     private static RenderTarget frozenImpactTarget;
     protected static RenderTarget getFrozenImpactTarget() {
         if (frozenImpactTarget == null) {
-            frozenImpactTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
+            int width = Minecraft.getInstance().getMainRenderTarget().width;
+            int height = Minecraft.getInstance().getMainRenderTarget().height;
+            frozenImpactTarget = new MainTarget(width, height);
+            //I have no idea why this is needed but it fixes a bug
+            frozenImpactTarget.resize(width, height, Minecraft.ON_OSX);
         }
         return frozenImpactTarget;
     }
