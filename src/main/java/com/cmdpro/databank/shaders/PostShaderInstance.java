@@ -53,16 +53,16 @@ public abstract class PostShaderInstance {
             }
         }
         if (postChain != null) {
-            for (PostPass i : passes) {
-                i.getEffect().safeGetUniform("time").set(getTime());
-                i.getEffect().safeGetUniform("CameraPosition").set(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().toVector3f());
-                i.getEffect().safeGetUniform("ModelViewMat").set(RenderSystem.getModelViewMatrix());
-                i.getEffect().safeGetUniform("invViewMat").set(new Matrix4f(PostShaderManager.viewStackMatrix).invert());
-                i.getEffect().safeGetUniform("invProjMat").set(new Matrix4f(RenderSystem.getProjectionMatrix()).invert());
-                setUniforms(i);
-            }
             beforeProcess();
             if (active) {
+                for (PostPass i : passes) {
+                    i.getEffect().safeGetUniform("time").set(getTime());
+                    i.getEffect().safeGetUniform("CameraPosition").set(Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().toVector3f());
+                    i.getEffect().safeGetUniform("ModelViewMat").set(RenderSystem.getModelViewMatrix());
+                    i.getEffect().safeGetUniform("invViewMat").set(new Matrix4f(PostShaderManager.viewStackMatrix).invert());
+                    i.getEffect().safeGetUniform("invProjMat").set(new Matrix4f(RenderSystem.getProjectionMatrix()).invert());
+                    setUniforms(i);
+                }
                 processPostChain();
                 afterProcess();
             }

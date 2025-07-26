@@ -5,12 +5,10 @@ import com.cmdpro.databank.model.DatabankModels;
 import com.cmdpro.databank.music.MusicSystem;
 import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
-import com.cmdpro.databank.rendering.ShaderHelper;
 import com.mojang.logging.LogUtils;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -50,8 +48,7 @@ public class Databank
         CriteriaTriggerRegistry.TRIGGERS.register(bus);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            DatabankModels.init();
-            MusicSystem.init();
+            DatabankClient.register();
             modLoadingContext.getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
     }

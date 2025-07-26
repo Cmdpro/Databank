@@ -48,11 +48,4 @@ public class PostShaderManager {
             }
         }
     }
-    static {
-        ResizeHelper.addListener((width, height) -> {
-            for (PostShaderInstance i : instances) {
-                i.resize(width, height);
-            }
-        });
-    }
 }

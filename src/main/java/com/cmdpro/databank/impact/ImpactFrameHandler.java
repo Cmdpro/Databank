@@ -37,12 +37,6 @@ import java.util.Map;
 import java.util.SequencedMap;
 
 public class ImpactFrameHandler {
-    static {
-        ResizeHelper.addListener((width, height) -> {
-            getImpactTarget().resize(width, height, Minecraft.ON_OSX);
-            getFrozenImpactTarget().resize(width, height, Minecraft.ON_OSX);
-        });
-    }
     public static final ImpactShader defaultShader = new ImpactShader();
     public static ImpactFrame impactFrame;
     public static class ImpactFrame {
@@ -68,6 +62,10 @@ public class ImpactFrameHandler {
             float maxProgress = (float) ImpactFrameHandler.impactFrame.startTicks / 20f;
             return ((float)(startTicks-ticks)/20f) / maxProgress;
         }
+    }
+    public static void resize(int width, int height) {
+        getImpactTarget().resize(width, height, Minecraft.ON_OSX);
+        getFrozenImpactTarget().resize(width, height, Minecraft.ON_OSX);
     }
     public static ImpactFrame addImpact(int ticks, ImpactRender frozenRender, ImpactRender dynamicRender, FloatGradient alpha, boolean merge, ImpactShader shader) {
         impactData.add(new ImpactData(frozenRender, dynamicRender, merge));
@@ -116,8 +114,7 @@ public class ImpactFrameHandler {
             int width = Minecraft.getInstance().getMainRenderTarget().width;
             int height = Minecraft.getInstance().getMainRenderTarget().height;
             impactTarget = new MainTarget(width, height);
-            //I have no idea why this is needed but it fixes a bug
-            impactTarget.resize(width, height, Minecraft.ON_OSX);
+            impactTarget.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         }
         return impactTarget;
     }
@@ -127,8 +124,7 @@ public class ImpactFrameHandler {
             int width = Minecraft.getInstance().getMainRenderTarget().width;
             int height = Minecraft.getInstance().getMainRenderTarget().height;
             frozenImpactTarget = new MainTarget(width, height);
-            //I have no idea why this is needed but it fixes a bug
-            frozenImpactTarget.resize(width, height, Minecraft.ON_OSX);
+            frozenImpactTarget.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         }
         return frozenImpactTarget;
     }
@@ -178,7 +174,7 @@ public class ImpactFrameHandler {
                         reset = false;
                     }
                     getImpactTarget().clear(Minecraft.ON_OSX);
-                    getImpactTarget().copyDepthFrom(frozenImpactTarget);
+                    getImpactTarget().copyDepthFrom(getFrozenImpactTarget());
                     for (ImpactData i : impactFrame.impactData) {
                         renderData(i, true, event);
                     }
