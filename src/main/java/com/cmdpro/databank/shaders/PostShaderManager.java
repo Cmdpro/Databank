@@ -1,6 +1,7 @@
 package com.cmdpro.databank.shaders;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.misc.ResizeHelper;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
@@ -46,5 +47,12 @@ public class PostShaderManager {
                 i.process();
             }
         }
+    }
+    static {
+        ResizeHelper.addListener((width, height) -> {
+            for (PostShaderInstance i : instances) {
+                i.resize(width, height);
+            }
+        });
     }
 }

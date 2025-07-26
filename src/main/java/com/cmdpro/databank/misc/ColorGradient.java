@@ -45,6 +45,11 @@ public class ColorGradient extends BaseGradient<Color> {
         return this;
     }
     @Override
+    public ColorGradient addPoint(Color value, float time, boolean instant) {
+        super.addPoint(value, time, instant);
+        return this;
+    }
+    @Override
     public ColorGradient sort() {
         super.sort();
         return this;

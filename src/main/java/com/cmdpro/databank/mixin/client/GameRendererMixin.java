@@ -1,5 +1,6 @@
 package com.cmdpro.databank.mixin.client;
 
+import com.cmdpro.databank.misc.ResizeHelper;
 import com.cmdpro.databank.shaders.PostShaderInstance;
 import com.cmdpro.databank.shaders.PostShaderManager;
 import com.cmdpro.databank.worldgui.WorldGuiEntity;
@@ -21,9 +22,7 @@ import java.util.List;
 public abstract class GameRendererMixin {
     @Inject(method = "resize", at = @At(value = "TAIL"), remap = false)
     private void resize(int pWidth, int pHeight, CallbackInfo ci) {
-        for (PostShaderInstance i : PostShaderManager.instances) {
-            i.resize(pWidth, pHeight);
-        }
+        ResizeHelper.resize(pWidth, pHeight);
     }
     @Inject(method = "pick(Lnet/minecraft/world/entity/Entity;DDF)Lnet/minecraft/world/phys/HitResult;", at = @At(value = "RETURN"), remap = false, cancellable = true)
     private void Databank$pick(Entity entity, double blockInteractionRange, double entityInteractionRange, float partialTick, CallbackInfoReturnable<HitResult> cir) {

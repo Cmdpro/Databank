@@ -14,17 +14,20 @@ public abstract class BaseGradient<T> {
     public BaseGradient(T start, float startTime, T end, float endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
-        addPoint(start, startTime);
-        addPoint(end, endTime);
+        addPoint(start, startTime, true);
+        addPoint(end, endTime, false);
     }
     public BaseGradient(T start, T end) {
         this(start, 0, end, 1);
     }
-    public BaseGradient<T> addPoint(T value, float time) {
-        GradientPoint point = new GradientPoint(value, time);
+    public BaseGradient<T> addPoint(T value, float time, boolean instant) {
+        GradientPoint point = new GradientPoint(value, time, instant);
         points.add(point);
         sort();
         return this;
+    }
+    public BaseGradient<T> addPoint(T value, float time) {
+        return addPoint(value, time, false);
     }
     public T getValue(float time) {
         if (time < startTime) {
@@ -43,6 +46,9 @@ public abstract class BaseGradient<T> {
             return points.getLast().value;
         }
         GradientPoint after = afterList.getFirst();
+        if (after.instant) {
+            return before.value;
+        }
         float progress = (time-before.time)/(after.time-before.time);
         return blend(before.value, after.value, progress);
     }
@@ -54,9 +60,11 @@ public abstract class BaseGradient<T> {
     protected class GradientPoint {
         public T value;
         public float time;
-        public GradientPoint(T value, float time) {
+        public boolean instant;
+        public GradientPoint(T value, float time, boolean instant) {
             this.value = value;
             this.time = time;
+            this.instant = instant;
         }
     }
 }
