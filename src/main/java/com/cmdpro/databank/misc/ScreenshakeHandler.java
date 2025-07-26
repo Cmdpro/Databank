@@ -1,6 +1,7 @@
 package com.cmdpro.databank.misc;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.config.DatabankClientConfig;
 import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -39,8 +40,11 @@ public class ScreenshakeHandler {
         public float getIntensity() {
             return this.intensity.getValue(1f-((float)ticks/(float)startTicks));
         }
+        public float getAdjustedIntensity() {
+            return getIntensity() * (float)DatabankClientConfig.screenshakeMultiplier;
+        }
         public void computeAngles(ViewportEvent.ComputeCameraAngles event) {
-            float intensity = getIntensity();
+            float intensity = getAdjustedIntensity();
             float ySpeed = 20;
             float xSpeed = (ySpeed*1.5f);
             float time = (float)(Blaze3D.getTime()*360f);

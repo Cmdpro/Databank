@@ -1,6 +1,7 @@
 package com.cmdpro.databank.impact;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.config.DatabankClientConfig;
 import com.cmdpro.databank.shaders.PostShaderInstance;
 import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +28,9 @@ public class ImpactShader extends PostShaderInstance {
     public void beforeProcess() {
         super.beforeProcess();
         if (ImpactFrameHandler.impactFrame == null) {
+            setActive(false);
+        }
+        if (!DatabankClientConfig.allowImpactVisuals) {
             setActive(false);
         }
     }

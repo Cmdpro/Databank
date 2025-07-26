@@ -9,5 +9,8 @@
 
   "commands.databank.megastructure": "Spawned %1$s at %2$s",
 
-  "entity.databank.world_gui": "World Gui"
+  "entity.databank.world_gui": "World Gui",
+
+  "databank.configuration.compatibility": "Compatibility",
+  "databank.configuration.accessibility": "Accessibility"
 }

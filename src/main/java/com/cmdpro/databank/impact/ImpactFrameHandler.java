@@ -1,6 +1,7 @@
 package com.cmdpro.databank.impact;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.config.DatabankClientConfig;
 import com.cmdpro.databank.misc.FloatGradient;
 import com.cmdpro.databank.misc.ResizeHelper;
 import com.cmdpro.databank.mixin.client.BufferSourceMixin;
@@ -90,6 +91,9 @@ public class ImpactFrameHandler {
         return original;
     }
     public static FloatGradient withFlashes(FloatGradient original, float seconds, float[] flashes, float flashTime) {
+        if (!DatabankClientConfig.allowFlashOnImpactVisuals) {
+            return original;
+        }
         float flash = flashTime / seconds;
         for (float i : flashes) {
             float progress = i / seconds;
