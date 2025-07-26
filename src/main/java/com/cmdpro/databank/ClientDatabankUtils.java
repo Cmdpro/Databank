@@ -2,8 +2,14 @@ package com.cmdpro.databank;
 
 import com.cmdpro.databank.config.DatabankClientConfig;
 import com.cmdpro.databank.misc.RenderingUtil;
+import com.cmdpro.databank.mixin.client.BufferSourceMixin;
+import com.cmdpro.databank.mixin.client.RenderBuffersMixin;
+import com.cmdpro.databank.multiblock.MultiblockRenderer;
 import com.cmdpro.databank.rendering.ShaderHelper;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Function3;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
@@ -16,6 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
+import java.util.Map;
+import java.util.SequencedMap;
 
 public class ClientDatabankUtils {
     public static void updateWorld() {
@@ -64,5 +72,25 @@ public class ClientDatabankUtils {
             Level pLevel
     ) {
         RenderingUtil.renderItemWithColor(pItemStack, pDisplayContext, pLeftHand, pPoseStack, pBufferSource, pCombinedLight, pCombinedOverlay, color, pLevel);
+    }
+    public static MultiBufferSource.BufferSource createBufferSourceCopy(BufferSourceCreation create, MultiBufferSource.BufferSource original) {
+        BufferSourceMixin mixin = (BufferSourceMixin)original;
+        SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers = mixin.getFixedBuffers();
+        ByteBufferBuilder sharedBuffer = mixin.getSharedBuffer();
+        return create.create(fixedBuffers, sharedBuffer);
+    }
+    public static MultiBufferSource.BufferSource createBufferSourceCopyFrom(MultiBufferSource.BufferSource original) {
+        return createBufferSourceCopy(MultiBufferSource::immediateWithBuffers, original);
+    }
+    public static MultiBufferSource.BufferSource createMainBufferSourceCopy() {
+        RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
+        return createBufferSourceCopyFrom(ShaderHelper.needsBufferWorkaround() ? ((RenderBuffersMixin)renderBuffers).getBufferSource() : renderBuffers.bufferSource());
+    }
+    public static MultiBufferSource.BufferSource createMainBufferSourceCopy(BufferSourceCreation create) {
+        RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
+        return createBufferSourceCopy(create, ShaderHelper.needsBufferWorkaround() ? ((RenderBuffersMixin)renderBuffers).getBufferSource() : renderBuffers.bufferSource());
+    }
+    public interface BufferSourceCreation {
+        MultiBufferSource.BufferSource create(SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers, ByteBufferBuilder sharedBuffer);
     }
 }

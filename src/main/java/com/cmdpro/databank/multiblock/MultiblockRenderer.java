@@ -1,5 +1,6 @@
 package com.cmdpro.databank.multiblock;
 
+import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.mixin.client.BufferSourceMixin;
 import com.mojang.blaze3d.pipeline.TextureTarget;
@@ -191,14 +192,13 @@ public class MultiblockRenderer {
         stack.popPose();
     }
     private static MultiBufferSource.BufferSource initBuffers(MultiBufferSource.BufferSource original) {
-        BufferSourceMixin mixin = (BufferSourceMixin)original;
-        var fallback = mixin.getSharedBuffer();
-        var layerBuffers = mixin.getFixedBuffers();
-        SequencedMap<RenderType, ByteBufferBuilder> remapped = new Object2ObjectLinkedOpenHashMap<>();
-        for (Map.Entry<RenderType, ByteBufferBuilder> e : layerBuffers.entrySet()) {
-            remapped.put(HologramRenderType.remap(e.getKey()), e.getValue());
-        }
-        return new HologramBuffers(fallback, remapped);
+        return ClientDatabankUtils.createMainBufferSourceCopy((fixedBuffers, sharedBuffer) -> {
+            SequencedMap<RenderType, ByteBufferBuilder> remapped = new Object2ObjectLinkedOpenHashMap<>();
+            for (Map.Entry<RenderType, ByteBufferBuilder> e : fixedBuffers.entrySet()) {
+                remapped.put(HologramRenderType.remap(e.getKey()), e.getValue());
+            }
+            return new HologramBuffers(sharedBuffer, remapped);
+        });
     }
     private static class HologramBuffers extends MultiBufferSource.BufferSource {
         protected HologramBuffers(ByteBufferBuilder fallback, SequencedMap<RenderType, ByteBufferBuilder> layerBuffers) {

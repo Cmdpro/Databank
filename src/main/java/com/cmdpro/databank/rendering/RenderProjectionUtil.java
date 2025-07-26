@@ -1,5 +1,6 @@
 package com.cmdpro.databank.rendering;
 
+import com.cmdpro.databank.ClientDatabankUtils;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.mixin.client.BufferSourceMixin;
 import com.cmdpro.databank.mixin.client.RenderBuffersMixin;
@@ -120,12 +121,7 @@ public class RenderProjectionUtil {
     static MultiBufferSource.BufferSource projectionBufferSource = null;
     private static MultiBufferSource.BufferSource createProjectionBufferSource() {
         if (projectionBufferSource == null) {
-            RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
-            MultiBufferSource.BufferSource source = ShaderHelper.needsBufferWorkaround() ? ((RenderBuffersMixin)renderBuffers).getBufferSource() : renderBuffers.bufferSource();
-            BufferSourceMixin mixin = (BufferSourceMixin)source;
-            SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers = mixin.getFixedBuffers();
-            ByteBufferBuilder sharedBuffer = mixin.getSharedBuffer();
-            projectionBufferSource = MultiBufferSource.immediateWithBuffers(fixedBuffers, sharedBuffer);
+            projectionBufferSource = ClientDatabankUtils.createMainBufferSourceCopy();
         }
         return projectionBufferSource;
     }
