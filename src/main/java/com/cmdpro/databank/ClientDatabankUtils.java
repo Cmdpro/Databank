@@ -5,7 +5,9 @@ import com.cmdpro.databank.misc.RenderingUtil;
 import com.cmdpro.databank.mixin.client.BufferSourceMixin;
 import com.cmdpro.databank.mixin.client.RenderBuffersMixin;
 import com.cmdpro.databank.multiblock.MultiblockRenderer;
+import com.cmdpro.databank.rendering.RenderTargetPool;
 import com.cmdpro.databank.rendering.ShaderHelper;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Function3;
@@ -20,6 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL33;
 
 import java.awt.*;
 import java.util.Map;
@@ -89,6 +93,18 @@ public class ClientDatabankUtils {
     public static MultiBufferSource.BufferSource createMainBufferSourceCopy(BufferSourceCreation create) {
         RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
         return createBufferSourceCopy(create, ShaderHelper.needsBufferWorkaround() ? ((RenderBuffersMixin)renderBuffers).getBufferSource() : renderBuffers.bufferSource());
+    }
+    public static int getDrawFrameBufferId() {
+        return GL11.glGetInteger(GL33.GL_DRAW_FRAMEBUFFER_BINDING);
+    }
+    public static int getReadFrameBufferId() {
+        return GL11.glGetInteger(GL33.GL_READ_FRAMEBUFFER_BINDING);
+    }
+    public static boolean isDrawRenderTarget(RenderTarget target) {
+        return target.frameBufferId == getDrawFrameBufferId();
+    }
+    public static boolean isReadRenderTarget(RenderTarget target) {
+        return target.frameBufferId == getReadFrameBufferId();
     }
     public interface BufferSourceCreation {
         MultiBufferSource.BufferSource create(SequencedMap<RenderType, ByteBufferBuilder> fixedBuffers, ByteBufferBuilder sharedBuffer);
