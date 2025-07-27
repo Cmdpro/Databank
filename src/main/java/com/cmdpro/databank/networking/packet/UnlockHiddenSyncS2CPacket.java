@@ -22,7 +22,7 @@ public record UnlockHiddenSyncS2CPacket(ResourceLocation hidden) implements Mess
     public static void write(FriendlyByteBuf buf, UnlockHiddenSyncS2CPacket obj) {
         buf.writeResourceLocation(obj.hidden);
     }
-    public static final Type<UnlockHiddenSyncS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "unlock_hidden_block_sync"));
+    public static final Type<UnlockHiddenSyncS2CPacket> TYPE = new Type<>(Databank.locate("unlock_hidden_block_sync"));
     @Override
     public Type<UnlockHiddenSyncS2CPacket> type() {
         return TYPE;

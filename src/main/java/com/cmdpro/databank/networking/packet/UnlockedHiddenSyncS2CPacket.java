@@ -22,7 +22,7 @@ public record UnlockedHiddenSyncS2CPacket(List<ResourceLocation> hidden, boolean
         buf.writeCollection(obj.hidden, FriendlyByteBuf::writeResourceLocation);
         buf.writeBoolean(obj.updateListeners);
     }
-    public static final Type<UnlockedHiddenSyncS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "unlocked_hidden_block_sync"));
+    public static final Type<UnlockedHiddenSyncS2CPacket> TYPE = new Type<>(Databank.locate("unlocked_hidden_block_sync"));
     @Override
     public Type<UnlockedHiddenSyncS2CPacket> type() {
         return TYPE;

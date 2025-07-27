@@ -29,7 +29,7 @@ public record HiddenSyncS2CPacket(Map<ResourceLocation, Hidden> hidden) implemen
     public static void write(FriendlyByteBuf buf, HiddenSyncS2CPacket obj) {
         buf.writeMap(obj.hidden, FriendlyByteBuf::writeResourceLocation, (buf2, val) -> HiddenSerializer.STREAM_CODEC.encode((RegistryFriendlyByteBuf)buf2, val));
     }
-    public static final Type<HiddenSyncS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "hidden_block_sync"));
+    public static final Type<HiddenSyncS2CPacket> TYPE = new Type<>(Databank.locate("hidden_block_sync"));
     @Override
     public Type<HiddenSyncS2CPacket> type() {
         return TYPE;

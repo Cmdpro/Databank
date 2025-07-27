@@ -19,7 +19,7 @@ public record UnlockAdvancementS2CPacket(ResourceLocation advancement) implement
     public static void write(FriendlyByteBuf buf, UnlockAdvancementS2CPacket obj) {
         buf.writeResourceLocation(obj.advancement);
     }
-    public static final Type<UnlockAdvancementS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "unlock_advancement"));
+    public static final Type<UnlockAdvancementS2CPacket> TYPE = new Type<>(Databank.locate("unlock_advancement"));
     @Override
     public Type<UnlockAdvancementS2CPacket> type() {
         return TYPE;

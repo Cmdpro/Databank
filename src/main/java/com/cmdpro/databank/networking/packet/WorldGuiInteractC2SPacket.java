@@ -25,7 +25,7 @@ public record WorldGuiInteractC2SPacket(int entity, int interactionType, int x, 
         buf.writeInt(obj.x);
         buf.writeInt(obj.y);
     }
-    public static final Type<WorldGuiInteractC2SPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "world_gui_interact"));
+    public static final Type<WorldGuiInteractC2SPacket> TYPE = new Type<>(Databank.locate("world_gui_interact"));
     @Override
     public Type<WorldGuiInteractC2SPacket> type() {
         return TYPE;

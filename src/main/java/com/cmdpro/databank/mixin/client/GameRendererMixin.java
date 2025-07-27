@@ -1,15 +1,24 @@
 package com.cmdpro.databank.mixin.client;
 
+import com.cmdpro.databank.misc.DatabankRenderLevelStages;
 import com.cmdpro.databank.misc.ResizeHelper;
+import com.cmdpro.databank.rendering.RenderHandler;
 import com.cmdpro.databank.shaders.PostShaderInstance;
 import com.cmdpro.databank.shaders.PostShaderManager;
 import com.cmdpro.databank.worldgui.WorldGuiEntity;
 import com.cmdpro.databank.worldgui.WorldGuiHitResult;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
+import net.neoforged.neoforge.client.ClientHooks;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,6 +29,12 @@ import java.util.List;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
+    @Inject(method = "renderLevel", at = @At(value = "TAIL"), remap = false)
+    private void Databank$renderLevel(DeltaTracker deltaTracker, CallbackInfo ci, @Local(name="matrix4f") Matrix4f matrix4f, @Local(name="matrix4f") Matrix4f matrix4f1, @Local(name="camera") Camera camera) {
+        Minecraft mc = Minecraft.getInstance();
+        LevelRenderer levelRenderer = mc.levelRenderer;
+        ClientHooks.dispatchRenderStage(DatabankRenderLevelStages.AFTER_HAND, levelRenderer, null, matrix4f1, matrix4f, levelRenderer.getTicks(), camera, levelRenderer.getFrustum());
+    }
     @Inject(method = "resize", at = @At(value = "TAIL"), remap = false)
     private void resize(int pWidth, int pHeight, CallbackInfo ci) {
         ResizeHelper.resize(pWidth, pHeight);

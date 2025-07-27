@@ -25,7 +25,7 @@ public record MultiblockSyncS2CPacket(Map<ResourceLocation, Multiblock> multiblo
     public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
-    public static final Type<MultiblockSyncS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "multiblock_sync"));
+    public static final Type<MultiblockSyncS2CPacket> TYPE = new Type<>(Databank.locate("multiblock_sync"));
 
     public static MultiblockSyncS2CPacket read(RegistryFriendlyByteBuf buf) {
         Map<ResourceLocation, Multiblock> multiblocks = buf.readMap(ResourceLocation.STREAM_CODEC, (pBuffer) -> MultiblockSerializer.STREAM_CODEC.decode((RegistryFriendlyByteBuf)pBuffer));

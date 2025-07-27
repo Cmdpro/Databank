@@ -16,17 +16,17 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 
 @EventBusSubscriber(modid = Databank.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DatabankRegistries {
-    public static ResourceKey<Registry<MultiblockPredicateSerializer<?>>> MULTIBLOCK_PREDICATE_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "multiblock_predicates"));
+    public static ResourceKey<Registry<MultiblockPredicateSerializer<?>>> MULTIBLOCK_PREDICATE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("multiblock_predicates"));
     public static Registry<MultiblockPredicateSerializer<?>> MULTIBLOCK_PREDICATE_REGISTRY = new RegistryBuilder<>(MULTIBLOCK_PREDICATE_REGISTRY_KEY).sync(true).create();
-    public static ResourceKey<Registry<WorldGuiType>> WORLD_GUI_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "world_gui_types"));
+    public static ResourceKey<Registry<WorldGuiType>> WORLD_GUI_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("world_gui_types"));
     public static Registry<WorldGuiType> WORLD_GUI_TYPE_REGISTRY = new RegistryBuilder<>(WORLD_GUI_TYPE_REGISTRY_KEY).sync(true).create();
-    public static ResourceKey<Registry<WorldGuiComponentType>> WORLD_GUI_COMPONENT_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "world_gui_components"));
+    public static ResourceKey<Registry<WorldGuiComponentType>> WORLD_GUI_COMPONENT_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("world_gui_components"));
     public static Registry<WorldGuiComponentType> WORLD_GUI_COMPONENT_REGISTRY = new RegistryBuilder<>(WORLD_GUI_COMPONENT_REGISTRY_KEY).sync(true).create();
-    public static ResourceKey<Registry<MusicCondition.Serializer<?>>> MUSIC_CONDITION_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "music_conditions"));
+    public static ResourceKey<Registry<MusicCondition.Serializer<?>>> MUSIC_CONDITION_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("music_conditions"));
     public static Registry<MusicCondition.Serializer<?>> MUSIC_CONDITION_REGISTRY = new RegistryBuilder<>(MUSIC_CONDITION_REGISTRY_KEY).sync(true).create();
-    public static ResourceKey<Registry<HiddenCondition.Serializer<?>>> HIDDEN_CONDITION_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "hidden_conditions"));
+    public static ResourceKey<Registry<HiddenCondition.Serializer<?>>> HIDDEN_CONDITION_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("hidden_conditions"));
     public static Registry<HiddenCondition.Serializer<?>> HIDDEN_CONDITION_REGISTRY = new RegistryBuilder<>(HIDDEN_CONDITION_REGISTRY_KEY).sync(true).create();
-    public static ResourceKey<Registry<HiddenTypeInstance.HiddenType<?>>> HIDDEN_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "hidden_types"));
+    public static ResourceKey<Registry<HiddenTypeInstance.HiddenType<?>>> HIDDEN_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("hidden_types"));
     public static Registry<HiddenTypeInstance.HiddenType<?>> HIDDEN_TYPE_REGISTRY = new RegistryBuilder<>(HIDDEN_TYPE_REGISTRY_KEY).sync(true).create();
     @SubscribeEvent
     public static void registerRegistries(NewRegistryEvent event) {

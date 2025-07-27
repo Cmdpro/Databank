@@ -6,6 +6,7 @@ import com.cmdpro.databank.music.MusicSystem;
 import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -51,6 +52,9 @@ public class Databank
             DatabankClient.register();
             modLoadingContext.getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
+    }
+    public static ResourceLocation locate(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {

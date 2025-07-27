@@ -27,8 +27,8 @@ public class ShaderTypeHandler {
     }
     @SubscribeEvent
     public static void shaderRegistry(RegisterShadersEvent event) throws IOException {
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "additive"), DefaultVertexFormat.POSITION_TEX_COLOR), shader -> { ADDITIVE = shader; });
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "transparent"), DefaultVertexFormat.PARTICLE), shader -> { TRANSPARENT = shader; });
-        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "screen_projection"), DefaultVertexFormat.POSITION_TEX), shader -> { SCREEN_PROJECTION = shader; });
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Databank.locate("additive"), DefaultVertexFormat.POSITION_TEX_COLOR), shader -> { ADDITIVE = shader; });
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Databank.locate("transparent"), DefaultVertexFormat.PARTICLE), shader -> { TRANSPARENT = shader; });
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Databank.locate("screen_projection"), DefaultVertexFormat.POSITION_TEX), shader -> { SCREEN_PROJECTION = shader; });
     }
 }

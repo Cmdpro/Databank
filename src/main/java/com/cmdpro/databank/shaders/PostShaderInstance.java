@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.PostPass;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.io.IOException;
@@ -93,5 +94,8 @@ public abstract class PostShaderInstance {
     public void afterProcess() {}
     public float getTime() {
         return time + (Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true) / 20f);
+    }
+    public RenderLevelStageEvent.Stage getRenderStage() {
+        return RenderLevelStageEvent.Stage.AFTER_LEVEL;
     }
 }

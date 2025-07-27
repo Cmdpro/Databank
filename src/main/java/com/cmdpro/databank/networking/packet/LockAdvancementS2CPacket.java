@@ -19,7 +19,7 @@ public record LockAdvancementS2CPacket(ResourceLocation advancement) implements 
     public static void write(FriendlyByteBuf buf, LockAdvancementS2CPacket obj) {
         buf.writeResourceLocation(obj.advancement);
     }
-    public static final Type<LockAdvancementS2CPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "lock_advancement"));
+    public static final Type<LockAdvancementS2CPacket> TYPE = new Type<>(Databank.locate("lock_advancement"));
     @Override
     public Type<LockAdvancementS2CPacket> type() {
         return TYPE;

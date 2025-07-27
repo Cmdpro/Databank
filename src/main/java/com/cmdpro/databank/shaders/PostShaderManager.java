@@ -1,6 +1,7 @@
 package com.cmdpro.databank.shaders;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.misc.DatabankRenderLevelStages;
 import com.cmdpro.databank.misc.ResizeHelper;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -42,8 +43,8 @@ public class PostShaderManager {
     }
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage().equals(RenderLevelStageEvent.Stage.AFTER_LEVEL)) {
-            for (PostShaderInstance i : instances) {
+        for (PostShaderInstance i : instances) {
+            if (event.getStage().equals(i.getRenderStage())) {
                 i.process();
             }
         }

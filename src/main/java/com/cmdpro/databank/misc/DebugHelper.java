@@ -20,7 +20,7 @@ public class DebugHelper {
     protected static class ModEvents {
         @SubscribeEvent
         public static void registerGuiLayers(RegisterGuiLayersEvent event) {
-            event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "debug"), (guiGraphics, deltaTracker) -> {
+            event.registerAboveAll(Databank.locate("debug"), (guiGraphics, deltaTracker) -> {
                 int y = 4;
                 Font font = Minecraft.getInstance().font;
                 for (String i : renderedText) {

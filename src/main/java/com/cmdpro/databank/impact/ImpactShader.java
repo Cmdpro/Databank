@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 public class ImpactShader extends PostShaderInstance {
     @Override
     public ResourceLocation getShaderLocation() {
-        return ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "shaders/post/impact.json");
+        return Databank.locate("shaders/post/impact.json");
     }
     @Override
     public void setUniforms(PostPass instance) {
