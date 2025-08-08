@@ -62,11 +62,11 @@ public class Megastructure {
         }
         List<MegastructureBlock> key = new ArrayList<>();
         key.add(new MegastructureBlock(Blocks.AIR.defaultBlockState(), Optional.empty()));
-        for (BlockPos i : BlockPos.betweenClosed(corner1, corner2)) {
-            BlockPos blockPos = i.subtract(corner1);
+        for (BlockPos i : BlockPos.betweenClosed(min, max)) {
+            BlockPos blockPos = i.subtract(min);
             BlockState blockState = level.getBlockState(i);
             Optional<CompoundTag> nbt = Optional.empty();
-            if (level.getBlockEntity(blockPos) instanceof BlockEntity ent) {
+            if (level.getBlockEntity(i) instanceof BlockEntity ent) {
                 nbt = Optional.of(ent.saveCustomOnly(level.registryAccess()));
             }
             MegastructureBlock block = new MegastructureBlock(blockState, nbt);
