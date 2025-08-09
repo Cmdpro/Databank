@@ -1,5 +1,3 @@
-### Additions
-- Added some util methods in ClientDatabankUtils for buffer source copy creation
-- Added some util methods in ClientDatabankUtils for getting the currently used render buffer
-- Added AFTER_HAND render stage
-- Added the ability to define the render stage your shader should apply during
+### Fixes
+- Fixed Megastructures not properly saving block entities
+- Fixed Megastructures failing to save if the bounds weren't defined in a specific way
