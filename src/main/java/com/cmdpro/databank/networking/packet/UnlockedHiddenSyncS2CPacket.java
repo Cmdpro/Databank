@@ -10,6 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public record UnlockedHiddenSyncS2CPacket(List<ResourceLocation> hidden, boolean updateListeners) implements Message {
@@ -30,20 +32,44 @@ public record UnlockedHiddenSyncS2CPacket(List<ResourceLocation> hidden, boolean
 
     @Override
     public void handleClient(Minecraft minecraft, Player player, IPayloadContext context) {
-        if (updateListeners) {
-            List<Hidden> unlocked = hidden.stream().filter((i) -> !ClientHidden.unlocked.contains(i)).map((i) -> HiddenManager.hidden.get(i)).toList();
-            List<Hidden> locked = ClientHidden.unlocked.stream().filter((i) -> !hidden.contains(i)).map((i) -> HiddenManager.hidden.get(i)).toList();
-            for (Hidden i : locked) {
-                ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onHide(i));
+        if (updateListeners && !ClientHiddenListener.HIDDEN_LISTENERS.isEmpty()) {
+            // We need to make a copy of the list to do our destructive comparisons below.
+            List<ResourceLocation> unlockedIds = new ArrayList<>(hidden);
+            List<ResourceLocation> lockedIds = new ArrayList<>(ClientHidden.unlocked);
+
+            // Any entries in locked should be removed from both sets, leaving us with one set
+            // containing newly unhidden items and old items that are no longer unhidden.
+            unlockedIds.removeIf(lockedIds::remove);
+
+            // Make sure we still have work to do before doing more work.
+            if (!lockedIds.isEmpty() || !unlockedIds.isEmpty()) {
+                List<Hidden> unlockedList = new ArrayList<>(unlockedIds.size());
+                List<Hidden> lockedList = new ArrayList<>(lockedIds.size());
+
+                for (ResourceLocation id : lockedIds) {
+                    Hidden i = HiddenManager.hidden.get(id);
+                    if (i == null)
+                        continue;
+                    lockedList.add(i);
+                    ClientHiddenListener.HIDDEN_LISTENERS.forEach(listener -> listener.onHide(i));
+                }
+
+                ClientHiddenListener.HIDDEN_LISTENERS.forEach(listener -> listener.onHide(lockedList));
+
+                for (ResourceLocation id : unlockedIds) {
+                    Hidden i = HiddenManager.hidden.get(id);
+                    if (i == null)
+                        continue;
+                    unlockedList.add(i);
+                    ClientHiddenListener.HIDDEN_LISTENERS.forEach(listener -> listener.onUnhide(i));
+                }
+
+                ClientHiddenListener.HIDDEN_LISTENERS.forEach(listener -> listener.onUnhide(unlockedList));
             }
-            ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onHide(locked));
-            for (Hidden i : unlocked) {
-                ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onUnhide(i));
-            }
-            ClientHiddenListener.HIDDEN_LISTENERS.forEach((listener) -> listener.onUnhide(unlocked));
         }
+
         ClientHidden.unlocked = hidden;
-        for (HiddenTypeInstance.HiddenType<?> i : DatabankRegistries.HIDDEN_TYPE_REGISTRY.stream().toList()) {
+        for (HiddenTypeInstance.HiddenType<?> i : DatabankRegistries.HIDDEN_TYPE_REGISTRY) {
             i.updateClient();
         }
     }

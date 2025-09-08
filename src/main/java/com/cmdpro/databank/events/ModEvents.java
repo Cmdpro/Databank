@@ -15,6 +15,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber(modid = Databank.MOD_ID)
 public class ModEvents {
@@ -37,12 +39,24 @@ public class ModEvents {
     protected static void syncToPlayer(ServerPlayer player) {
         ModMessages.sendToPlayer(new HiddenSyncS2CPacket(HiddenManager.hidden), player);
         ModMessages.sendToPlayer(new MultiblockSyncS2CPacket(MultiblockManager.multiblocks), player);
+
+        DatabankUtils.uncachePlayerHidden(player);
         DatabankUtils.updateHidden(player, false);
     }
 
     @SubscribeEvent
+    public static void onTick(ServerTickEvent.Post event) {
+        DatabankUtils.sendScheduledUpdates(event.getServer());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        DatabankUtils.uncachePlayerHidden(event.getEntity());
+    }
+
+    @SubscribeEvent
     public static void onAdvancement(AdvancementEvent.AdvancementProgressEvent event) {
-        DatabankUtils.updateHidden(event.getEntity());
+        DatabankUtils.scheduleUpdateHidden(event.getEntity());
         if (event.getProgressType() == AdvancementEvent.AdvancementProgressEvent.ProgressType.GRANT) {
             if (event.getAdvancementProgress().isDone()) {
                 DatabankUtils.sendUnlockAdvancement(event.getEntity(), event.getAdvancement().id());
