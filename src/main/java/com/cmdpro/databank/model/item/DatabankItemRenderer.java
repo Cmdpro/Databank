@@ -28,12 +28,16 @@ public abstract class DatabankItemRenderer<T extends Item> extends BlockEntityWi
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 0, 0.5);
-        getModel().setupModelPose(pStack, partialTick);
-        getModel().render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI ? new Vec3(-1, -1, 1) : new Vec3(1, 1, 1));
+        DatabankItemModel<T> model = getModel(pStack);
+        model.setupModelPose(pStack, partialTick);
+        model.render(pStack, partialTick, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, 0xFFFFFFFF, pDisplayContext == ItemDisplayContext.GUI ? new Vec3(-1, -1, 1) : new Vec3(1, 1, 1));
         pPoseStack.popPose();
     }
 
     public DatabankItemModel<T> getModel() {
         return model;
+    }
+    public DatabankItemModel<T> getModel(ItemStack stack) {
+        return getModel();
     }
 }

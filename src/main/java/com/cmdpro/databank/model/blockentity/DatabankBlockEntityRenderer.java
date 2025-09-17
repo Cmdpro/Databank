@@ -1,5 +1,6 @@
 package com.cmdpro.databank.model.blockentity;
 
+import com.cmdpro.databank.model.entity.DatabankEntityModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.geom.ModelPart;
@@ -19,11 +20,15 @@ public abstract class DatabankBlockEntityRenderer<T extends BlockEntity> impleme
     public void render(T pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
         pPoseStack.pushPose();
         pPoseStack.translate(0.5, 0, 0.5);
-        getModel().setupModelPose(pBlockEntity, pPartialTick);
-        getModel().render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, new Vec3(1, 1, 1));
+        DatabankBlockEntityModel<T> model = getModel(pBlockEntity);
+        model.setupModelPose(pBlockEntity, pPartialTick);
+        model.render(pBlockEntity, pPartialTick, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay, 0xFFFFFFFF, new Vec3(1, 1, 1));
         pPoseStack.popPose();
     }
     public DatabankBlockEntityModel<T> getModel() {
         return model;
+    }
+    public DatabankBlockEntityModel<T> getModel(T blockEntity) {
+        return getModel();
     }
 }

@@ -37,8 +37,9 @@ public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRen
     public void render(T pEntity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         super.render(pEntity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         poseStack.pushPose();
-        getModel().setupModelPose(pEntity, partialTick);
-        getModel().render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, new Vec3(1, 1, 1));
+        DatabankEntityModel<T> model = getModel(pEntity);
+        model.setupModelPose(pEntity, partialTick);
+        model.render(pEntity, partialTick, poseStack, bufferSource, packedLight, getOverlayCoords(pEntity), 0xFFFFFFFF, new Vec3(1, 1, 1));
         poseStack.popPose();
     }
     public int getOverlayCoords(T entity) {
@@ -47,5 +48,8 @@ public abstract class DatabankEntityRenderer<T extends Entity> extends EntityRen
 
     public DatabankEntityModel<T> getModel() {
         return model;
+    }
+    public DatabankEntityModel<T> getModel(T entity) {
+        return getModel();
     }
 }
