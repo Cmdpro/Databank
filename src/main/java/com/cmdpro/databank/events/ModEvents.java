@@ -3,6 +3,7 @@ package com.cmdpro.databank.events;
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
 import com.cmdpro.databank.hidden.HiddenManager;
+import com.cmdpro.databank.interfaces.item.AdjustableAttributes;
 import com.cmdpro.databank.megastructures.MegastructureManager;
 import com.cmdpro.databank.multiblock.MultiblockManager;
 import com.cmdpro.databank.networking.ModMessages;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -67,6 +69,14 @@ public class ModEvents {
             if (!event.getAdvancementProgress().isDone()) {
                 DatabankUtils.sendLockAdvancement(event.getEntity(), event.getAdvancement().id());
             }
+        }
+    }
+
+    // for tools/items/etc whose attributes can change over time
+    @SubscribeEvent
+    public static void adjustItemAttributes(ItemAttributeModifierEvent event) {
+        if (event.getItemStack().getItem() instanceof AdjustableAttributes item) {
+            item.adjustAttributes(event);
         }
     }
 }
