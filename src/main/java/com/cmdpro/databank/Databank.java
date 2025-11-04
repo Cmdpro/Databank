@@ -1,8 +1,8 @@
 package com.cmdpro.databank;
 
 import com.cmdpro.databank.config.DatabankClientConfig;
-import com.cmdpro.databank.model.DatabankModels;
-import com.cmdpro.databank.music.MusicSystem;
+import com.cmdpro.databank.events.DatabankEventManager;
+import com.cmdpro.databank.events.BuiltinDatabankEvents;
 import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.mojang.logging.LogUtils;
@@ -16,6 +16,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -52,6 +53,7 @@ public class Databank
             DatabankClient.register();
             modLoadingContext.getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
+        BuiltinDatabankEvents.init();
     }
     public static ResourceLocation locate(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
@@ -59,6 +61,10 @@ public class Databank
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
         RenderTypeHandler.load();
+    }
+    @SubscribeEvent
+    public static void commonSetup(FMLCommonSetupEvent event) {
+        DatabankEventManager.init();
     }
     @SubscribeEvent
     public static void onModConfigEvent(ModConfigEvent event) {

@@ -1,4 +1,4 @@
-package com.cmdpro.databank.events;
+package com.cmdpro.databank.handlers;
 
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
@@ -21,7 +21,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber(modid = Databank.MOD_ID)
-public class ModEvents {
+public class ModEventHandler {
     @SubscribeEvent
     public static void addReloadListenerEvent(AddReloadListenerEvent event) {
         event.addListener(HiddenManager.getOrCreateInstance());
