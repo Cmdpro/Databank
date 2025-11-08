@@ -1,8 +1,8 @@
 package com.cmdpro.databank;
 
 import com.cmdpro.databank.config.DatabankClientConfig;
-import com.cmdpro.databank.events.DatabankEventManager;
-import com.cmdpro.databank.events.BuiltinDatabankEvents;
+import com.cmdpro.databank.specialconditions.DatabankSpecialConditionManager;
+import com.cmdpro.databank.specialconditions.BuiltinDatabankSpecialConditions;
 import com.cmdpro.databank.registry.*;
 import com.cmdpro.databank.rendering.RenderTypeHandler;
 import com.mojang.logging.LogUtils;
@@ -53,7 +53,7 @@ public class Databank
             DatabankClient.register();
             modLoadingContext.getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
-        BuiltinDatabankEvents.init();
+        BuiltinDatabankSpecialConditions.init();
     }
     public static ResourceLocation locate(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
@@ -64,7 +64,7 @@ public class Databank
     }
     @SubscribeEvent
     public static void commonSetup(FMLCommonSetupEvent event) {
-        DatabankEventManager.init();
+        DatabankSpecialConditionManager.init();
     }
     @SubscribeEvent
     public static void onModConfigEvent(ModConfigEvent event) {

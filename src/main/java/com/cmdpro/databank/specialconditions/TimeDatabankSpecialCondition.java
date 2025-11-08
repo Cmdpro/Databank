@@ -1,14 +1,12 @@
-package com.cmdpro.databank.events;
+package com.cmdpro.databank.specialconditions;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
-import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
+import java.util.Map;
 
-public abstract class TimeDatabankEvent extends DatabankEvent {
+public abstract class TimeDatabankSpecialCondition extends DatabankSpecialCondition {
     private int distance;
     @Override
     public boolean checkActive() {
@@ -17,6 +15,18 @@ public abstract class TimeDatabankEvent extends DatabankEvent {
         distance = timespan.getDistance(now);
         return isValidYear(now.getYear()) && distance <= -1;
     }
+
+    @Override
+    public boolean isActiveParams(Map<String, Object> params) {
+        if (params.containsKey("distance")) {
+            if (params.get("distance") instanceof Integer distance) {
+                return getDistance() <= distance;
+            }
+            return false;
+        }
+        return super.isActiveParams(params);
+    }
+
     public int getDistance() {
         return distance;
     }
