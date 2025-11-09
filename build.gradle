@@ -26,6 +26,29 @@ base {
     archivesName = mod_id
 }
 
+sourceSets {
+    dev {
+        depends.on sourceSets.main
+        java {
+            srcDirs = ['src/dev/java']
+        }
+        resources {
+            srcDirs = ['src/dev/resources']
+        }
+    }
+}
+def devJar = tasks.register("devJar", Jar) {
+    archiveBaseName = "${mod_id}dev"
+    archiveVersion = "1.0.0"
+
+    from(sourceSets.dev.output)
+
+    manifest {
+        attributes 'Main-Class': 'com.cmdpro.databank.dev.DatabankDev'
+    }
+    destinationDirectory = getTemporaryDir()
+}
+
 // Mojang ships Java 21 to end users starting in 1.20.5, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
@@ -114,6 +137,7 @@ dependencies {
     implementation "maven.modrinth:iris:1.8.1+1.21.1-neoforge"
     implementation "maven.modrinth:sodium:mc1.21.1-0.6.7-neoforge"
     implementation "maven.modrinth:jade:15.9.2+neoforge"
+    runtimeOnly files(devJar.get().archiveFile)
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
@@ -167,6 +191,7 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
+
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
