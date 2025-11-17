@@ -50,14 +50,14 @@ public class ModelPose {
                 pPoseStack.pushPose();
                 Vec3 origin = new Vec3(part.origin.x, part.origin.y, part.origin.z);
 
-                Vec3 x0y0z0 = new Vec3(0, 0, 0).add(-part.inflate, part.inflate, -part.inflate).add(origin);
-                Vec3 x1y0z0 = new Vec3(part.dimensions.x, 0, 0).add(part.inflate, part.inflate, -part.inflate).add(origin);
-                Vec3 x1y1z0 = new Vec3(part.dimensions.x, part.dimensions.y, 0).add(part.inflate, -part.inflate, -part.inflate).add(origin);
-                Vec3 x0y1z0 = new Vec3(0, part.dimensions.y, 0).add(-part.inflate, -part.inflate, -part.inflate).add(origin);
-                Vec3 x0y0z1 = new Vec3(0, 0, part.dimensions.z).add(-part.inflate, part.inflate, part.inflate).add(origin);
-                Vec3 x1y0z1 = new Vec3(part.dimensions.x, 0, part.dimensions.z).add(part.inflate, part.inflate, part.inflate).add(origin);
-                Vec3 x1y1z1 = new Vec3(part.dimensions.x, part.dimensions.y, part.dimensions.z).add(part.inflate, -part.inflate, part.inflate).add(origin);
-                Vec3 x0y1z1 = new Vec3(0, part.dimensions.y, part.dimensions.z).add(-part.inflate, -part.inflate, part.inflate).add(origin);
+                Vec3 x0y0z0 = new Vec3(0, 0, 0).add(-part.inflate, -part.inflate, -part.inflate).add(origin);
+                Vec3 x1y0z0 = new Vec3(part.dimensions.x, 0, 0).add(part.inflate, -part.inflate, -part.inflate).add(origin);
+                Vec3 x1y1z0 = new Vec3(part.dimensions.x, part.dimensions.y, 0).add(part.inflate, part.inflate, -part.inflate).add(origin);
+                Vec3 x0y1z0 = new Vec3(0, part.dimensions.y, 0).add(-part.inflate, part.inflate, -part.inflate).add(origin);
+                Vec3 x0y0z1 = new Vec3(0, 0, part.dimensions.z).add(-part.inflate, -part.inflate, part.inflate).add(origin);
+                Vec3 x1y0z1 = new Vec3(part.dimensions.x, 0, part.dimensions.z).add(part.inflate, -part.inflate, part.inflate).add(origin);
+                Vec3 x1y1z1 = new Vec3(part.dimensions.x, part.dimensions.y, part.dimensions.z).add(part.inflate, part.inflate, part.inflate).add(origin);
+                Vec3 x0y1z1 = new Vec3(0, part.dimensions.y, part.dimensions.z).add(-part.inflate, part.inflate, part.inflate).add(origin);
 
                 float uMin = part.texOffset.x + part.dimensions.z;
                 float vMin = part.texOffset.y;
