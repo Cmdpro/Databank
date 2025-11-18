@@ -40,7 +40,7 @@ public abstract class DatabankPartData {
         Vector3f rotation = getRotation();
         return PartPose.offsetAndRotation(offset.x, offset.y, offset.z, rotation.x, rotation.y, rotation.z);
     }
-    public Matrix4f getMatrixWithParents() {
+    public Matrix4f getMatrixWithParents(boolean ignoreGroups) {
         List<DatabankPartDefinition> parts = new ArrayList<>();
         DatabankPartDefinition current = part;
         while (current != null) {
@@ -53,6 +53,9 @@ public abstract class DatabankPartData {
         Quaternionf rotation = new Quaternionf();
         Vector3f offset = new Vector3f();
         for (DatabankPartDefinition i : parts) {
+            if (ignoreGroups && i.data instanceof DatabankGroupPart) {
+                continue;
+            }
             offset.add(new Vector3f(i.data.getOffset()).rotate(rotation));
             rotation.rotateXYZ(i.data.getRotation().x, i.data.getRotation().y, i.data.getRotation().z);
         }
@@ -462,9 +465,9 @@ public abstract class DatabankPartData {
                 Matrix4f mat4 = new Matrix4f();
                 Vector3f target = new Vector3f();
 
-                Matrix4f armatureMatrixInverse = new Matrix4f(posePart.parent.parent.getMatrixWithParents()).invert();
+                Matrix4f armatureMatrixInverse = new Matrix4f(posePart.parent.parent.getMatrixWithParents(true)).invert();
                 Matrix4f bindMatrix = new Matrix4f(armatureMatrixInverse);
-                bindMatrix.mul(getMatrixWithParents());
+                bindMatrix.mul(getMatrixWithParents(true));
                 Matrix4f bindMatrixInverse = new Matrix4f(bindMatrix).invert();
 
                 pos.mulPosition(bindMatrix);
@@ -496,8 +499,8 @@ public abstract class DatabankPartData {
                         float weight = weights.get(j);
                         if (weight != 0 && affectingBones.size() > j) {
                             ModelPose.ModelPosePart bone = bones.get(j);
-                            mat4 = new Matrix4f(armatureMatrixInverse).mul(bone.getMatrixWithParents());
-                            mat4.mul(new Matrix4f(bone.part.data.getMatrixWithParents()).invert());
+                            mat4 = new Matrix4f(armatureMatrixInverse).mul(bone.getMatrixWithParents(true));
+                            mat4.mul(new Matrix4f(bone.part.data.getMatrixWithParents(true)).invert());
                             target.add(new Vector3f(pos).mulPosition(mat4).mul(weight));
                         }
                     }

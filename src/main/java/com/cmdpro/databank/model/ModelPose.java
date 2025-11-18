@@ -71,7 +71,7 @@ public class ModelPose {
             part.data.render(this, model, partialTick, pPoseStack, pConsumer, pPackedLight, pPackedOverlay, pColor, normalMult, isShadedByNormal, quaternionf);
             pPoseStack.popPose();
         }
-        public Matrix4f getMatrixWithParents() {
+        public Matrix4f getMatrixWithParents(boolean ignoreGroups) {
             List<ModelPosePart> parts = new ArrayList<>();
             ModelPosePart current = this;
             while (current != null) {
@@ -84,6 +84,9 @@ public class ModelPose {
             Quaternionf rotation = new Quaternionf();
             Vector3f offset = new Vector3f();
             for (ModelPosePart i : parts) {
+                if (ignoreGroups && i.part.data instanceof DatabankPartData.DatabankGroupPart) {
+                    continue;
+                }
                 offset.add(new Vector3f(i.pos).rotate(rotation));
                 rotation.rotateXYZ(i.rotation.x, i.rotation.y, i.rotation.z);
             }

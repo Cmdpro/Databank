@@ -39,7 +39,8 @@ public class ModelTestBlockEntity extends BlockEntity {
         super(BlockEntityRegistry.MODEL_TEST.get(), pos, blockState);
     }
     public DatabankAnimationState animState = new DatabankAnimationState("animation")
-            .addAnim(new DatabankAnimationReference("animation", (state, anim) -> {}, (state, anim) -> {}));
+            .addAnim(new DatabankAnimationReference("animation", (state, anim) -> {}, (state, anim) -> {}))
+            .addAnim(new DatabankAnimationReference("animation2", (state, anim) -> {}, (state, anim) -> {}));
 
     @Override
     public void setLevel(Level level) {

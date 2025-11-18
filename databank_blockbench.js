@@ -370,7 +370,7 @@ Plugin.register('databank_blockbench', {
                                 })
                                 if (keyframes.length > 0) {
                                     animParts.push({
-                                        bone: nameMap[animator.element.uuid],
+                                        bone: nameMap[animator.element != null ? animator.element.uuid : animator.group.uuid],
                                         target: id,
                                         keyframes: keyframes
                                     })

@@ -36,39 +36,6 @@ public class DatabankPartDefinition {
         }
     }
     public DatabankPartDefinition parent;
-    /*
-    public DatabankPartDefinition(String name, Vector3f rotation, Vector3f offset, List<DatabankPartDefinition> children) {
-        this(name, rotation, offset, children, false, false, false, null, null, null, 0, Optional.empty());
-    }
-    public DatabankPartDefinition(String name, Vector3f rotation, Vector3f offset, List<DatabankPartDefinition> children, boolean mirror, Vector2i texOffset, Vector3f origin, Vector3f dimensions, float inflate) {
-        this(name, rotation, offset, children, true, false, mirror, texOffset, origin, dimensions, inflate, Optional.empty());
-    }
-    public DatabankPartDefinition(String name, Vector3f rotation, Vector3f offset, List<DatabankPartDefinition> children, boolean isCube, boolean isMesh, boolean mirror, Vector2i texOffset, Vector3f origin, Vector3f dimensions, float inflate, Optional<List<List<DatabankPartData.Vertex>>> faces) {
-        this.name = name;
-        this.rotation = rotation;
-        this.offset = offset;
-        this.children = children;
-        this.isCube = isCube;
-        this.isMesh = isMesh;
-        this.mirror = mirror;
-        this.texOffset = texOffset;
-        this.origin = origin;
-        this.dimensions = dimensions;
-        this.inflate = inflate;
-        this.faces = faces;
-    }
-    public String name;
-    public Vector3f rotation;
-    public Vector3f offset;
-    public List<DatabankPartDefinition> children;
-    public boolean isCube;
-    public boolean isMesh;
-    public boolean mirror;
-    public Vector2i texOffset;
-    public Vector3f origin;
-    public Vector3f dimensions;
-    public float inflate;
-    public Optional<List<List<DatabankPartData.Vertex>>> faces;*/
     public DatabankPartData data;
     public CubeListBuilder createCubeListBuilder() {
         if (data instanceof DatabankPartData.DatabankCubePart cube) {

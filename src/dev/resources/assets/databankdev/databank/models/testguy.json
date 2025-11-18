@@ -215,6 +215,90 @@
           ]
         },
         {
+          "bone": "root",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.25,
+              "target": [
+                7.5,
+                0,
+                2.5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.5,
+              "target": [
+                7.5,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "root",
+          "target": "scale",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0.9,
+                1,
+                1
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.25,
+              "target": [
+                1.1,
+                0.9,
+                1
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.5,
+              "target": [
+                1,
+                0.9,
+                1
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0.9,
+                1,
+                1
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
           "bone": "bone9",
           "target": "rotation",
           "keyframes": [
@@ -259,9 +343,304 @@
       ]
     },
     "animation2": {
-      "length": 2.1666666666666665,
-      "looping": false,
-      "animation": []
+      "length": 2.25,
+      "looping": true,
+      "animation": [
+        {
+          "bone": "bone2",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                -5,
+                5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "bone5",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                10.2617272313,
+                6.3588145418,
+                -53.1920601835
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                11.629510558,
+                -3.1935722953,
+                -6.5889095941
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                11.8926719051,
+                1.9811193117,
+                -31.0572355465
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                10.2617272313,
+                6.3588145418,
+                -53.1920601835
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "bone6",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                -30
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                -25
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                32.5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                0,
+                0,
+                -30
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "bone7",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                -60
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                -70
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                -60
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                0,
+                0,
+                -60
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "bone8",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                -17.5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                -12.5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        },
+        {
+          "bone": "root",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                72.5,
+                0,
+                0
+              ],
+              "interpolation": "linear"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                77.5
+              ],
+              "interpolation": "linear"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "linear"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                72.5,
+                0,
+                0
+              ],
+              "interpolation": "linear"
+            }
+          ]
+        },
+        {
+          "bone": "bone9",
+          "target": "rotation",
+          "keyframes": [
+            {
+              "timestamp": 0,
+              "target": [
+                0,
+                0,
+                -10
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 0.75,
+              "target": [
+                0,
+                0,
+                7.5
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 1.5,
+              "target": [
+                0,
+                0,
+                0
+              ],
+              "interpolation": "smooth"
+            },
+            {
+              "timestamp": 2.25,
+              "target": [
+                0,
+                0,
+                -10
+              ],
+              "interpolation": "smooth"
+            }
+          ]
+        }
+      ]
     }
   },
   "parts": [
