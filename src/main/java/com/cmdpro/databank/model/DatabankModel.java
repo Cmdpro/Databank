@@ -27,16 +27,30 @@ public class DatabankModel {
     public List<DatabankPartDefinition> parts;
     public Map<String, DatabankAnimation> animations;
     public Vector2i textureSize;
+    public HashMap<String, DatabankPartData.DatabankBonePart> allBones = new HashMap<>();
     public DatabankModel(List<DatabankPartDefinition> parts, Map<String, DatabankAnimation> animations, Vector2i textureSize) {
         this.parts = parts;
         this.animations = animations;
         this.textureSize = textureSize;
+        allBones = findBones(parts);
+    }
+    private HashMap<String, DatabankPartData.DatabankBonePart> findBones(List<DatabankPartDefinition> parts) {
+        HashMap<String, DatabankPartData.DatabankBonePart> bones = new HashMap<>();
+        for (DatabankPartDefinition i : parts) {
+            if (i.data instanceof DatabankPartData.DatabankBonePart bone) {
+                bones.put(bone.name, bone);
+            }
+            if (i.data.getChildren() != null) {
+                bones.putAll(findBones(i.data.getChildren()));
+            }
+        }
+        return bones;
     }
     private void goThroughChildren(PartDefinition partDefinition, List<DatabankPartDefinition> definitions) {
         for (DatabankPartDefinition i : definitions) {
-            PartDefinition part = partDefinition.addOrReplaceChild(i.name, i.createCubeListBuilder(), i.createPartPose());
-            if (i.children != null) {
-                goThroughChildren(part, i.children);
+            PartDefinition part = partDefinition.addOrReplaceChild(i.data.name, i.createCubeListBuilder(), i.createPartPose());
+            if (i.data.getChildren() != null) {
+                goThroughChildren(part, i.data.getChildren());
             }
         }
     }
@@ -44,22 +58,25 @@ public class DatabankModel {
         HashMap<String, ModelPose.ModelPosePart> stringToPart = new HashMap<>();
         List<ModelPose.ModelPosePart> children = new ArrayList<>();
         for (DatabankPartDefinition i : parts) {
-            Vector3f offset = new Vector3f(i.offset);
-            Vector3f rotation = new Vector3f(i.rotation).mul(-1, -1, 1);
-            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.dimensions));
+            Vector3f offset = new Vector3f(i.data.getOffset());
+            Vector3f rotation = new Vector3f(i.data.getRotation()).mul(-1, -1, 1);
+            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.data.getDimensions()));
             children.add(part);
-            stringToPart.put(i.name, part);
+            stringToPart.put(i.data.name, part);
         }
         return new ModelPose(children, stringToPart);
     }
     private List<ModelPose.ModelPosePart> goThroughChildrenForModelPose(HashMap<String, ModelPose.ModelPosePart> stringToPart, DatabankPartDefinition parent) {
         List<ModelPose.ModelPosePart> children = new ArrayList<>();
-        for (DatabankPartDefinition i : parent.children) {
-            Vector3f offset = new Vector3f(i.offset);
-            Vector3f rotation = new Vector3f(i.rotation).mul(-1, -1, 1);
-            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.dimensions));
+        if (parent.data.getChildren() == null) {
+            return children;
+        }
+        for (DatabankPartDefinition i : parent.data.getChildren()) {
+            Vector3f offset = new Vector3f(i.data.getOffset());
+            Vector3f rotation = new Vector3f(i.data.getRotation()).mul(-1, -1, 1);
+            ModelPose.ModelPosePart part = new ModelPose.ModelPosePart(i, goThroughChildrenForModelPose(stringToPart, i), offset, rotation, new Vector3f(i.data.getDimensions()));
             children.add(part);
-            stringToPart.put(i.name, part);
+            stringToPart.put(i.data.name, part);
         }
         return children;
     }

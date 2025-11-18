@@ -48,6 +48,7 @@ public class Databank
         MusicConditionRegistry.MUSIC_CONDITIONS.register(bus);
         HiddenTypeRegistry.HIDDEN_TYPES.register(bus);
         CriteriaTriggerRegistry.TRIGGERS.register(bus);
+        ModelPartRegistry.MODEL_PART_TYPES.register(bus);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             DatabankClient.register();

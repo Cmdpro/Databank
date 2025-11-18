@@ -2,9 +2,6 @@ package com.cmdpro.databank.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -20,10 +17,33 @@ public class ModelPose {
     public ModelPose(List<ModelPosePart> parts, HashMap<String, ModelPosePart> stringToPart) {
         this.parts = parts;
         this.stringToPart = stringToPart;
+        updatePose(parts);
+        allBones = findBones(parts);
+    }
+    private void updatePose(List<ModelPosePart> parts) {
+        for (ModelPosePart i : parts) {
+            i.pose = this;
+            updatePose(i.children);
+        }
+    }
+    public HashMap<String, ModelPosePart> allBones = new HashMap<>();
+    private HashMap<String, ModelPosePart> findBones(List<ModelPosePart> parts) {
+        HashMap<String, ModelPosePart> bones = new HashMap<>();
+        for (ModelPosePart i : parts) {
+            if (i.part.data instanceof DatabankPartData.DatabankBonePart bone) {
+                bones.put(bone.name, i);
+            }
+            if (i.part.data.getChildren() != null) {
+                bones.putAll(findBones(i.children));
+            }
+        }
+        return bones;
     }
     public static class ModelPosePart {
+        public ModelPose pose;
         public DatabankPartDefinition part;
         public List<ModelPosePart> children;
+        public ModelPosePart parent;
         public Vector3f pos;
         public Vector3f rotation;
         public Vector3f scale;
@@ -33,6 +53,9 @@ public class ModelPose {
             this.pos = pos;
             this.rotation = rotation;
             this.scale = scale;
+            for (ModelPosePart i : children) {
+                i.parent = this;
+            }
         }
         public void offsetPosition(Vector3f offset) {
             pos.add(-offset.x, -offset.y, offset.z);
@@ -45,218 +68,29 @@ public class ModelPose {
         }
         public void render(DatabankModel model, float partialTick, PoseStack pPoseStack, VertexConsumer pConsumer, int pPackedLight, int pPackedOverlay, int pColor, Vec3 normalMult, boolean isShadedByNormal, Quaternionf quaternionf) {
             pPoseStack.pushPose();
-            List<DatabankPartDefinition.Face> faces = null;
-            if (part.isCube) {
-                pPoseStack.pushPose();
-                Vec3 origin = new Vec3(part.origin.x, part.origin.y, part.origin.z);
-
-                Vec3 x0y0z0 = new Vec3(0, 0, 0).add(-part.inflate, -part.inflate, -part.inflate).add(origin);
-                Vec3 x1y0z0 = new Vec3(part.dimensions.x, 0, 0).add(part.inflate, -part.inflate, -part.inflate).add(origin);
-                Vec3 x1y1z0 = new Vec3(part.dimensions.x, part.dimensions.y, 0).add(part.inflate, part.inflate, -part.inflate).add(origin);
-                Vec3 x0y1z0 = new Vec3(0, part.dimensions.y, 0).add(-part.inflate, part.inflate, -part.inflate).add(origin);
-                Vec3 x0y0z1 = new Vec3(0, 0, part.dimensions.z).add(-part.inflate, -part.inflate, part.inflate).add(origin);
-                Vec3 x1y0z1 = new Vec3(part.dimensions.x, 0, part.dimensions.z).add(part.inflate, -part.inflate, part.inflate).add(origin);
-                Vec3 x1y1z1 = new Vec3(part.dimensions.x, part.dimensions.y, part.dimensions.z).add(part.inflate, part.inflate, part.inflate).add(origin);
-                Vec3 x0y1z1 = new Vec3(0, part.dimensions.y, part.dimensions.z).add(-part.inflate, part.inflate, part.inflate).add(origin);
-
-                float uMin = part.texOffset.x + part.dimensions.z;
-                float vMin = part.texOffset.y;
-                float uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x;
-                float vMax = part.texOffset.y + part.dimensions.z;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> up = new ArrayList<>();
-                up.add(new DatabankPartDefinition.Vertex(x1y1z1, uMin, vMin));
-                up.add(new DatabankPartDefinition.Vertex(x0y1z1, uMax, vMin));
-                up.add(new DatabankPartDefinition.Vertex(x0y1z0, uMax, vMax));
-                up.add(new DatabankPartDefinition.Vertex(x1y1z0, uMin, vMax));
-
-                uMin = part.texOffset.x + part.dimensions.z + part.dimensions.x;
-                vMin = part.texOffset.y;
-                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.x;
-                vMax = part.texOffset.y + part.dimensions.z;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> down = new ArrayList<>();
-                down.add(new DatabankPartDefinition.Vertex(x1y0z1, uMin, vMin));
-                down.add(new DatabankPartDefinition.Vertex(x0y0z1, uMax, vMin));
-                down.add(new DatabankPartDefinition.Vertex(x0y0z0, uMax, vMax));
-                down.add(new DatabankPartDefinition.Vertex(x1y0z0, uMin, vMax));
-                uMin = part.texOffset.x + part.dimensions.z;
-                vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x;
-                vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> east = new ArrayList<>();
-                east.add(new DatabankPartDefinition.Vertex(x1y1z1, uMax, vMin));
-                east.add(new DatabankPartDefinition.Vertex(x1y1z0, uMin, vMin));
-                east.add(new DatabankPartDefinition.Vertex(x1y0z0, uMin, vMax));
-                east.add(new DatabankPartDefinition.Vertex(x1y0z1, uMax, vMax));
-
-                uMin = part.texOffset.x + part.dimensions.z;
-                vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x;
-                vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> north = new ArrayList<>();
-                north.add(new DatabankPartDefinition.Vertex(x1y1z0, uMin, vMin));
-                north.add(new DatabankPartDefinition.Vertex(x0y1z0, uMax, vMin));
-                north.add(new DatabankPartDefinition.Vertex(x0y0z0, uMax, vMax));
-                north.add(new DatabankPartDefinition.Vertex(x1y0z0, uMin, vMax));
-
-                uMin = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.z;
-                vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x;
-                vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> west = new ArrayList<>();
-                west.add(new DatabankPartDefinition.Vertex(x0y1z1, uMin, vMin));
-                west.add(new DatabankPartDefinition.Vertex(x0y1z0, uMax, vMin));
-                west.add(new DatabankPartDefinition.Vertex(x0y0z0, uMax, vMax));
-                west.add(new DatabankPartDefinition.Vertex(x0y0z1, uMin, vMax));
-
-                uMin = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.z;
-                vMin = part.texOffset.y + part.dimensions.z;
-                uMax = part.texOffset.x + part.dimensions.z + part.dimensions.x + part.dimensions.z + part.dimensions.x;
-                vMax = part.texOffset.y + part.dimensions.z + part.dimensions.y;
-
-                if (part.mirror) {
-                    float uMinBackup = uMin;
-                    uMin = uMax;
-                    uMax = uMinBackup;
-                }
-
-                List<DatabankPartDefinition.Vertex> south = new ArrayList<>();
-                south.add(new DatabankPartDefinition.Vertex(x1y1z1, uMax, vMin));
-                south.add(new DatabankPartDefinition.Vertex(x0y1z1, uMin, vMin));
-                south.add(new DatabankPartDefinition.Vertex(x0y0z1, uMin, vMax));
-                south.add(new DatabankPartDefinition.Vertex(x1y0z1, uMax, vMax));
-
-                boolean[] facesVisible = new boolean[] { true, true, true, true, true, true };
-                Vec3[] normals = new Vec3[] {
-                        new Vec3(0, 1*normalMult.y, 0),
-                        new Vec3(0, -1*normalMult.y, 0),
-                        new Vec3(1*normalMult.x, 0, 0),
-                        new Vec3(0, 0, -1*normalMult.z),
-                        new Vec3(-1*normalMult.x, 0, 0),
-                        new Vec3(0, 0, 1*normalMult.z)
-                };
-
-                if (part.dimensions.x+part.inflate <= 0.001 && part.dimensions.x+part.inflate >= -0.001) {
-                    facesVisible[2] = false;
-                }
-                if (part.dimensions.y+part.inflate <= 0.001 && part.dimensions.y+part.inflate >= -0.001) {
-                    facesVisible[1] = false;
-                }
-                if (part.dimensions.z+part.inflate <= 0.001 && part.dimensions.z+part.inflate >= -0.001) {
-                    facesVisible[5] = false;
-                }
-
-                faces = new ArrayList<>();
-                if (facesVisible[0]) { faces.add(new DatabankPartDefinition.Face(up, normals[0])); }
-                if (facesVisible[1]) { faces.add(new DatabankPartDefinition.Face(down, normals[1])); }
-                if (facesVisible[2]) { faces.add(new DatabankPartDefinition.Face(east, normals[2])); }
-                if (facesVisible[3]) { faces.add(new DatabankPartDefinition.Face(north, normals[3])); }
-                if (facesVisible[4]) { faces.add(new DatabankPartDefinition.Face(west, normals[4])); }
-                if (facesVisible[5]) { faces.add(new DatabankPartDefinition.Face(south, normals[5])); }
-                Matrix4f matrix4f = new Matrix4f();
-                matrix4f.rotateZYX(part.rotation.z, part.rotation.y, part.rotation.x);
-                quaternionf.rotateZYX(part.rotation.z, -part.rotation.y, part.rotation.x);
-                for (DatabankPartDefinition.Face i : faces) {
-                    for (DatabankPartDefinition.Vertex j : i.vertices) {
-                        Vector3f pos = j.pos.toVector3f();
-                        matrix4f.transformPosition(pos);
-                        pos.add(new Vector3f(this.pos.x, this.pos.y, this.pos.z));
-                        j.pos = new Vec3(pos.x, pos.y, pos.z);
-                    }
-                }
-                pPoseStack.popPose();
-            }
-            if (part.isMesh) {
-                pPoseStack.translate(pos.x/16f, pos.y/16f, pos.z/16f);
-                Matrix4f matrix4f = new Matrix4f();
-                matrix4f.rotateXYZ(rotation.x, -rotation.y, rotation.z);
-                quaternionf.rotateXYZ(rotation.x, rotation.y, rotation.z);
-                List<List<DatabankPartDefinition.Vertex>> faces2 = part.faces.orElse(null);
-                if (faces2 != null) {
-                    faces = new ArrayList<>();
-                    for (List<DatabankPartDefinition.Vertex> i : faces2) {
-                        if (i.size() == 3 || i.size() == 4) {
-                            List<DatabankPartDefinition.Vertex> verts = new ArrayList<>();
-                            for (DatabankPartDefinition.Vertex j : i) {
-                                Vector3f pos = matrix4f.transformPosition(j.pos.toVector3f());
-                                verts.add(new DatabankPartDefinition.Vertex(new Vec3(pos.x, pos.y, pos.z), j.u, j.v));
-                            }
-                            Vec3 vecA = i.get(1).pos.subtract(i.get(0).pos);
-                            Vec3 vecB = i.get(2).pos.subtract(i.get(0).pos);
-                            Vector3f normal = vecA.cross(vecB).toVector3f().normalize();
-                            faces.add(new DatabankPartDefinition.Face(verts, new Vec3(normal.x, normal.y, normal.z)));
-                        }
-                    }
-                }
-            }
-            if (faces != null) {
-                for (DatabankPartDefinition.Face i : faces) {
-                    if (i.vertices.size() == 3 || i.vertices.size() == 4) {
-                        Vector3f normal = i.normal.toVector3f().rotate(quaternionf);
-                        if (!isShadedByNormal) {
-                            normal = new Vec3(0, 1, 0).multiply(normalMult).toVector3f();
-                        }
-                        for (DatabankPartDefinition.Vertex j : i.vertices) {
-                            float x = (float)j.pos.x() / 16f;
-                            float y = (float)(j.pos.y()) / 16f;
-                            float z = (float)j.pos.z() / 16f;
-                            pConsumer.addVertex(pPoseStack.last(), x, y, z);
-                            pConsumer.setColor(pColor);
-                            pConsumer.setUv((float)j.u/(float)model.textureSize.x, (float)j.v/(float)model.textureSize.y);
-                            pConsumer.setOverlay(pPackedOverlay);
-                            pConsumer.setLight(pPackedLight);
-                            pConsumer.setNormal(normal.x, normal.y, normal.z);
-                        }
-                        if (i.vertices.size() == 3) {
-                            DatabankPartDefinition.Vertex j = i.vertices.getLast();
-                            float x = (float)j.pos.x() / 16f;
-                            float y = (float)(j.pos.y()) / 16f;
-                            float z = (float)j.pos.z() / 16f;
-                            pConsumer.addVertex(pPoseStack.last(), x, y, z);
-                            pConsumer.setColor(pColor);
-                            pConsumer.setUv((float)j.u/(float)model.textureSize.x, (float)j.v/(float)model.textureSize.y);
-                            pConsumer.setOverlay(pPackedOverlay);
-                            pConsumer.setLight(pPackedLight);
-                            pConsumer.setNormal(normal.x, normal.y, normal.z);
-                        }
-                    }
-                }
-            }
+            part.data.render(this, model, partialTick, pPoseStack, pConsumer, pPackedLight, pPackedOverlay, pColor, normalMult, isShadedByNormal, quaternionf);
             pPoseStack.popPose();
+        }
+        public Matrix4f getMatrixWithParents() {
+            List<ModelPosePart> parts = new ArrayList<>();
+            ModelPosePart current = this;
+            while (current != null) {
+                parts.addFirst(current);
+                current = current.parent;
+            }
+            if (parts.isEmpty()) {
+                return new Matrix4f();
+            }
+            Quaternionf rotation = new Quaternionf();
+            Vector3f offset = new Vector3f();
+            for (ModelPosePart i : parts) {
+                offset.add(new Vector3f(i.pos).rotate(rotation));
+                rotation.rotateXYZ(i.rotation.x, i.rotation.y, i.rotation.z);
+            }
+            Matrix4f mat4 = new Matrix4f();
+            mat4.translate(offset);
+            mat4.rotate(rotation);
+            return mat4;
         }
     }
 }

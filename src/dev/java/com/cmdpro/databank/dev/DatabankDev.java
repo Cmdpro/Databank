@@ -1,5 +1,8 @@
 package com.cmdpro.databank.dev;
 
+import com.cmdpro.databank.dev.registry.BlockEntityRegistry;
+import com.cmdpro.databank.dev.registry.BlockRegistry;
+import com.cmdpro.databank.dev.registry.ItemRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -21,6 +24,9 @@ public class DatabankDev
     {
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         DatabankDevSpecialConditions.init();
+        ItemRegistry.ITEMS.register(bus);
+        BlockRegistry.BLOCKS.register(bus);
+        BlockEntityRegistry.BLOCK_ENTITIES.register(bus);
     }
     public static ResourceLocation locate(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);

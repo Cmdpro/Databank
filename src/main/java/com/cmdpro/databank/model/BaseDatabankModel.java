@@ -26,13 +26,13 @@ public abstract class BaseDatabankModel<T> {
     }
     private void renderPartAndChildren(T obj, float partialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay, int pColor, ModelPose.ModelPosePart part, Vec3 normalMult, Quaternionf quaternionf) {
         pPoseStack.pushPose();
-        if (!part.part.isCube && !part.part.isMesh) {
+        if (part.part.data instanceof DatabankPartData.DatabankGroupPart) {
             pPoseStack.translate((part.pos.x/16f), (part.pos.y/16f), (part.pos.z/16f));
             pPoseStack.mulPose(new Quaternionf().rotationZYX(part.rotation.z, -part.rotation.y, -part.rotation.x));
             pPoseStack.scale(part.scale.x, part.scale.y, part.scale.z);
             quaternionf.rotateZYX(part.rotation.z, -part.rotation.y, -part.rotation.x);
         }
-        if (part.part.isCube || part.part.isMesh) {
+        if (part.part.data instanceof DatabankPartData.DatabankCubePart || part.part.data instanceof DatabankPartData.DatabankMeshPart) {
             VertexConsumer consumer = pBuffer.getBuffer(getRenderType(obj, part));
             part.render(getModel(), partialTick, pPoseStack, consumer, getPackedLight(obj, part, pPackedLight), getPackedOverlay(obj, part, pPackedOverlay), getColor(obj, part, pColor), normalMult, isShadedByNormal(obj, part), new Quaternionf(quaternionf));
         }
@@ -42,13 +42,15 @@ public abstract class BaseDatabankModel<T> {
         pPoseStack.popPose();
     }
     public boolean isShadedByNormal(T obj, ModelPose.ModelPosePart part) {
-        if (part.part.dimensions.x+part.part.inflate <= 0.001 && part.part.dimensions.x+part.part.inflate >= -0.001) {
+        Vector3f dimensions = part.part.data.getDimensions();
+        float inflate = part.part.data.getInflate();
+        if (dimensions.x+inflate <= 0.001 && dimensions.x+inflate >= -0.001) {
             return false;
         }
-        if (part.part.dimensions.y+part.part.inflate <= 0.001 && part.part.dimensions.y+part.part.inflate >= -0.001) {
+        if (dimensions.y+inflate <= 0.001 && dimensions.y+inflate >= -0.001) {
             return false;
         }
-        if (part.part.dimensions.z+part.part.inflate <= 0.001 && part.part.dimensions.z+part.part.inflate >= -0.001) {
+        if (dimensions.z+inflate <= 0.001 && dimensions.z+inflate >= -0.001) {
             return false;
         }
         return true;

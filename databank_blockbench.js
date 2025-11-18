@@ -92,6 +92,8 @@ function makeCodec() {
 }
 
 var duplicateNames = {}
+var nameMap = {}
+var allBones = []
 
 function getNewName(name) {
     if (Object.hasOwn(duplicateNames, name)) {
@@ -102,25 +104,44 @@ function getNewName(name) {
     return name
 }
 
+function getNewNamesRecursive(children) {
+    children.forEach(element => {
+        if (element.name != null) {
+            nameMap[element.uuid] = getNewName(element.name)
+        }
+        if (element.children != null) {
+            getNewNamesRecursive(element.children)
+        }
+    })
+}
+function findBones(children) {
+    children.forEach(element => {
+        if (element instanceof ArmatureBone) {
+            allBones.push(element)
+        }
+        if (element.children != null) {
+            findBones(element.children)
+        }
+    })
+}
+
 function goThroughChildren(array, parentOffset) {
     var parts = []
     array.forEach(element => {
         if (element instanceof Cube) {
             var part = {}
-            part.name = getNewName(element.name)
+            part.type = "databank:cube"
+            part.name = nameMap[element.uuid]
             part.rotation = [
                 Math.degToRad(element.rotation[0]),
                 Math.degToRad(element.rotation[1]),
                 Math.degToRad(element.rotation[2])
             ]
-            console.log(parentOffset);
             part.offset = [
                 element.origin[0]-parentOffset[0],
                 element.origin[1]-parentOffset[1],
                 element.origin[2]-parentOffset[2]
             ]
-            part.isCube = true
-            part.isMesh = false
             part.texOffset = [
                 element.uv_offset[0],
                 element.uv_offset[1]
@@ -140,7 +161,8 @@ function goThroughChildren(array, parentOffset) {
             parts.push(part)
         } else if (element instanceof Group) {
             var part = {}
-            part.name = element.name
+            part.type = "databank:group"
+            part.name = nameMap[element.uuid]
             part.rotation = [
                 Math.degToRad(element.rotation[0]),
                 Math.degToRad(element.rotation[1]),
@@ -151,15 +173,14 @@ function goThroughChildren(array, parentOffset) {
                 element.origin[1]-parentOffset[1],
                 element.origin[2]-parentOffset[2]
             ]
-            part.isCube = false
-            part.isMesh = false
             if (element.children != null) {
                 part.children = goThroughChildren(element.children, [ element.origin[0], element.origin[1], element.origin[2] ])
             }
             parts.push(part)
         } else if (element instanceof Mesh) {
             var part = {}
-            part.name = getNewName(element.name)
+            part.type = "databank:mesh"
+            part.name = nameMap[element.uuid]
             part.rotation = [
                     Math.degToRad(element.rotation[0]),
                   Math.degToRad(element.rotation[1]),
@@ -170,21 +191,34 @@ function goThroughChildren(array, parentOffset) {
                 element.origin[1]-parentOffset[1],
                 element.origin[2]-parentOffset[2]
             ]
-            part.isCube = false
-            part.isMesh = true
-            part.mirror = element.mirror_uv
+            var vertices = {}
+            for (var k in element.vertices) {
+                var current = element.vertices[k]
+                var vertice = {}
+                vertice.x = current[0]
+                vertice.y = current[1]
+                vertice.z = current[2]
+                vertice.weights = {}
+                var bones = []
+                var key = element.uuid.substring(0, 6) + ':' + k
+                allBones.forEach(bone => {
+                    var weight = bone.vertex_weights[key] ?? bone.vertex_weights[k] ?? 0
+                    if (weight > 0) {
+                        vertice.weights[nameMap[bone.uuid]] = weight
+                        bones.push(bone)
+                    }
+                })
+                vertices[k] = vertice
+            }
+            part.vertices = vertices
             var faces = []
             for (var k in element.faces) {
                 var v = element.faces[k]
                 var face = []
-                var vertIndex = 0
                 v.getSortedVertices().forEach((j) => {
                     var vertice = {}
                     if (j in element.vertices) {
-                        var current = element.vertices[j]
-                        vertice.x = current[0]
-                        vertice.y = current[1]
-                        vertice.z = current[2]
+                        vertice.id = j
                         if (j in v.uv) {
                             var uv = v.uv[j]
                             vertice.u = uv[0]
@@ -192,11 +226,46 @@ function goThroughChildren(array, parentOffset) {
                         }
                     }
                     face.push(vertice)
-                    vertIndex++
                 })
                 faces.push(face)
             }
             part.faces = faces
+            parts.push(part)
+        } else if (element instanceof Armature) {
+            var part = {}
+            part.type = "databank:armature"
+            part.name = nameMap[element.uuid]
+            part.offset = [
+                element.origin[0]-parentOffset[0],
+                element.origin[1]-parentOffset[1],
+                element.origin[2]-parentOffset[2]
+            ]
+            if (element.children != null) {
+                part.children = goThroughChildren(element.children, [ element.origin[0], element.origin[1], element.origin[2] ])
+            }
+            parts.push(part)
+        } else if (element instanceof ArmatureBone) {
+            var part = {}
+            part.type = "databank:bone"
+            part.name = nameMap[element.uuid]
+            part.offset = [
+                element.origin[0],
+                element.origin[1],
+                element.origin[2]
+            ]
+            part.rotation = [
+                Math.degToRad(element.rotation[0]),
+                  Math.degToRad(element.rotation[1]),
+                  Math.degToRad(element.rotation[2])
+            ]
+            part.dimensions = [
+                element.size(0, false),
+                  element.size(1, false),
+                  element.size(2, false)
+            ]
+            if (element.children != null) {
+                part.children = goThroughChildren(element.children, [ element.origin[0], element.origin[1], element.origin[2] ])
+            }
             parts.push(part)
         }
     });
@@ -230,6 +299,7 @@ Plugin.register('databank_blockbench', {
             display_mode: true,
             select_texture_for_particles: true,
             meshes: true,
+            armature_rig: true,
         })
         codec.format = modelFormat
         export_display = new Action({
@@ -251,6 +321,17 @@ Plugin.register('databank_blockbench', {
                 var model = {}
 
                 duplicateNames = {}
+                nameMap = {}
+                allBones = []
+
+                var rootGroups = []
+                Project.groups.forEach(element => {
+                    if (element.parent == 'root') {
+                        rootGroups.push(element)
+                    }
+                })
+                getNewNamesRecursive(rootGroups)
+                findBones(rootGroups)
 
                 var animations = {}
                 Project.animations.forEach(anim => {
@@ -289,7 +370,7 @@ Plugin.register('databank_blockbench', {
                                 })
                                 if (keyframes.length > 0) {
                                     animParts.push({
-                                        bone: animator.name,
+                                        bone: nameMap[animator.element.uuid],
                                         target: id,
                                         keyframes: keyframes
                                     })
@@ -305,12 +386,6 @@ Plugin.register('databank_blockbench', {
                 })
                 model.animations = animations
 
-                var rootGroups = []
-                Project.groups.forEach(element => {
-                    if (element.parent == 'root') {
-                        rootGroups.push(element)
-                    }
-                })
                 var parts = goThroughChildren(rootGroups, [0, 0, 0])
                 model.parts = parts
 
@@ -318,6 +393,8 @@ Plugin.register('databank_blockbench', {
                     Project.texture_width,
                     Project.texture_height
                 ];
+
+                model.version = 1
 
                 var databankModelString = JSON.stringify(model, null, 2)
                 Blockbench.export({
