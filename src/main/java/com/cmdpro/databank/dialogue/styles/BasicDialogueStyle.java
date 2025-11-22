@@ -19,11 +19,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.resources.language.FormattedBidiReorder;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -35,19 +39,22 @@ public class BasicDialogueStyle extends DialogueStyle {
     public NineSliceSprite choiceHoverBorder;
     public NineSliceSprite nameBorder;
     public SpriteData portraitBorder;
+    public Holder<SoundEvent> clickSound;
     public static final MapCodec<BasicDialogueStyle> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             NineSliceSprite.CODEC.fieldOf("textBorder").forGetter((obj) -> obj.textBorder),
             NineSliceSprite.CODEC.fieldOf("choiceBorder").forGetter((obj) -> obj.choiceBorder),
             NineSliceSprite.CODEC.fieldOf("choiceHoverBorder").forGetter((obj) -> obj.choiceHoverBorder),
             NineSliceSprite.CODEC.fieldOf("nameBorder").forGetter((obj) -> obj.nameBorder),
-            SpriteData.CODEC.fieldOf("portraitBorder").forGetter((obj) -> obj.portraitBorder)
+            SpriteData.CODEC.fieldOf("portraitBorder").forGetter((obj) -> obj.portraitBorder),
+            SoundEvent.CODEC.optionalFieldOf("clickSound", SoundEvents.UI_BUTTON_CLICK).forGetter((obj) -> obj.clickSound)
     ).apply(instance, BasicDialogueStyle::new));
-    public BasicDialogueStyle(NineSliceSprite textBorder, NineSliceSprite choiceBorder, NineSliceSprite choiceHoverBorder, NineSliceSprite nameBorder, SpriteData portraitBorder) {
+    public BasicDialogueStyle(NineSliceSprite textBorder, NineSliceSprite choiceBorder, NineSliceSprite choiceHoverBorder, NineSliceSprite nameBorder, SpriteData portraitBorder, Holder<SoundEvent> clickSound) {
         this.textBorder = textBorder;
         this.choiceHoverBorder = choiceHoverBorder;
         this.choiceBorder = choiceBorder;
         this.nameBorder = nameBorder;
         this.portraitBorder = portraitBorder;
+        this.clickSound = clickSound;
     }
     @Override
     public MapCodec<? extends DialogueStyle> getCodec() {
@@ -57,7 +64,10 @@ public class BasicDialogueStyle extends DialogueStyle {
     @Override
     public boolean click(DialogueInstance instance, double mouseX, double mouseY, int button) {
         for (int i = 0; i < instance.entry.choices.size(); i++) {
-            if (isHovering(instance, i, mouseX, mouseY)) runChoice(i);
+            if (isHovering(instance, i, mouseX, mouseY)) {
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(clickSound, 1f));
+                runChoice(i);
+            }
         }
         return false;
     }
