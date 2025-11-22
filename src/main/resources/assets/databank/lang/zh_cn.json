@@ -12,7 +12,7 @@
   "commands.databank.recheck_advancements.plural": "已成功为%1$s名玩家重新检验所有进度",
   "commands.databank.open_dialogue": "已成功打开对话",
   "commands.databank.open_dialogue.fail.tree_doesnt_exist": "对话树%1$s不存在",
-  "commands.databank.open_dialogue.fail.entry_doesnt_exist": "对话树%2$s中不存在%1$s条目",
+  "commands.databank.open_dialogue.fail.entry_doesnt_exist": "对话树%2$s中不存在条目%1$s",
 
   "entity.databank.world_gui": "世界GUI",
 
