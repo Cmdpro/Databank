@@ -1,6 +1,7 @@
 package com.cmdpro.databank;
 
 import com.cmdpro.databank.config.DatabankClientConfig;
+import com.cmdpro.databank.dialogue.styles.BasicDialogueStyle;
 import com.cmdpro.databank.specialconditions.DatabankSpecialConditionManager;
 import com.cmdpro.databank.specialconditions.BuiltinDatabankSpecialConditions;
 import com.cmdpro.databank.registry.*;
@@ -49,8 +50,10 @@ public class Databank
         HiddenTypeRegistry.HIDDEN_TYPES.register(bus);
         CriteriaTriggerRegistry.TRIGGERS.register(bus);
         ModelPartRegistry.MODEL_PART_TYPES.register(bus);
+        DialogueActionRegistry.DIALOGUE_ACTIONS.register(bus);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            DialogueStyleRegistry.DIALOGUE_STYLES.register(bus);
             DatabankClient.register();
             modLoadingContext.getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }

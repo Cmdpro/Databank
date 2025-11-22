@@ -60,9 +60,14 @@ public class ModMessages {
         registrar.playToClient(MultiblockSyncS2CPacket.TYPE, getNetworkCodec(MultiblockSyncS2CPacket::read, MultiblockSyncS2CPacket::write), Handler::handle);
         registrar.playToClient(LockAdvancementS2CPacket.TYPE, getNetworkCodec(LockAdvancementS2CPacket::read, LockAdvancementS2CPacket::write), Handler::handle);
         registrar.playToClient(UnlockAdvancementS2CPacket.TYPE, getNetworkCodec(UnlockAdvancementS2CPacket::read, UnlockAdvancementS2CPacket::write), Handler::handle);
+        registrar.playToClient(DialogueOpenS2CPacket.TYPE, getNetworkCodec(DialogueOpenS2CPacket::read, DialogueOpenS2CPacket::write), Handler::handle);
+        registrar.playToClient(ChangeDialogueEntryS2CPacket.TYPE, getNetworkCodec(ChangeDialogueEntryS2CPacket::read, ChangeDialogueEntryS2CPacket::write), Handler::handle);
+        registrar.playToClient(CloseDialogueS2CPacket.TYPE, getNetworkCodec(CloseDialogueS2CPacket::read, CloseDialogueS2CPacket::write), Handler::handle);
 
         //C2S
         registrar.playToServer(WorldGuiInteractC2SPacket.TYPE, getNetworkCodec(WorldGuiInteractC2SPacket::read, WorldGuiInteractC2SPacket::write), Handler::handle);
+        registrar.playToServer(ClickChoiceC2SPacket.TYPE, getNetworkCodec(ClickChoiceC2SPacket::read, ClickChoiceC2SPacket::write), Handler::handle);
+        registrar.playToServer(CloseDialogueC2SPacket.TYPE, getNetworkCodec(CloseDialogueC2SPacket::read, CloseDialogueC2SPacket::write), Handler::handle);
     }
 
     public static <T extends Message> StreamCodec<RegistryFriendlyByteBuf, T> getNetworkCodec(Handler.Reader<T> reader, Handler.Writer<T> writer) {

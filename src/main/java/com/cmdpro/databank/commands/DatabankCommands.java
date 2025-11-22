@@ -2,10 +2,14 @@ package com.cmdpro.databank.commands;
 
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
+import com.cmdpro.databank.dialogue.DialogueInstance;
+import com.cmdpro.databank.dialogue.DialogueTree;
+import com.cmdpro.databank.dialogue.DialogueTreeManager;
 import com.cmdpro.databank.megastructures.Megastructure;
 import com.cmdpro.databank.megastructures.MegastructureManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
@@ -52,7 +56,44 @@ public class DatabankCommands {
                                 })
                         )
                 )
+                .then(Commands.literal("open_dialogue")
+                        .then(Commands.argument("target", EntityArgument.players())
+                            .then(Commands.argument("tree", ResourceLocationArgument.id())
+                                    .suggests((stack, builder) -> {
+                                        return SharedSuggestionProvider.suggest(DialogueTreeManager.trees.keySet().stream().map(ResourceLocation::toString), builder);
+                                    })
+                                    .then(Commands.argument("entry", StringArgumentType.string())
+                                        .executes((command) -> {
+                                            return openDialogue(command);
+                                        })
+                                    )
+                            )
+                        )
+                )
         );
+    }
+    private static int openDialogue(CommandContext<CommandSourceStack> command) throws CommandSyntaxException {
+        List<ServerPlayer> players = command.getArgument("target", EntitySelector.class).findPlayers(command.getSource());
+        for (ServerPlayer i : players) {
+            ResourceLocation treeId = command.getArgument("tree", ResourceLocation.class);
+            String entry = command.getArgument("entry", String.class);
+            if (DialogueTreeManager.trees.containsKey(treeId)) {
+                DialogueTree tree = DialogueTreeManager.trees.get(treeId);
+                if (tree.entries.containsKey(entry)) {
+                    tree.open(i, entry);
+                    command.getSource().sendSuccess(() -> {
+                        return Component.translatable("commands.databank.open_dialogue");
+                    }, true);
+                } else {
+                    command.getSource().sendFailure(Component.translatable("commands.databank.open_dialogue.fail.entry_doesnt_exist", entry, treeId.toString()));
+                    return 0;
+                }
+            } else {
+                command.getSource().sendFailure(Component.translatable("commands.databank.open_dialogue.fail.tree_doesnt_exist", treeId.toString()));
+                return 0;
+            }
+        }
+        return Command.SINGLE_SUCCESS;
     }
     private static int recheckAdvancements(CommandContext<CommandSourceStack> command) throws CommandSyntaxException {
         List<ServerPlayer> players = command.getArgument("target", EntitySelector.class).findPlayers(command.getSource());

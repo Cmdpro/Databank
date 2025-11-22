@@ -8,11 +8,13 @@ import com.cmdpro.databank.multiblock.MultiblockRenderer;
 import com.cmdpro.databank.rendering.RenderTargetPool;
 import com.cmdpro.databank.rendering.ShaderHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Function3;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
@@ -22,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL33;
 
@@ -76,6 +79,28 @@ public class ClientDatabankUtils {
             Level pLevel
     ) {
         RenderingUtil.renderItemWithColor(pItemStack, pDisplayContext, pLeftHand, pPoseStack, pBufferSource, pCombinedLight, pCombinedOverlay, color, pLevel);
+    }
+    public static void blitStretched(GuiGraphics graphics, ResourceLocation texture, int blitOffset, int x, int y, int u, int v, int width, int height, int screenWidth, int screenHeight, int textureWidth, int textureHeight) {
+        RenderSystem.enableBlend();
+        int x2 = x+screenWidth;
+        int y2 = y+screenHeight;
+        float minU = (u + 0.0F) / (float)textureWidth;
+        float maxU = (u + (float)width) / (float)textureWidth;
+        float minV = (v + 0.0F) / (float)textureHeight;
+        float maxV = (v + (float)height) / (float)textureHeight;
+        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        Matrix4f matrix4f = graphics.pose().last().pose();
+        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferbuilder.addVertex(matrix4f, (float)x, (float)y, (float)blitOffset).setUv(minU, minV);
+        bufferbuilder.addVertex(matrix4f, (float)x, (float)y2, (float)blitOffset).setUv(minU, maxV);
+        bufferbuilder.addVertex(matrix4f, (float)x2, (float)y2, (float)blitOffset).setUv(maxU, maxV);
+        bufferbuilder.addVertex(matrix4f, (float)x2, (float)y, (float)blitOffset).setUv(maxU, minV);
+        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+        RenderSystem.disableBlend();
+    }
+    public static void blitStretched(GuiGraphics graphics, ResourceLocation texture, int x, int y, int u, int v, int width, int height, int screenWidth, int screenHeight) {
+        blitStretched(graphics, texture, 0, x, y, u, v, width, height, screenWidth, screenHeight, 256, 256);
     }
     public static MultiBufferSource.BufferSource createBufferSourceCopy(BufferSourceCreation create, MultiBufferSource.BufferSource original) {
         BufferSourceMixin mixin = (BufferSourceMixin)original;

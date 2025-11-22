@@ -1,6 +1,8 @@
 package com.cmdpro.databank.registry;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.dialogue.DialogueInstance;
+import com.cmdpro.databank.dialogue.DialogueTree;
 import com.cmdpro.databank.misc.VersionChangeHelper;
 import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
@@ -23,6 +25,9 @@ public class AttachmentTypeRegistry {
 
     public static final Supplier<AttachmentType<HashMap<String, String>>> MOD_VERSIONS =
             register("mod_versions", () -> AttachmentType.builder(() -> new HashMap<String, String>()).serialize(Codec.unboundedMap(Codec.STRING, Codec.STRING).xmap(HashMap::new, HashMap::new)).copyOnDeath().build());
+
+    public static final Supplier<AttachmentType<Optional<DialogueInstance>>> CURRENT_DIALOGUE =
+            register("current_dialogue", () -> AttachmentType.builder(() -> Optional.ofNullable((DialogueInstance)null)).build());
 
     private static <T extends AttachmentType<?>> Supplier<T> register(final String name, final Supplier<T> attachment) {
         return ATTACHMENT_TYPES.register(name, attachment);

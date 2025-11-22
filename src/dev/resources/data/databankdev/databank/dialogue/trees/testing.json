@@ -1,0 +1,102 @@
+{
+  "speakers": {
+    "sillyguy": {
+      "name": {
+        "text": "Silly Guy :3"
+      },
+      "portrait": "databankdev:textures/gui/test_portrait.png"
+    }
+  },
+  "entries": {
+    "testing": {
+      "text": {
+        "text": "Hello! I am a random testing guy :3"
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "Ok"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing2"
+            }
+          ]
+        }
+      ]
+    },
+    "testing2": {
+      "text": {
+        "text": "What do you want?"
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "You arent actually silly"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing3"
+            }
+          ]
+        },
+        {
+          "text": {
+            "text": "Bye"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing4"
+            }
+          ]
+        }
+      ]
+    },
+    "testing3": {
+      "text": {
+        "text": "Thats not nice..."
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "Sorry"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing"
+            }
+          ]
+        }
+      ]
+    },
+    "testing4": {
+      "text": {
+        "text": "Okay bye!"
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "Ok"
+          },
+          "actions": [
+            {
+              "type": "databank:close"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

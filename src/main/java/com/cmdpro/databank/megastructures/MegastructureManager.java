@@ -43,10 +43,10 @@ public class MegastructureManager extends SimpleJsonResourceReloadListener {
                 Megastructure megastructure = ICondition.getWithWithConditionsCodec(Megastructure.CONDITION_CODEC, JsonOps.INSTANCE, obj).orElse(null);
                 megastructures.put(i.getKey(), megastructure);
             } catch (IllegalArgumentException | JsonParseException e) {
-                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading music controller type {}", location, e);
+                Databank.LOGGER.error("[DATABANK ERROR] Parsing error loading megastructure type {}", location, e);
             }
         }
-        Databank.LOGGER.info("[DATABANK] Loaded {} Music Controllers", megastructures.size());
+        Databank.LOGGER.info("[DATABANK] Loaded {} Megastructures", megastructures.size());
     }
     public static MusicSerializer serializer = new MusicSerializer();
 }

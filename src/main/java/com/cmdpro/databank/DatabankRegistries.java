@@ -1,5 +1,7 @@
 package com.cmdpro.databank;
 
+import com.cmdpro.databank.dialogue.DialogueChoiceAction;
+import com.cmdpro.databank.dialogue.DialogueStyle;
 import com.cmdpro.databank.hidden.HiddenCondition;
 import com.cmdpro.databank.hidden.HiddenTypeInstance;
 import com.cmdpro.databank.model.DatabankPartData;
@@ -25,6 +27,8 @@ public class DatabankRegistries {
     public static ResourceKey<Registry<HiddenCondition.Serializer<?>>> HIDDEN_CONDITION_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("hidden_conditions"));
     public static ResourceKey<Registry<HiddenTypeInstance.HiddenType<?>>> HIDDEN_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("hidden_types"));
     public static ResourceKey<Registry<MapCodec<? extends DatabankPartData>>> MODEL_PART_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("model_part_type"));
+    public static ResourceKey<Registry<MapCodec<? extends DialogueStyle>>> DIALOGUE_STYLE_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("dialogue_style"));
+    public static ResourceKey<Registry<DialogueChoiceAction.Codecs>> DIALOGUE_CHOICE_ACTION_REGISTRY_KEY = ResourceKey.createRegistryKey(Databank.locate("dialogue_choice_action"));
 
     public static Registry<MultiblockPredicateSerializer<?>> MULTIBLOCK_PREDICATE_REGISTRY = new RegistryBuilder<>(MULTIBLOCK_PREDICATE_REGISTRY_KEY).sync(true).create();
     public static Registry<WorldGuiType> WORLD_GUI_TYPE_REGISTRY = new RegistryBuilder<>(WORLD_GUI_TYPE_REGISTRY_KEY).sync(true).create();
@@ -33,6 +37,8 @@ public class DatabankRegistries {
     public static Registry<HiddenCondition.Serializer<?>> HIDDEN_CONDITION_REGISTRY = new RegistryBuilder<>(HIDDEN_CONDITION_REGISTRY_KEY).sync(true).create();
     public static Registry<HiddenTypeInstance.HiddenType<?>> HIDDEN_TYPE_REGISTRY = new RegistryBuilder<>(HIDDEN_TYPE_REGISTRY_KEY).sync(true).create();
     public static Registry<MapCodec<? extends DatabankPartData>> MODEL_PART_TYPE_REGISTRY = new RegistryBuilder<>(MODEL_PART_TYPE_REGISTRY_KEY).create();
+    public static Registry<MapCodec<? extends DialogueStyle>> DIALOGUE_STYLE_REGISTRY = new RegistryBuilder<>(DIALOGUE_STYLE_REGISTRY_KEY).create();
+    public static Registry<DialogueChoiceAction.Codecs> DIALOGUE_CHOICE_ACTION_REGISTRY = new RegistryBuilder<>(DIALOGUE_CHOICE_ACTION_REGISTRY_KEY).create();
     @SubscribeEvent
     public static void registerRegistries(NewRegistryEvent event) {
         event.register(MULTIBLOCK_PREDICATE_REGISTRY);
@@ -42,5 +48,7 @@ public class DatabankRegistries {
         event.register(HIDDEN_CONDITION_REGISTRY);
         event.register(HIDDEN_TYPE_REGISTRY);
         event.register(MODEL_PART_TYPE_REGISTRY);
+        event.register(DIALOGUE_STYLE_REGISTRY);
+        event.register(DIALOGUE_CHOICE_ACTION_REGISTRY);
     }
 }

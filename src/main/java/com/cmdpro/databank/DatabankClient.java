@@ -1,5 +1,6 @@
 package com.cmdpro.databank;
 
+import com.cmdpro.databank.dialogue.styles.DialogueStyleManager;
 import com.cmdpro.databank.impact.ImpactFrameHandler;
 import com.cmdpro.databank.misc.ResizeHelper;
 import com.cmdpro.databank.model.DatabankModels;
@@ -22,6 +23,7 @@ public class DatabankClient {
     protected static void register() {
         DatabankModels.init();
         MusicSystem.init();
+        DialogueStyleManager.init();
         addResizeListeners();
     }
 }

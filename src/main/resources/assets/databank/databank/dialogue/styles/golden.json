@@ -1,0 +1,58 @@
+{
+  "type": "databank:basic",
+  "textBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 0,
+    "v": 0,
+    "width": 15,
+    "height": 15,
+    "top": 7,
+    "bottom": 7,
+    "left": 7,
+    "right": 7,
+    "defaultInset": 3
+  },
+  "choiceBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 55,
+    "v": 0,
+    "width": 15,
+    "height": 15,
+    "top": 7,
+    "bottom": 7,
+    "left": 7,
+    "right": 7,
+    "defaultInset": 3
+  },
+  "choiceHoverBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 70,
+    "v": 0,
+    "width": 15,
+    "height": 15,
+    "top": 7,
+    "bottom": 7,
+    "left": 7,
+    "right": 7,
+    "defaultInset": 3
+  },
+  "nameBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 0,
+    "v": 30,
+    "width": 15,
+    "height": 15,
+    "top": 7,
+    "bottom": 7,
+    "left": 7,
+    "right": 7,
+    "defaultInset": 3
+  },
+  "portraitBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 15,
+    "v": 0,
+    "width": 40,
+    "height": 40
+  }
+}

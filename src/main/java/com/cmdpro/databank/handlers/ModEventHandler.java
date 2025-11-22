@@ -2,6 +2,7 @@ package com.cmdpro.databank.handlers;
 
 import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
+import com.cmdpro.databank.dialogue.DialogueTreeManager;
 import com.cmdpro.databank.hidden.HiddenManager;
 import com.cmdpro.databank.interfaces.item.AdjustableAttributes;
 import com.cmdpro.databank.megastructures.MegastructureManager;
@@ -27,6 +28,7 @@ public class ModEventHandler {
         event.addListener(HiddenManager.getOrCreateInstance());
         event.addListener(MultiblockManager.getOrCreateInstance());
         event.addListener(MegastructureManager.getOrCreateInstance());
+        event.addListener(DialogueTreeManager.getOrCreateInstance());
     }
     @SubscribeEvent
     public static void onDatapackSync(OnDatapackSyncEvent event) {
