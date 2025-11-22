@@ -37,17 +37,6 @@
       "choices": [
         {
           "text": {
-            "text": "You arent actually silly"
-          },
-          "actions": [
-            {
-              "type": "databank:switch_entry",
-              "entry": "testing3"
-            }
-          ]
-        },
-        {
-          "text": {
             "text": "Bye"
           },
           "actions": [
@@ -56,12 +45,23 @@
               "entry": "testing4"
             }
           ]
+        },
+        {
+          "text": {
+            "text": "You arent actually silly"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing3"
+            }
+          ]
         }
       ]
     },
     "testing3": {
       "text": {
-        "text": "Thats not nice..."
+        "text": "Take that back."
       },
       "speaker": "sillyguy",
       "style": "databank:golden",
@@ -73,7 +73,18 @@
           "actions": [
             {
               "type": "databank:switch_entry",
-              "entry": "testing"
+              "entry": "testing6"
+            }
+          ]
+        },
+        {
+          "text": {
+            "text": "You arent."
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing5"
             }
           ]
         }
@@ -93,6 +104,49 @@
           "actions": [
             {
               "type": "databank:close"
+            }
+          ]
+        }
+      ]
+    },
+    "testing5": {
+      "text": {
+        "text": "You will regret that."
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "Ok"
+          },
+          "actions": [
+            {
+              "type": "databank:command",
+              "command": "kill @s"
+            },
+            {
+              "type": "databank:close"
+            }
+          ]
+        }
+      ]
+    },
+    "testing6": {
+      "text": {
+        "text": "Its alright"
+      },
+      "speaker": "sillyguy",
+      "style": "databank:golden",
+      "choices": [
+        {
+          "text": {
+            "text": "Ok"
+          },
+          "actions": [
+            {
+              "type": "databank:switch_entry",
+              "entry": "testing2"
             }
           ]
         }

@@ -16,8 +16,7 @@ public class CommandDialogueAction extends DialogueChoiceAction {
     public String command;
     @Override
     public void onClick(Player player, DialogueInstance instance, DialogueChoice choice) {
-        CommandSourceStack source = player.createCommandSourceStack();
-        source.withPermission(4);
+        CommandSourceStack source = player.createCommandSourceStack().withPermission(4).withSuppressedOutput();
         if (player.getServer() != null)
             player.getServer().getCommands().performPrefixedCommand(source, command);
     }
