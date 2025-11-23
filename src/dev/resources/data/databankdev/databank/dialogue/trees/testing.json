@@ -130,7 +130,9 @@
             }
           ]
         }
-      ]
+      ],
+      "speed": 0.25,
+      "closeMenuChoice": 0
     },
     "testing6": {
       "text": {

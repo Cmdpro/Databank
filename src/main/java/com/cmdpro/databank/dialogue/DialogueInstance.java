@@ -13,6 +13,7 @@ import java.util.Optional;
 public class DialogueInstance {
     public DialogueTree tree;
     public DialogueEntry entry;
+    public double ticksOnEntry;
     public DialogueInstance(DialogueTree tree, DialogueEntry entry) {
         this.tree = tree;
         this.entry = entry;
@@ -22,6 +23,7 @@ public class DialogueInstance {
         return this;
     }
     public DialogueInstance setEntry(DialogueEntry entry) {
+        ticksOnEntry = 0;
         this.entry = entry;
         return this;
     }

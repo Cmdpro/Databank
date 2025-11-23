@@ -28,6 +28,17 @@ public record CloseDialogueC2SPacket() implements Message {
 
     @Override
     public void handleServer(MinecraftServer server, ServerPlayer player, IPayloadContext context) {
+        player.getData(AttachmentTypeRegistry.CURRENT_DIALOGUE).ifPresent((data) -> {
+            if (data.entry != null) {
+                if (data.entry.closeMenuChoice.isPresent()) {
+                    int choice = data.entry.closeMenuChoice.get();
+                    if (data.entry.choices.size() > choice && choice >= 0) {
+                        DialogueChoice choiceInst = data.entry.choices.get(choice);
+                        choiceInst.onClick(player, data, choiceInst);
+                    }
+                }
+            }
+        });
         player.setData(AttachmentTypeRegistry.CURRENT_DIALOGUE, Optional.empty());
     }
 }

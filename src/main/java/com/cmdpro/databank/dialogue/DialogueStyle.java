@@ -22,4 +22,5 @@ public abstract class DialogueStyle {
     public void runChoice(int index) {
         ModMessages.sendToServer(new ClickChoiceC2SPacket(index));
     }
+    public void tick(DialogueInstance instance, double lastTicksPassed, double ticksPassed) {}
 }

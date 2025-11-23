@@ -54,5 +54,6 @@
     "v": 0,
     "width": 40,
     "height": 40
-  }
+  },
+  "charactersPerTick": 2
 }

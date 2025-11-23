@@ -1,12 +1,8 @@
 package com.cmdpro.databank.dialogue.styles;
 
-import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.dialogue.DialogueChoice;
 import com.cmdpro.databank.dialogue.DialogueInstance;
 import com.cmdpro.databank.dialogue.DialogueStyle;
-import com.cmdpro.databank.model.DatabankPartData;
-import com.cmdpro.databank.networking.ModMessages;
-import com.cmdpro.databank.networking.packet.ClickChoiceC2SPacket;
 import com.cmdpro.databank.rendering.NineSliceSprite;
 import com.cmdpro.databank.rendering.SpriteData;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -16,22 +12,19 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.resources.language.FormattedBidiReorder;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BasicDialogueStyle extends DialogueStyle {
     public NineSliceSprite textBorder;
@@ -40,21 +33,24 @@ public class BasicDialogueStyle extends DialogueStyle {
     public NineSliceSprite nameBorder;
     public SpriteData portraitBorder;
     public Holder<SoundEvent> clickSound;
+    public int charactersPerTick;
     public static final MapCodec<BasicDialogueStyle> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             NineSliceSprite.CODEC.fieldOf("textBorder").forGetter((obj) -> obj.textBorder),
             NineSliceSprite.CODEC.fieldOf("choiceBorder").forGetter((obj) -> obj.choiceBorder),
             NineSliceSprite.CODEC.fieldOf("choiceHoverBorder").forGetter((obj) -> obj.choiceHoverBorder),
             NineSliceSprite.CODEC.fieldOf("nameBorder").forGetter((obj) -> obj.nameBorder),
             SpriteData.CODEC.fieldOf("portraitBorder").forGetter((obj) -> obj.portraitBorder),
-            SoundEvent.CODEC.optionalFieldOf("clickSound", SoundEvents.UI_BUTTON_CLICK).forGetter((obj) -> obj.clickSound)
+            SoundEvent.CODEC.optionalFieldOf("clickSound", SoundEvents.UI_BUTTON_CLICK).forGetter((obj) -> obj.clickSound),
+            Codec.INT.optionalFieldOf("charactersPerTick", 1).forGetter((obj) -> obj.charactersPerTick)
     ).apply(instance, BasicDialogueStyle::new));
-    public BasicDialogueStyle(NineSliceSprite textBorder, NineSliceSprite choiceBorder, NineSliceSprite choiceHoverBorder, NineSliceSprite nameBorder, SpriteData portraitBorder, Holder<SoundEvent> clickSound) {
+    public BasicDialogueStyle(NineSliceSprite textBorder, NineSliceSprite choiceBorder, NineSliceSprite choiceHoverBorder, NineSliceSprite nameBorder, SpriteData portraitBorder, Holder<SoundEvent> clickSound, int charactersPerTick) {
         this.textBorder = textBorder;
         this.choiceHoverBorder = choiceHoverBorder;
         this.choiceBorder = choiceBorder;
         this.nameBorder = nameBorder;
         this.portraitBorder = portraitBorder;
         this.clickSound = clickSound;
+        this.charactersPerTick = charactersPerTick;
     }
     @Override
     public MapCodec<? extends DialogueStyle> getCodec() {
@@ -65,7 +61,7 @@ public class BasicDialogueStyle extends DialogueStyle {
     public boolean click(DialogueInstance instance, double mouseX, double mouseY, int button) {
         for (int i = 0; i < instance.entry.choices.size(); i++) {
             if (isHovering(instance, i, mouseX, mouseY)) {
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(clickSound, 1f));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1f));
                 runChoice(i);
             }
         }
@@ -92,6 +88,43 @@ public class BasicDialogueStyle extends DialogueStyle {
     }
 
     @Override
+    public void tick(DialogueInstance instance, double lastTicksPassed, double ticksPassed) {
+        super.tick(instance, lastTicksPassed, ticksPassed);
+        int strLength = instance.entry.text.getString().length();
+        int charactersShown = (int)Math.floor((double)charactersPerTick*ticksPassed);
+        int lastCharactersShown = (int)Math.floor((double)charactersPerTick*lastTicksPassed);
+        if (charactersShown > strLength) charactersShown = strLength;
+        if (lastCharactersShown > strLength) lastCharactersShown = strLength;
+        boolean play = false;
+        for (int i = lastCharactersShown+1; i <= charactersShown; i++) {
+            if (instance.entry.text.getString().charAt(i-1) != ' ') {
+                play = true;
+            }
+        }
+        if (charactersShown != lastCharactersShown && play) {
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(instance.entry.getSpeaker().talkSound, 1));
+        }
+    }
+
+    private Component cutComponent(FormattedText component, int end) {
+        MutableComponent newComponent = Component.empty();
+        AtomicInteger characters = new AtomicInteger(0);
+        component.visit((style, string) -> {
+            if (characters.get() <= end) {
+                if (characters.get()+string.length() > end) {
+                    int strEnd = end-characters.get();
+                    newComponent.append(Component.literal(string.substring(0, strEnd)).setStyle(style));
+                } else {
+                    newComponent.append(Component.literal(string).setStyle(style));
+                }
+            }
+            characters.addAndGet(string.length());
+            return Optional.empty();
+        }, Style.EMPTY);
+        return newComponent;
+    }
+
+    @Override
     public void render(DialogueInstance instance, GuiGraphics graphics, double mouseX, double mouseY) {
         RenderSystem.enableBlend();
         NineSliceSprite textBorder = getTextBorder();
@@ -99,6 +132,7 @@ public class BasicDialogueStyle extends DialogueStyle {
         NineSliceSprite nameBorder = getNameBorder();
         SpriteData portraitBorder = getPortraitBorder();
 
+        int charactersShown = (int)Math.floor((double)charactersPerTick*instance.ticksOnEntry);
         int dialogueWidth = getDialogueBoxWidth();
         int x = getX();
         int y = getY();
@@ -113,9 +147,16 @@ public class BasicDialogueStyle extends DialogueStyle {
         List<FormattedText> lines = Minecraft.getInstance().font.getSplitter().splitLines(text, dialogueWidth-48, Style.EMPTY);
         int padding = 0;
         int lineY = centerY-(int)(lines.size()*((font.lineHeight/2f)+(float)padding));
+        int characterStart = 0;
         for (FormattedText i : lines) {
-            FormattedCharSequence formattedCharSequence = FormattedBidiReorder.reorder(i, Language.getInstance().isDefaultRightToLeft());
+            if (characterStart > charactersShown) {
+                break;
+            }
+            int end = charactersShown-characterStart;
+            Component component = cutComponent(i, end);
+            FormattedCharSequence formattedCharSequence = FormattedBidiReorder.reorder(component, Language.getInstance().isDefaultRightToLeft());
             graphics.drawString(font, formattedCharSequence, x+48, lineY, 0xFFFFFFFF);
+            characterStart += i.getString().length();
             lineY += font.lineHeight+padding;
         }
 

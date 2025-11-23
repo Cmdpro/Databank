@@ -34,6 +34,18 @@ public class DialogueScreen extends Screen {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (instance != null) {
+            double last = instance.ticksOnEntry;
+            instance.ticksOnEntry += instance.entry != null ? instance.entry.speed : 1;
+            if (instance.entry != null && instance.entry.style != null) {
+                DialogueStyleManager.styles.get(instance.entry.style).tick(instance, last, instance.ticksOnEntry);
+            }
+        }
+    }
+
+    @Override
     public boolean isPauseScreen() {
         return false;
     }
