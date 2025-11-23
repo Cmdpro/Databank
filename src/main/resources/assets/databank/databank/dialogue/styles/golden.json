@@ -55,5 +55,30 @@
     "width": 40,
     "height": 40
   },
+  "scrollBorder": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 85,
+    "v": 0,
+    "width": 5,
+    "height": 11,
+    "top": 4,
+    "bottom": 4,
+    "left": 0,
+    "right": 0
+  },
+  "scrollPoint": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 90,
+    "v": 0,
+    "width": 3,
+    "height": 5
+  },
+  "scrollPointHovered": {
+    "texture": "databank:textures/gui/golden_dialogue_style.png",
+    "u": 93,
+    "v": 0,
+    "width": 3,
+    "height": 5
+  },
   "charactersPerTick": 2
 }

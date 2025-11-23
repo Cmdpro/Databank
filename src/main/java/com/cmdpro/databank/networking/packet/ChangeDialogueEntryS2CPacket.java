@@ -33,6 +33,7 @@ public record ChangeDialogueEntryS2CPacket(String entry) implements Message {
     private static class ClientHandler {
         public static void changeEntry(String entry) {
             if (Minecraft.getInstance().screen instanceof DialogueScreen dialogueScreen) {
+                dialogueScreen.changeEntry(dialogueScreen.instance.entry.id, entry);
                 dialogueScreen.instance.setEntry(entry);
             }
         }

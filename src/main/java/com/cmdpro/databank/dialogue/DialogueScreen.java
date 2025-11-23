@@ -13,16 +13,45 @@ public class DialogueScreen extends Screen {
     public DialogueScreen(DialogueInstance instance) {
         super(Component.empty());
         this.instance = instance;
+        if (instance != null && instance.entry != null && instance.entry.style != null) {
+            DialogueStyleManager.styles.get(instance.entry.style).changeEntry(instance, null, instance.entry.id);
+        }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (instance != null && instance.entry != null && instance.entry.style != null) {
-            if (DialogueStyleManager.styles.get(instance.entry.style).click(instance, mouseX, mouseY, button)) {
+            if (DialogueStyleManager.styles.get(instance.entry.style).mouseClick(instance, mouseX, mouseY, button)) {
                 return true;
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (instance != null && instance.entry != null && instance.entry.style != null) {
+            if (DialogueStyleManager.styles.get(instance.entry.style).mouseDrag(instance, mouseX, mouseY, button, dragX, dragY)) {
+                return true;
+            }
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (instance != null && instance.entry != null && instance.entry.style != null) {
+            if (DialogueStyleManager.styles.get(instance.entry.style).mouseRelease(instance, mouseX, mouseY, button)) {
+                return true;
+            }
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    public void changeEntry(String from, String to) {
+        if (instance != null && instance.entry != null && instance.entry.style != null) {
+            DialogueStyleManager.styles.get(instance.entry.style).changeEntry(instance, from, to);
+        }
     }
 
     @Override
