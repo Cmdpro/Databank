@@ -15,20 +15,23 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
     public BasicMegablockCore(Properties properties) {
         super(properties);
     }
-    public Rotation getRotation() {
+    public Rotation getRotation(BlockState state) {
         return Rotation.NONE;
     }
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        if (!MegablockCoreUtil.ableToPlace(this, context)) {
+        return checkPlacement(context, super.getStateForPlacement(context));
+    }
+    public BlockState checkPlacement(BlockPlaceContext context, BlockState state) {
+        if (!MegablockCoreUtil.ableToPlace(this, getRotation(state), context)) {
             return null;
         }
-        return super.getStateForPlacement(context);
+        return state;
     }
 
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        MegablockCoreUtil.placeRouters(this, getRotation(), level, pos);
+        MegablockCoreUtil.placeRouters(this, getRotation(state), level, pos);
         super.onPlace(state, level, pos, oldState, movedByPiston);
     }
 
@@ -36,7 +39,7 @@ public abstract class BasicMegablockCore extends Block implements MegablockCore 
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
         if (state.getBlock() != newState.getBlock()) {
-            MegablockCoreUtil.removeRouters(this, getRotation(), level, pos);
+            MegablockCoreUtil.removeRouters(this, getRotation(state), level, pos);
         }
     }
 }

@@ -12,14 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MegablockCoreUtil {
-    public static boolean ableToPlace(MegablockCore core, BlockPlaceContext context) {
-        MegablockShape shape = core.getMegablockShape();
+    public static boolean ableToPlace(MegablockCore core, Rotation rotation, BlockPlaceContext context) {
+        MegablockShape shape = core.getMegablockShape().getRotated(rotation);
         for (Vec3i i : shape.shape) {
             if (!context.getLevel().getBlockState(context.getClickedPos().offset(i)).canBeReplaced()) {
                 return false;
             }
         }
         return true;
+    }
+    public static boolean ableToPlace(MegablockCore core, BlockPlaceContext context) {
+        return ableToPlace(core, Rotation.NONE, context);
     }
     public static void placeRouters(MegablockCore core, Rotation rotation, Level level, BlockPos pos) {
         MegablockShape shape = core.getMegablockShape().getRotated(rotation);

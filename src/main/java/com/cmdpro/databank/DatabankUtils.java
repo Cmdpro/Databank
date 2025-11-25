@@ -13,6 +13,7 @@ import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -22,8 +23,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -183,6 +186,22 @@ public class DatabankUtils {
                 CriteriaTriggerRegistry.HAS_ADVANCEMENTS.get().trigger(player);
             }
         }
+    }
+    public static Rotation getRotationFromDirection(Direction direction) {
+        return switch (direction) {
+            case Direction.EAST -> Rotation.CLOCKWISE_90;
+            case Direction.SOUTH -> Rotation.CLOCKWISE_180;
+            case Direction.WEST -> Rotation.COUNTERCLOCKWISE_90;
+            default -> Rotation.NONE;
+        };
+    }
+    public static Direction getDirectionFromRotation(Rotation direction) {
+        return switch (direction) {
+            case Rotation.CLOCKWISE_90 -> Direction.EAST;
+            case Rotation.CLOCKWISE_180 -> Direction.SOUTH;
+            case Rotation.COUNTERCLOCKWISE_90 -> Direction.WEST;
+            default -> Direction.NORTH;
+        };
     }
     private static class ClientHandler {
         public static boolean isClientPlayer(Player player) {
