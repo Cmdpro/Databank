@@ -13,6 +13,6 @@
 ### Fixes
 - Fixed an issue where inflation on models would be inverted on y axis
 - Fixed Megastructure logging error saying it was music controllers
-- Fixed BasicMegablockCores not using the rotated shape when checking if it can place [PLEASE TEST]
+- Fixed BasicMegablockCores not using the rotated shape when checking if it can place
 - Fixed it being difficult to change the placement block state for BasicMegablockCores
 - Fixed an issue where the BasicMegablockRouter would not properly set the "core" variable
