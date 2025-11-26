@@ -109,7 +109,7 @@ public class InstancedDimension {
         }
         public void removeDimension(MinecraftServer server) {
             MinecraftServerAccessor accessor = ((MinecraftServerAccessor)server);
-            for (Player o : level.players()) {
+            /*for (Player o : level.players()) {
                 Optional<PlayerLastLocationData> data = o.getData(AttachmentTypeRegistry.LAST_LOCATION_DATA);
                 ResourceKey<Level> outside = Level.OVERWORLD;
                 Vec3 pos = Vec3.ZERO;
@@ -118,7 +118,7 @@ public class InstancedDimension {
                     pos = data.get().pos;
                 }
                 o.changeDimension(new DimensionTransition(server.getLevel(outside), pos, Vec3.ZERO, 0, 0, false, (entity) -> {}));
-            }
+            }*/
             if (accessor.getLevels().containsKey(key)) {
                 try {
                     ServerLevel overworld = server.getLevel(Level.OVERWORLD);
