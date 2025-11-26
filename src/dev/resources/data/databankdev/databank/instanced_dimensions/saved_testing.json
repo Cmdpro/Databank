@@ -1,0 +1,15 @@
+{
+  "saves": true,
+  "stem": {
+    "type": "minecraft:overworld",
+    "generator": {
+      "type": "minecraft:flat",
+      "settings": {
+        "biome": "minecraft:beach",
+        "lakes": true,
+        "features": false,
+        "layers": []
+      }
+    }
+  }
+}

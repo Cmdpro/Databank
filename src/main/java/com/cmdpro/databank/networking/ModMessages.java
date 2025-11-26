@@ -63,6 +63,8 @@ public class ModMessages {
         registrar.playToClient(DialogueOpenS2CPacket.TYPE, getNetworkCodec(DialogueOpenS2CPacket::read, DialogueOpenS2CPacket::write), Handler::handle);
         registrar.playToClient(ChangeDialogueEntryS2CPacket.TYPE, getNetworkCodec(ChangeDialogueEntryS2CPacket::read, ChangeDialogueEntryS2CPacket::write), Handler::handle);
         registrar.playToClient(CloseDialogueS2CPacket.TYPE, getNetworkCodec(CloseDialogueS2CPacket::read, CloseDialogueS2CPacket::write), Handler::handle);
+        registrar.playToClient(AddDimensionS2CPacket.TYPE, getNetworkCodec(AddDimensionS2CPacket::read, AddDimensionS2CPacket::write), Handler::handle);
+        registrar.playToClient(RemoveDimensionS2CPacket.TYPE, getNetworkCodec(RemoveDimensionS2CPacket::read, RemoveDimensionS2CPacket::write), Handler::handle);
 
         //C2S
         registrar.playToServer(WorldGuiInteractC2SPacket.TYPE, getNetworkCodec(WorldGuiInteractC2SPacket::read, WorldGuiInteractC2SPacket::write), Handler::handle);
@@ -80,6 +82,9 @@ public class ModMessages {
 
     public static <T extends Message> void sendToPlayer(T message, ServerPlayer player) {
         PacketDistributor.sendToPlayer(player, message);
+    }
+    public static <T extends Message> void sendToAllPlayers(T message) {
+        PacketDistributor.sendToAllPlayers(message);
     }
     public static <T extends Message> void sendToPlayersTrackingEntityAndSelf(T message, ServerPlayer player) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, message);
