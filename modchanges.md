@@ -7,7 +7,7 @@
 - Added a small utility for conversion between Rotation and Direction to DatabankUtils
 
 ### Changes
-- Modified the databank model format, if you are a developer, please run the python script in the databank github to update your models
+- Modified the databank model format; if you are a developer, please run the python script in the databank github to update your models
 - Changed BasicMegablockCores to take in a BlockState in the getRotation method
 
 ### Fixes
