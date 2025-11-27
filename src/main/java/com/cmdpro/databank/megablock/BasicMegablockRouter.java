@@ -8,6 +8,7 @@ public class BasicMegablockRouter extends MegablockRouter {
     public Supplier<Block> core;
     public BasicMegablockRouter(Properties properties, Supplier<Block> core) {
         super(properties);
+        this.core = core;
     }
 
     @Override

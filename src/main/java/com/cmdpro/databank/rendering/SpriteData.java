@@ -2,6 +2,7 @@ package com.cmdpro.databank.rendering;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 public record SpriteData(ResourceLocation texture, int u, int v, int width, int height) {
@@ -12,4 +13,7 @@ public record SpriteData(ResourceLocation texture, int u, int v, int width, int 
             Codec.INT.fieldOf("width").forGetter((data) -> data.width),
             Codec.INT.fieldOf("height").forGetter((data) -> data.height)
     ).apply(instance, SpriteData::new));
+    public void blit(GuiGraphics graphics, int x, int y) {
+        graphics.blit(texture, x, y, u, v, width, height);
+    }
 }

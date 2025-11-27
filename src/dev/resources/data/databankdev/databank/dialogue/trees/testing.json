@@ -10,7 +10,7 @@
   "entries": {
     "testing": {
       "text": {
-        "text": "Hello! I am a random testing guy :3"
+        "text": "Hello! I am a random testing guy :3 a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a\nVery silly :3:3:3\nfull of silliness\nhahahahahaha:3\nsillysillysilly"
       },
       "speaker": "sillyguy",
       "style": "databank:golden",
@@ -130,7 +130,9 @@
             }
           ]
         }
-      ]
+      ],
+      "speed": 0.25,
+      "closeMenuChoice": 0
     },
     "testing6": {
       "text": {

@@ -6,7 +6,11 @@
   "mixins": [
     "BlockBehaviourMixin",
     "BlockStateBaseMixin",
-    "PlayerAdvancementsAccessor"
+    "PlayerAdvancementsAccessor",
+    "ChunkMapAccessor",
+    "DelegateBorderChangeListenerAccessor",
+    "MinecraftServerAccessor",
+    "WorldBorderAccessor"
   ],
   "client": [
     "client.BlockColorsMixin",

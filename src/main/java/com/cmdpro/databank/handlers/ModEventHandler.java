@@ -4,12 +4,14 @@ import com.cmdpro.databank.Databank;
 import com.cmdpro.databank.DatabankUtils;
 import com.cmdpro.databank.dialogue.DialogueTreeManager;
 import com.cmdpro.databank.hidden.HiddenManager;
+import com.cmdpro.databank.instanceddimension.InstancedDimensionManager;
 import com.cmdpro.databank.interfaces.item.AdjustableAttributes;
 import com.cmdpro.databank.megastructures.MegastructureManager;
 import com.cmdpro.databank.multiblock.MultiblockManager;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.HiddenSyncS2CPacket;
 import com.cmdpro.databank.networking.packet.MultiblockSyncS2CPacket;
+import com.cmdpro.databank.registry.AttachmentTypeRegistry;
 import com.cmdpro.databank.registry.CriteriaTriggerRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,6 +21,7 @@ import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber(modid = Databank.MOD_ID)
@@ -29,6 +32,7 @@ public class ModEventHandler {
         event.addListener(MultiblockManager.getOrCreateInstance());
         event.addListener(MegastructureManager.getOrCreateInstance());
         event.addListener(DialogueTreeManager.getOrCreateInstance());
+        event.addListener(InstancedDimensionManager.getOrCreateInstance());
     }
     @SubscribeEvent
     public static void onDatapackSync(OnDatapackSyncEvent event) {
@@ -51,6 +55,12 @@ public class ModEventHandler {
     @SubscribeEvent
     public static void onTick(ServerTickEvent.Post event) {
         DatabankUtils.sendScheduledUpdates(event.getServer());
+    }
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        event.getEntity().getData(AttachmentTypeRegistry.CURRENT_DIALOGUE).ifPresent((data) -> {
+            data.ticksOnEntry += data.entry != null ? data.entry.speed : 1;
+        });
     }
 
     @SubscribeEvent

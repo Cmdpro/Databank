@@ -63,6 +63,6 @@ public record NineSliceSprite(ResourceLocation texture, int u, int v, int width,
             Codec.INT.fieldOf("bottom").forGetter((data) -> data.bottom),
             Codec.INT.fieldOf("left").forGetter((data) -> data.left),
             Codec.INT.fieldOf("right").forGetter((data) -> data.right),
-            Codec.INT.fieldOf("defaultInset").forGetter((data) -> data.defaultInset)
+            Codec.INT.optionalFieldOf("defaultInset", 0).forGetter((data) -> data.defaultInset)
     ).apply(instance, NineSliceSprite::new));
 }

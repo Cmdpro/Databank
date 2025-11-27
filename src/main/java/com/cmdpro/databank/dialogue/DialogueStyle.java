@@ -18,8 +18,12 @@ public abstract class DialogueStyle {
     public static void render(ResourceLocation style, DialogueInstance instance, GuiGraphics graphics, double mouseX, double mouseY) {
         DialogueStyleManager.styles.get(style).render(instance, graphics, mouseX, mouseY);
     }
-    public abstract boolean click(DialogueInstance instance, double mouseX, double mouseY, int button);
+    public abstract boolean mouseClick(DialogueInstance instance, double mouseX, double mouseY, int button);
+    public boolean mouseDrag(DialogueInstance instance, double mouseX, double mouseY, int button, double dragX, double dragY) { return false; }
+    public boolean mouseRelease(DialogueInstance instance, double mouseX, double mouseY, int button) { return false; }
+    public void changeEntry(DialogueInstance instance, String from, String to) {}
     public void runChoice(int index) {
         ModMessages.sendToServer(new ClickChoiceC2SPacket(index));
     }
+    public void tick(DialogueInstance instance, double lastTicksPassed, double ticksPassed) {}
 }
