@@ -10,7 +10,9 @@
     "ChunkMapAccessor",
     "DelegateBorderChangeListenerAccessor",
     "MinecraftServerAccessor",
-    "WorldBorderAccessor"
+    "WorldBorderAccessor",
+    "PlayerListAccessor",
+    "PlayerDataStorageAccessor"
   ],
   "client": [
     "client.BlockColorsMixin",

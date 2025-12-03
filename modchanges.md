@@ -5,6 +5,8 @@
 - Added utilities for stretched blits and nine slices
 - Added a dialogue system
 - Added a small utility for conversion between Rotation and Direction to DatabankUtils
+- Added utilities for modifying the data of offline players
+- Added utilities for instanced dimensions
 
 ### Changes
 - Modified the databank model format; if you are a developer, please run the python script in the databank github to update your models

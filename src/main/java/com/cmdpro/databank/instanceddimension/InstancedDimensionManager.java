@@ -9,6 +9,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -21,6 +22,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.conditions.ICondition;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
@@ -82,20 +85,26 @@ public class InstancedDimensionManager extends SimpleJsonResourceReloadListener 
         }
     }
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (event.getEntity().level().isClientSide) {
+    public static void onPlayerTravel(EntityTravelToDimensionEvent event) {
+        if (!(event.getEntity() instanceof Player) || event.getEntity().level().isClientSide) {
             return;
         }
+        ResourceKey<Level> to = event.getDimension();
+        ResourceKey<Level> from = event.getEntity().level().dimension();
         ServerLevel overworld = event.getEntity().getServer().overworld();
         List<InstancedDimension.Instance> instances = getInstances(overworld);
         boolean inDimension = false;
+        boolean wasInDimension = false;
         for (InstancedDimension.Instance i : instances) {
-            if (i.level != null && event.getEntity().level() == i.level) {
+            if (i.level != null && to.equals(i.key)) {
                 inDimension = true;
             }
+            if (i.level != null && from.equals(i.key)) {
+                wasInDimension = true;
+            }
         }
-        if (!inDimension) {
-            event.getEntity().setData(AttachmentTypeRegistry.LAST_LOCATION_DATA, Optional.of(new PlayerLastLocationData(event.getEntity().level().dimension(), event.getEntity().position())));
+        if (inDimension && !wasInDimension) {
+            event.getEntity().setData(AttachmentTypeRegistry.LAST_LOCATION_DATA, Optional.of(new PlayerLastLocationData(from, event.getEntity().position())));
         }
     }
     @SubscribeEvent
@@ -114,8 +123,31 @@ public class InstancedDimensionManager extends SimpleJsonResourceReloadListener 
             i.removeDimension(event.getServer());
         }
     }
+    @SubscribeEvent
+    public static void playerLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        Player player = event.getEntity();
+        MinecraftServer server = player.getServer();
+        if (server == null) return;
+        if (server.isSingleplayerOwner(player.getGameProfile())) {
+            Level overworld = server.overworld();
+            List<InstancedDimension.Instance> instances = overworld.getData(AttachmentTypeRegistry.TEMP_INSTANCED_DIMENSIONS);
+            if (instances.stream().anyMatch((i) -> i.key.equals(player.level().dimension()))) {
+                teleportPlayerOut(server, player);
+            }
+        }
+    }
+    public static void teleportPlayerOut(MinecraftServer server, Player player) {
+        Optional<PlayerLastLocationData> data = player.getData(AttachmentTypeRegistry.LAST_LOCATION_DATA);
+        ResourceKey<Level> outside = Level.OVERWORLD;
+        Vec3 pos = Vec3.ZERO;
+        if (data.isPresent()) {
+            outside = data.get().level;
+            pos = data.get().pos;
+        }
+        player.teleportTo(server.getLevel(outside), pos.x, pos.y, pos.z, Set.of(), player.yRotO, player.xRotO);
+    }
     public static List<InstancedDimension.Instance> getInstances(Level level) {
-        List<InstancedDimension.Instance> instances = level.getData(AttachmentTypeRegistry.TEMP_INSTANCED_DIMENSIONS);
+        List<InstancedDimension.Instance> instances = new ArrayList<>(level.getData(AttachmentTypeRegistry.TEMP_INSTANCED_DIMENSIONS));
         instances.addAll(level.getData(AttachmentTypeRegistry.INSTANCED_DIMENSIONS));
         return instances;
     }

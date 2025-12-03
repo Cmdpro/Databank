@@ -8,10 +8,13 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerLastLocationData {
     public static final Codec<PlayerLastLocationData> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             ResourceKey.codec(Registries.DIMENSION).fieldOf("level").forGetter((obj) -> obj.level),
-            ExtraCodecs.VECTOR3F.xmap((val) -> new Vec3(val.x, val.y, val.z), Vec3::toVector3f).fieldOf("pos").forGetter((obj) -> obj.pos)
+            Codec.DOUBLE.listOf(3, 3).xmap((val) -> new Vec3(val.get(0), val.get(1), val.get(2)), (val) -> List.of(val.x, val.y, val.z)).fieldOf("pos").forGetter((obj) -> obj.pos)
     ).apply(instance, PlayerLastLocationData::new));
     public ResourceKey<Level> level;
     public Vec3 pos;
