@@ -343,6 +343,7 @@ Plugin.register('databank_blockbench', {
                             channelTypes.forEach(id => {
                                 var currentKeyframes = animator[id].slice().sort((a, b) => a.time - b.time)
                                 var keyframes = []
+                                var i = 0;
                                 currentKeyframes.forEach(keyframe => {
                                     function addKeyframe(timestamp, x, y, z, interpolation) {
                                         var interpolationStr = keyframe.interpolation == 'catmullrom' ? "smooth" : "linear"
@@ -366,7 +367,7 @@ Plugin.register('databank_blockbench', {
                                         let next = currentKeyframes[i+1];
                                         addKeyframe(next.time-0.001, keyframe.calc('x')*xMult, keyframe.calc('y')*yMult, keyframe.calc('z')*zMult, 'linear');
                                     }
-
+                                    i += 1;
                                 })
                                 if (keyframes.length > 0) {
                                     animParts.push({
