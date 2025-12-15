@@ -1,16 +1,23 @@
 package com.cmdpro.databank.instanceddimension;
 
 import com.cmdpro.databank.Databank;
+import com.cmdpro.databank.misc.PlayerDataUtil;
 import com.cmdpro.databank.mixin.ChunkMapAccessor;
 import com.cmdpro.databank.mixin.MinecraftServerAccessor;
+import com.cmdpro.databank.mixin.PlayerListAccessor;
 import com.cmdpro.databank.mixin.WorldBorderAccessor;
 import com.cmdpro.databank.networking.ModMessages;
 import com.cmdpro.databank.networking.packet.AddDimensionS2CPacket;
 import com.cmdpro.databank.networking.packet.RemoveDimensionS2CPacket;
 import com.cmdpro.databank.registry.AttachmentTypeRegistry;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -21,23 +28,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.border.BorderChangeListener;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.level.storage.DerivedLevelData;
+import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import org.apache.commons.io.FileUtils;
 import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class InstancedDimension {
@@ -104,21 +111,39 @@ public class InstancedDimension {
             NeoForge.EVENT_BUS.post(new LevelEvent.Load(accessor.getLevels().get(key)));
             server.markWorldsDirty();
             ModMessages.sendToAllPlayers(new AddDimensionS2CPacket(key));
-            server.overworld().getData(getInstancedDimension().getAttachmentType()).add(this);
+            var list = server.overworld().getData(getInstancedDimension().getAttachmentType());
+            if (list.stream().noneMatch((k) -> k.key.equals(key))) list.add(this);
+            server.overworld().setData(getInstancedDimension().getAttachmentType(), list);
             return serverlevel1;
         }
         public void removeDimension(MinecraftServer server) {
             MinecraftServerAccessor accessor = ((MinecraftServerAccessor)server);
-            /*for (Player o : level.players()) {
-                Optional<PlayerLastLocationData> data = o.getData(AttachmentTypeRegistry.LAST_LOCATION_DATA);
-                ResourceKey<Level> outside = Level.OVERWORLD;
-                Vec3 pos = Vec3.ZERO;
-                if (data.isPresent()) {
-                    outside = data.get().level;
-                    pos = data.get().pos;
-                }
-                o.changeDimension(new DimensionTransition(server.getLevel(outside), pos, Vec3.ZERO, 0, 0, false, (entity) -> {}));
-            }*/
+            for (Player o : level.players()) {
+                InstancedDimensionManager.teleportPlayerOut(server, o);
+            }
+            for (String o : PlayerDataUtil.getAllOfflineUUIDS(server)) {
+                PlayerDataUtil.modifyOfflinePlayerData(server, o, (data) -> {
+                    if (data.contains("Dimension")) {
+                        ResourceKey<Level> resourcekey = DimensionType.parseLegacy(new Dynamic<>(NbtOps.INSTANCE, data.get("Dimension"))).getOrThrow();
+                        if (resourcekey.equals(key)) {
+                            String attachmentsKey = ResourceLocation.fromNamespaceAndPath("neoforge", "attachments").toString();
+                            if (data.contains(attachmentsKey)) {
+                                CompoundTag attachments = data.getCompound(attachmentsKey);
+                                ResourceLocation lastLocationDataKey = ResourceLocation.fromNamespaceAndPath(Databank.MOD_ID, "last_location_data");
+                                if (attachments.contains(lastLocationDataKey.toString())) {
+                                    CompoundTag lastLocationData = attachments.getCompound(lastLocationDataKey.toString());
+                                    String level = lastLocationData.getString("level");
+                                    ListTag pos = lastLocationData.getList("pos", CompoundTag.TAG_DOUBLE);
+                                    data.putString("Dimension", level);
+                                    data.put("Pos", pos);
+                                    return Optional.of(data);
+                                }
+                            }
+                        }
+                    }
+                    return Optional.empty();
+                });
+            }
             if (accessor.getLevels().containsKey(key)) {
                 try {
                     ServerLevel overworld = server.getLevel(Level.OVERWORLD);
@@ -140,7 +165,9 @@ public class InstancedDimension {
                     Path path = ((MinecraftServerAccessor) server).getStorageSource().getDimensionPath(key).toRealPath();
                     FileUtils.deleteDirectory(new File(path.toString()));
                     ModMessages.sendToAllPlayers(new RemoveDimensionS2CPacket(key));
-                    server.overworld().getData(getInstancedDimension().getAttachmentType()).remove(this);
+                    var list = server.overworld().getData(getInstancedDimension().getAttachmentType());
+                    list.removeIf((i) -> i.key.equals(key));
+                    server.overworld().setData(getInstancedDimension().getAttachmentType(), list);
                 } catch (Exception e) {}
             }
         }

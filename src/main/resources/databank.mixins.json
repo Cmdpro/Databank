@@ -10,7 +10,9 @@
     "ChunkMapAccessor",
     "DelegateBorderChangeListenerAccessor",
     "MinecraftServerAccessor",
-    "WorldBorderAccessor"
+    "WorldBorderAccessor",
+    "PlayerListAccessor",
+    "PlayerDataStorageAccessor"
   ],
   "client": [
     "client.BlockColorsMixin",
@@ -31,6 +33,7 @@
     "client.ClientAdvancementsMixin",
     "client.BlockColorsAccessor",
     "client.ItemColorsAccessor",
-    "client.ItemRendererAccessor"
+    "client.ItemRendererAccessor",
+    "client.DarkModeEverywhereClientProxyMixin"
   ]
 }
