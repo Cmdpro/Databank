@@ -3,3 +3,5 @@
 3. Databank is allowed to basically have almost anything as long as its useful to development of mods which wish to use it
 
 if more is thought of, ill add it here
+
+the purpose of these is mainly so that even without me, databank doesn't go outside what I wish for it to, anything that doesnt violate any of these should be assumed to be fine though
