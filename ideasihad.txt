@@ -13,3 +13,5 @@ common layer blending modes for item layers - basically more blending modes than
 inverse-kinematics on models - i do NOT expect this to EVER be done but hey, could be cool if succeeds
 
 uhhh I think there was some creative tab stuff, please replace this entry once figured out what it was if I dont
+
+ability to easily make elements on databank models one-sided within blockbench - im unsure if this is possible now but it could be quite useful to be able to click a button on elements for them to be rendered one-sided
