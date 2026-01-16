@@ -9,3 +9,5 @@ fabulous likely to break notification - add a thing mods can call to notify data
 holiday system-based lang changes (might be able to be taken further, idk) - should be easy to just Know what I mean
 
 common layer blending modes for item layers - basically more blending modes than just multiply, such as additive, subtractive, hue, stuff like that
+
+inverse-kinematics on models - i do NOT expect this to EVER be done but hey, could be cool if succeeds
