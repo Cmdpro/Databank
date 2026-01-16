@@ -5,3 +5,5 @@ attempt video playback - just playing videos lol, idk how to explain better
 experiment with reverse light sources - unlikely to become an actual feature but basically just messing around to see how stable light sources that remove light rather than add it could be
 
 fabulous likely to break notification - add a thing mods can call to notify databank "hey, fabulous might break stuff with what we do" and databank shows a warning when enabling fabulous (or on game startup if fabulous already is enabled)
+
+event-based lang changes (might be able to be taken further, idk) - should be easy to just Know what I mean
