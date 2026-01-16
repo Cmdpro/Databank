@@ -1,4 +1,5 @@
 1. Databank should never intentionally mess with the vanilla game unless another mod tells it to in some way
-2. Databank is allowed to basically have almost anything as long as its useful to development of mods which wish to use it
+2. Vanilla bug fixes are included in the previous entry
+3. Databank is allowed to basically have almost anything as long as its useful to development of mods which wish to use it
 
 if more is thought of, ill add it here
