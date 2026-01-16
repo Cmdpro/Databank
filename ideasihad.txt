@@ -7,3 +7,5 @@ experiment with reverse light sources - unlikely to become an actual feature but
 fabulous likely to break notification - add a thing mods can call to notify databank "hey, fabulous might break stuff with what we do" and databank shows a warning when enabling fabulous (or on game startup if fabulous already is enabled)
 
 holiday system-based lang changes (might be able to be taken further, idk) - should be easy to just Know what I mean
+
+common layer blending modes for item layers - basically more blending modes than just multiply, such as additive, subtractive, hue, stuff like that
