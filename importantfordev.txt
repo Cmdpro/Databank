@@ -5,3 +5,5 @@
 if more is thought of, ill add it here
 
 the purpose of these is mainly so that even if i provide no input, databank doesn't go outside what I wish for it to, anything that doesnt violate any of these should be assumed to be fine though
+
+please fork this (but still use existing curseforge page) if i end up unable to add new contributors for an extended period of time for any reason and it is needed
