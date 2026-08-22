@@ -2,7 +2,6 @@ package com.cmdpro.databank.shaders;
 
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -24,25 +23,31 @@ public abstract class PostShaderInstance {
     public List<PostPass> passes;
     private boolean active;
     public PoseStack viewModelStack;
+    private static RenderTarget depthBackupTarget;
+
     public boolean isActive() {
         return active;
     }
+
     public void setActive(boolean active) {
         if (!active) {
             time = 0;
         }
         this.active = active;
     }
+
     public void resize(int pWidth, int pHeight) {
         if (postChain != null) {
             postChain.resize(pWidth, pHeight);
         }
     }
+
     public void queueRemoval() {
         if (!PostShaderManager.removalQueue.contains(this)) {
             PostShaderManager.removalQueue.add(this);
         }
     }
+
     public void process() {
         if (postChain == null) {
             try {
@@ -69,6 +74,7 @@ public abstract class PostShaderInstance {
             }
         }
     }
+
     public void processPostChain() {
         getDepthBackupTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
         RenderSystem.disableBlend();
@@ -79,22 +85,28 @@ public abstract class PostShaderInstance {
         Minecraft.getInstance().getMainRenderTarget().copyDepthFrom(getDepthBackupTarget());
         Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
     }
-    private static RenderTarget depthBackupTarget;
+
     protected static RenderTarget getDepthBackupTarget() {
         if (depthBackupTarget == null) {
             depthBackupTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
         }
         return depthBackupTarget;
     }
+
     public void tick() {
         time += 1/20f;
     }
+
     public void setUniforms(PostPass instance) {}
+
     public void beforeProcess() {}
+
     public void afterProcess() {}
+
     public float getTime() {
         return time + (Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true) / 20f);
     }
+
     public RenderLevelStageEvent.Stage getRenderStage() {
         return RenderLevelStageEvent.Stage.AFTER_LEVEL;
     }
