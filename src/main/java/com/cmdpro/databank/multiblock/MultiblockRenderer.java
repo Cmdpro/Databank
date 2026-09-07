@@ -63,10 +63,16 @@ public class MultiblockRenderer {
             event.getPoseStack().popPose();
         }
     }
+
     @SubscribeEvent
-    public static void onClientTickPost(ClientTickEvent.Post event)
-    {
+    public static void onClientTickPost(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
+
+        if (mc.level == null) {
+            MultiblockRenderer.multiblock = null;
+            MultiblockRenderer.multiblockPos = null;
+        }
+
         if (MultiblockRenderer.multiblock != null) {
             if (MultiblockRenderer.multiblockPos != null) {
                 if (MultiblockRenderer.multiblock.checkMultiblock(mc.level, MultiblockRenderer.multiblockPos, MultiblockRenderer.multiblockRotation)) {
