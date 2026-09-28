@@ -65,6 +65,10 @@ public class DatabankDevCommands {
             InstancedDimension.Instance instance = InstancedDimensionManager.instanceddimensions.get(DatabankDev.locate("unsaved_delete_testing")).create();
             dimension = instance.getOrCreateDimension(command.getSource().getServer());
         }
+        if (value.equals("4")) {
+            InstancedDimension.Instance instance = InstancedDimensionManager.instanceddimensions.get(DatabankDev.locate("world_test")).create();
+            dimension = instance.getOrCreateDimension(command.getSource().getServer());
+        }
         ServerPlayer player = command.getSource().getPlayer();
         Vec3 pos = player.position();
         Vec2 look = player.getRotationVector();

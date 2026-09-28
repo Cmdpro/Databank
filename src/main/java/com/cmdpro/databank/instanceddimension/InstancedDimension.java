@@ -42,25 +42,34 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import org.apache.commons.io.FileUtils;
 import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
+import javax.swing.text.html.Option;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class InstancedDimension {
+    public static final ResourceLocation NO_WORLD = Databank.locate("no_world");
     public static final Codec<InstancedDimension> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
             LevelStem.CODEC.fieldOf("stem").forGetter((obj) -> obj.stem),
             Codec.BOOL.fieldOf("saves").forGetter((obj) -> obj.saves),
-            Codec.BOOL.optionalFieldOf("deletesWhenNoPlayers", false).forGetter((obj) -> obj.deletesWhenNoPlayers)
+            Codec.BOOL.optionalFieldOf("deletesWhenNoPlayers", false).forGetter((obj) -> obj.deletesWhenNoPlayers),
+            ResourceLocation.CODEC.optionalFieldOf("world").forGetter((obj) -> obj.world)
     ).apply(instance, InstancedDimension::new));
     public ResourceLocation id;
+    public Optional<ResourceLocation> world;
     public LevelStem stem;
     public boolean saves;
     public boolean deletesWhenNoPlayers;
-    public InstancedDimension(LevelStem stem, boolean saves, boolean deletesWhenNoPlayers) {
+    public InstancedDimension(LevelStem stem, boolean saves, boolean deletesWhenNoPlayers, Optional<ResourceLocation> world) {
         this.stem = stem;
         this.saves = saves;
         this.deletesWhenNoPlayers = deletesWhenNoPlayers;
+        this.world = world;
     }
     public Instance create(String identifier) {
         ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, Databank.locate(id.getNamespace() + "-" + id.getPath() + "-" + identifier));
@@ -94,6 +103,32 @@ public class InstancedDimension {
             return level;
         }
         protected ServerLevel createDimension(MinecraftServer server) {
+            var dimPath = ((MinecraftServerAccessor) server).getStorageSource().getDimensionPath(key);
+            boolean dimExisted = Files.exists(dimPath);
+            if (getInstancedDimension().world.isPresent()) {
+                try {
+                    if (!dimExisted) {
+                        var world = getInstancedDimension().world.get();
+                        var path = "databank/instanced_dimension_worlds/" + world.getPath();
+                        var resources = server.getResourceManager().listResources(path, (loc) -> loc.getNamespace().equals(world.getNamespace()));
+
+                        for (var resource : resources.entrySet()) {
+                            Path path2 = dimPath.resolve(Path.of(resource.getKey().getPath().substring(path.length()+1)));
+                            Files.createDirectories(path2.getParent());
+                            var file = resource.getValue().open();
+                            if (Files.exists(path2)) {
+                                Files.delete(path2);
+                            }
+                            Databank.LOGGER.info(path2.toString());
+                            var bytes = file.readAllBytes();
+                            Files.write(path2, bytes);
+                            file.close();
+                        }
+                    }
+                } catch (Exception e) {
+                    Databank.LOGGER.error(e.toString());
+                }
+            }
             LevelStem stem = getInstancedDimension().stem;
             MinecraftServerAccessor accessor = ((MinecraftServerAccessor)server);
             ServerLevel overworld = server.getLevel(Level.OVERWORLD);
@@ -118,8 +153,10 @@ public class InstancedDimension {
         }
         public void removeDimension(MinecraftServer server) {
             MinecraftServerAccessor accessor = ((MinecraftServerAccessor)server);
-            for (Player o : level.players()) {
-                InstancedDimensionManager.teleportPlayerOut(server, o);
+            if (level != null) {
+                for (Player o : level.players()) {
+                    InstancedDimensionManager.teleportPlayerOut(server, o);
+                }
             }
             for (String o : PlayerDataUtil.getAllOfflineUUIDS(server)) {
                 PlayerDataUtil.modifyOfflinePlayerData(server, o, (data) -> {

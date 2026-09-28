@@ -1,0 +1,16 @@
+{
+  "saves": false,
+  "stem": {
+    "type": "minecraft:overworld",
+    "generator": {
+      "type": "minecraft:flat",
+      "settings": {
+        "biome": "minecraft:the_void",
+        "lakes": false,
+        "features": false,
+        "layers": []
+      }
+    }
+  },
+  "world": "databankdev:silly"
+}
