@@ -90,11 +90,11 @@ public abstract class PostShaderInstance {
         postChain.process(Minecraft.getInstance().getTimer().getGameTimeDeltaTicks());
         mainRenderTarget.copyDepthFrom(getDepthBackupTarget());
 
-        GlStateManager._bindTexture(mainRenderTarget.getDepthTextureId());
-        var mainFormat = GlStateManager._getTexLevelParameter(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT);
-        GlStateManager._bindTexture(depthBackupTarget.getDepthTextureId());
-        var backupFormat = GlStateManager._getTexLevelParameter(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT);
-        Databank.LOGGER.info("Main: {}, Backup: {}", mainFormat, backupFormat);
+//        GlStateManager._bindTexture(mainRenderTarget.getDepthTextureId());
+//        var mainFormat = GlStateManager._getTexLevelParameter(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT);
+//        GlStateManager._bindTexture(depthBackupTarget.getDepthTextureId());
+//        var backupFormat = GlStateManager._getTexLevelParameter(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT);
+//        Databank.LOGGER.info("Main: {}, Backup: {}", mainFormat, backupFormat);
 
         mainRenderTarget.bindWrite(true);
     }
